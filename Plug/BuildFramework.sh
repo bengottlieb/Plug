@@ -11,7 +11,29 @@ FRAMEWORK_NAME="Plug"
 IOS_SUFFIX=""
 MAC_SUFFIX=""
 UNIVERSAL_OUTPUTFOLDER="Build/${CONFIGURATION}-universal"
-echo ${BASE_BUILD_DIR}
+
+GIT_BRANCH=`git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1/"`
+GIT_REV=`git rev-parse --short HEAD`
+
+BUILD_DATE=`date`
+
+IOS_PLIST_PATH="${PROJECT_DIR}/Plug/iOS/info.plist"
+/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c
+/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :branch"
+/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :rev"
+/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :built"
+/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :branch string ${GIT_BRANCH}"
+/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :rev string ${GIT_REV}"
+/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :built string ${BUILD_DATE}"
+
+MAC_PLIST_PATH="${PROJECT_DIR}/Plug/Mac/info.plist"
+/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c
+/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch"
+/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :rev"
+/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :built"
+/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Add :branch string ${GIT_BRANCH}"
+/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Add :rev string ${GIT_REV}"
+/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Add :built string ${BUILD_DATE}"
 
 # make sure the output directory exists
 mkdir -p "${UNIVERSAL_OUTPUTFOLDER}"
@@ -46,6 +68,14 @@ mkdir -p "${PROJECT_DIR}/Mac Framework/"
 rm -rf "${PROJECT_DIR}/Mac Framework/${FRAMEWORK_NAME}.framework"
 cp -R "${BASE_BUILD_DIR}/${CONFIGURATION}/${FRAMEWORK_NAME}.framework" "${PROJECT_DIR}/Mac Framework"
 
+
+/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch"
+/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :rev"
+/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :built"
+
+/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :branch"
+/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :rev"
+/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :built"
 
 # Step 7. Convenience step to open the project's directory in Finder
 #open "${PROJECT_DIR}"
