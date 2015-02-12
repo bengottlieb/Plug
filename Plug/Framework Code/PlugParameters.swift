@@ -13,6 +13,7 @@ extension Plug {
 		case None
 		case URL([String: String?])
 		case Form([String: String?])
+		case JSON(AnyObject)
 		
 		var stringValue: String {
 			switch (self) {
@@ -21,6 +22,13 @@ extension Plug {
 				
 			case .Form(let params):
 				return reduce(params.keys, "") { if let v = params[$1] { return $0 + "\($1)=\(v!)&" }; return $0 }
+			
+			case .JSON(let object):
+				var error: NSError?
+				var data = NSJSONSerialization.dataWithJSONObject(object, options: nil, error: &error)
+				if error != nil { println("Error \(error) while JSON encoding \(object)") }
+				if let data = data { return NSString(data: data, encoding: NSUTF8StringEncoding) ?? "" }
+				return ""
 				
 			case .None:
 				return ""
@@ -36,14 +44,18 @@ extension Plug {
 		
 		var bodyData: NSData? {
 			switch (self) {
-			case .Form: return self.stringValue.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)
+			case .Form: fallthrough
+			case .JSON:
+				return self.stringValue.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)
 			default: return nil
 			}
 		}
 		
 		func normalizeMethod(method: Plug.Method) -> Plug.Method {
 			switch (self) {
-			case .Form: return .POST
+			case .Form: fallthrough
+			case .JSON:
+				return .POST
 			default: return method
 			}
 		}
@@ -52,6 +64,7 @@ extension Plug {
 			switch (self) {
 			case .URL(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v!), " }; return $0 } + "]"
 			case .Form(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v!), " }; return $0 } + "]"
+			case .JSON: return "[" + self.stringValue + "]"
 				
 			default: return ""
 			}

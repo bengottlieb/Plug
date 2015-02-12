@@ -76,6 +76,7 @@ extension Plug {
 			request.HTTPMethod = self.method.rawValue
 			request.HTTPBody = self.parameters.bodyData
 			
+			println("Generated request: \n\(request)")
 			return request
 		}
 	}
@@ -105,7 +106,7 @@ extension Plug.Connection {
 
 extension Plug.Connection: Printable {
 	public override var description: String {
-		var request = self.request ?? self.defaultRequest
+		var request = self.task.originalRequest
 		var string = "\(self.method) \(request.URL.absoluteString!) \(self.parameters): \(self.state)"
 		
 		return string
@@ -132,5 +133,21 @@ extension Plug.Connection {		//actions
 	public func cancel() {
 		self.state = .Canceled
 		self.task.cancel()
+	}
+}
+
+extension NSURLRequest: Printable {
+	public override var description: String {
+		var str = (self.HTTPMethod ?? "[no method]") + " " + (self.URL.absoluteString ?? "[no URL]")
+		
+		for (label, value) in (self.allHTTPHeaderFields as [String: String]) {
+			str += "\n\t" + label + ": " + value
+		}
+		
+		if let data = self.HTTPBody {
+			str += "\n" + (NSString(data: data, encoding: NSUTF8StringEncoding) ?? "[unconvertible body: \(data.length) bytes]")
+		}
+		
+		return str
 	}
 }

@@ -24,8 +24,10 @@ class Plug_Tests: XCTestCase {
     
     func testExample() {
 		let expectation = expectationWithDescription("GET")
+		var url = "http://httpbin.org/get"
+		var params: Plug.Parameters = .None
 		
-		var connection = Plug.request(URL: "http://httpbin.org/get").completion { data in
+		var connection = Plug.request(URL: url, parameters: params).completion { data in
 			var str = NSString(data: data, encoding: NSUTF8StringEncoding)
 				println("Data: \(str)")
 				expectation.fulfill()
