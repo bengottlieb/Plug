@@ -32,7 +32,10 @@ extension Plug {
 		
 		var content: String {
 			switch (self) {
-			case .Accept(let types): return types.reduce("") { "\($0)\($1);" }
+			case .Accept(let types):
+				var content = types.reduce("") { "\($0)\($1);" }
+				return content.stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: ";"))
+				
 			case .AcceptEncoding(let encoding): return encoding
 			case .ContentType(let type): return type
 			case .BasicAuthorization(let user, let pass):

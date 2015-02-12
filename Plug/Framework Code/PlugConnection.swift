@@ -46,6 +46,8 @@ extension Plug {
 
 				return nil
 			}
+			if let header = self.parameters.contentTypeHeader { self.addHeader(header) }
+
 			if Plug.defaultManager.autostartConnections { self.start() }
 		}
 		
@@ -56,6 +58,11 @@ extension Plug {
 		func completedWithError(error: NSError) {
 			self.resultsError = error
 			self.completionQueue.suspended = false
+		}
+
+		public func addHeader(header: Plug.Header) {
+			if self.headers == nil { self.headers = Plug.defaultManager.defaultHeaders }
+			self.headers?.addHeader(header)
 		}
 		
 		func completedDownloadingToURL(location: NSURL) {

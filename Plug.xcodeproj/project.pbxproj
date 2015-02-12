@@ -76,7 +76,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B504E6131A89230F001B414B /* PlugHarness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = PlugHarness.app; path = TestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B504E6131A89230F001B414B /* TestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B504E6461A8968DC001B414B /* Plug.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Plug.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B504E66A1A896980001B414B /* BuildFramework.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = BuildFramework.sh; path = Plug/BuildFramework.sh; sourceTree = "<group>"; };
 		B504E6981A896E82001B414B /* Plug Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Plug Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -149,7 +149,7 @@
 		B504E6141A89230F001B414B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B504E6131A89230F001B414B /* PlugHarness.app */,
+				B504E6131A89230F001B414B /* TestHost.app */,
 				B504E6461A8968DC001B414B /* Plug.framework */,
 				B504E6981A896E82001B414B /* Plug Tests.xctest */,
 				B504E6AF1A898110001B414B /* Plug.framework */,
@@ -260,7 +260,7 @@
 			);
 			name = TestHost;
 			productName = Plug;
-			productReference = B504E6131A89230F001B414B /* PlugHarness.app */;
+			productReference = B504E6131A89230F001B414B /* TestHost.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B504E6451A8968DC001B414B /* Plug_iOS */ = {

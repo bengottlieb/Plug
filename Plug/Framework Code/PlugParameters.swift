@@ -60,6 +60,13 @@ extension Plug {
 			}
 		}
 		
+		var contentTypeHeader: Plug.Header? {
+			switch (self) {
+			case .JSON: return .ContentType("application/json")
+			default: return nil
+			}
+		}
+		
 		public var description: String {
 			switch (self) {
 			case .URL(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v!), " }; return $0 } + "]"
