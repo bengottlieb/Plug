@@ -22,7 +22,7 @@ extension Plug {
 		var request: NSURLRequest?
 		let completionQueue: NSOperationQueue
 		let parameters: Plug.Parameters
-		var headers: [String: String]?
+		var headers: Plug.Headers?
 		
 		lazy var task: NSURLSessionTask = {
 			self.task = Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
@@ -72,7 +72,7 @@ extension Plug {
 			var urlString = self.URL.absoluteString! + self.parameters.URLString
 			var request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
 			
-			request.allHTTPHeaderFields = self.headers ?? Plug.defaultManager.defaultHeaders
+			request.allHTTPHeaderFields = (self.headers ?? Plug.defaultManager.defaultHeaders).dictionary
 			request.HTTPMethod = self.method.rawValue
 			request.HTTPBody = self.parameters.bodyData
 			

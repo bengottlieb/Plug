@@ -25,6 +25,8 @@
 		B504E69D1A896E82001B414B /* Plug_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B504E69C1A896E82001B414B /* Plug_Tests.swift */; };
 		B504E6A41A897017001B414B /* Plug.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B504E6461A8968DC001B414B /* Plug.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B504E6A51A897087001B414B /* Plug.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B504E6461A8968DC001B414B /* Plug.framework */; };
+		B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
+		B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
 		B58D64791A898F89005A0002 /* Plug.h in Headers */ = {isa = PBXBuildFile; fileRef = B58D64681A898F81005A0002 /* Plug.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B58D647F1A898FBD005A0002 /* Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D64751A898F81005A0002 /* Plug.swift */; };
 		B58D64801A898FBD005A0002 /* PlugConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D64761A898F81005A0002 /* PlugConnection.swift */; };
@@ -74,13 +76,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B504E6131A89230F001B414B /* PlugHarness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlugHarness.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B504E6131A89230F001B414B /* PlugHarness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = PlugHarness.app; path = TestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B504E6461A8968DC001B414B /* Plug.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Plug.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B504E66A1A896980001B414B /* BuildFramework.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = BuildFramework.sh; path = Plug/BuildFramework.sh; sourceTree = "<group>"; };
 		B504E6981A896E82001B414B /* Plug Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Plug Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B504E69B1A896E82001B414B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B504E69C1A896E82001B414B /* Plug_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plug_Tests.swift; sourceTree = "<group>"; };
 		B504E6AF1A898110001B414B /* Plug.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Plug.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B572EB721A8CC96E00670D8E /* Plug.Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plug.Headers.swift; sourceTree = "<group>"; };
 		B58D64671A898F81005A0002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B58D64681A898F81005A0002 /* Plug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Plug.h; sourceTree = "<group>"; };
 		B58D646A1A898F81005A0002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -199,6 +202,7 @@
 				B58D64751A898F81005A0002 /* Plug.swift */,
 				B58D64761A898F81005A0002 /* PlugConnection.swift */,
 				B58D64771A898F81005A0002 /* PlugParameters.swift */,
+				B572EB721A8CC96E00670D8E /* Plug.Headers.swift */,
 				B58D64781A898F81005A0002 /* Protocols.swift */,
 			);
 			name = "Framework Code";
@@ -426,6 +430,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B58D647F1A898FBD005A0002 /* Plug.swift in Sources */,
+				B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */,
 				B58D64801A898FBD005A0002 /* PlugConnection.swift in Sources */,
 				B58D64811A898FBD005A0002 /* PlugParameters.swift in Sources */,
 				B58D64821A898FBD005A0002 /* Protocols.swift in Sources */,
@@ -445,6 +450,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B58D64831A898FBE005A0002 /* Plug.swift in Sources */,
+				B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */,
 				B58D64841A898FBE005A0002 /* PlugConnection.swift in Sources */,
 				B58D64851A898FBE005A0002 /* PlugParameters.swift in Sources */,
 				B58D64861A898FBE005A0002 /* Protocols.swift in Sources */,

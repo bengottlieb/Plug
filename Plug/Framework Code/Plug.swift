@@ -20,7 +20,11 @@ public class Plug: NSObject {
 	public var sessionQueue: NSOperationQueue = NSOperationQueue()
 	public var configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
 	public var session: NSURLSession!
-	public var defaultHeaders: [String: String] = [ "Accept": "application/json", "Accept-Encoding": "gzip;q=1.0,compress;q=0.5" ]
+	public var defaultHeaders = Plug.Headers([
+			.Accept(["application/json"]),
+			.AcceptEncoding("gzip;q=1.0,compress;q=0.5"),
+			.UserAgent("Plug-\(NSBundle.mainBundle().bundleIdentifier!)"),
+	])
 	
 	public override init() {
 		super.init()
