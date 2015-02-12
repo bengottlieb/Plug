@@ -38,10 +38,14 @@ extension Plug {
 			parameters = params ?? .None
 			
 			method = parameters.normalizeMethod(meth)
-			URL = url.URL!
+			URL = url.URL ?? NSURL()
 			
 			super.init()
-			if url.URL == nil { return nil }
+			if url.URL == nil {
+				println("Unable to create a connection with URL: \(url)")
+
+				return nil
+			}
 			if Plug.defaultManager.autostartConnections { self.start() }
 		}
 		
