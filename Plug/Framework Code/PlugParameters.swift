@@ -11,16 +11,16 @@ import Foundation
 extension Plug {
 	public enum Parameters: Printable {
 		case None
-		case URL([String:String])
-		case Form([String:String])
+		case URL([String: String?])
+		case Form([String: String?])
 		
 		var stringValue: String {
 			switch (self) {
 			case .URL(let params):
-				return (reduce(params.keys, "?") { $0 + "\($1)=\(params[$1]!)&" } as String).stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!
+				return (reduce(params.keys, "?") { if let v = params[$1] { return $0 + "\($1)=\(v!.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!)&" }; return $0 } as String)
 				
 			case .Form(let params):
-				return reduce(params.keys, "") { $0 + "\($1)=\(params[$1]!)&" }
+				return reduce(params.keys, "") { if let v = params[$1] { return $0 + "\($1)=\(v!)&" }; return $0 }
 				
 			case .None:
 				return ""
@@ -50,8 +50,8 @@ extension Plug {
 		
 		public var description: String {
 			switch (self) {
-			case .URL(let params): return reduce(params.keys, "[") { $0 + "\($1): \(params[$1]!), " } + "]"
-			case .Form(let params): return reduce(params.keys, "[") { $0 + "\($1): \(params[$1]!), " } + "]"
+			case .URL(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v!), " }; return $0 } + "]"
+			case .Form(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v!), " }; return $0 } + "]"
 				
 			default: return ""
 			}
