@@ -16,6 +16,8 @@ extension Plug {
 			var description: String { return self.rawValue }
 		}
 		
+		public var cachingPolicy: NSURLRequestCachePolicy = .ReloadIgnoringLocalCacheData
+		
 		let method: Method
 		let URL: NSURL
 		var state: State = .NotStarted
@@ -23,6 +25,15 @@ extension Plug {
 		let completionQueue: NSOperationQueue
 		let parameters: Plug.Parameters
 		var headers: Plug.Headers?
+		var active: Bool = false {
+			didSet {
+				if (oldValue && !self.active) {
+					NetworkActivityIndicator.sharedIndicator.decrement()
+				} else if (!oldValue && self.active) {
+					NetworkActivityIndicator.sharedIndicator.increment()
+				}
+			}
+		}
 		
 		lazy var task: NSURLSessionTask = {
 			self.task = Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
@@ -55,7 +66,8 @@ extension Plug {
 		var resultsURL: NSURL?
 		var resultsData: NSData? { return (self.resultsURL == nil) ? nil : NSData(contentsOfURL: self.resultsURL!) }
 		
-		func completedWithError(error: NSError) {
+		func failedWithError(error: NSError?) {
+			self.active = false
 			self.resultsError = error
 			self.completionQueue.suspended = false
 		}
@@ -66,6 +78,7 @@ extension Plug {
 		}
 		
 		func completedDownloadingToURL(location: NSURL) {
+			self.active = false
 			var filename = "Plug-temp-\(location.lastPathComponent!.hash).tmp"
 			var error: NSError?
 			
@@ -82,6 +95,7 @@ extension Plug {
 			request.allHTTPHeaderFields = (self.headers ?? Plug.defaultManager.defaultHeaders).dictionary
 			request.HTTPMethod = self.method.rawValue
 			request.HTTPBody = self.parameters.bodyData
+			request.cachePolicy = self.cachingPolicy
 			
 			println("Generated request: \n\(request)")
 			return request
@@ -125,6 +139,7 @@ extension Plug.Connection {		//actions
 		assert(state == .NotStarted, "Trying to start an already started connection")
 		self.state = .Running
 		self.task.resume()
+		self.active = true
 	}
 	
 	public func suspend() {

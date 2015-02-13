@@ -27,6 +27,7 @@
 		B504E6A51A897087001B414B /* Plug.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B504E6461A8968DC001B414B /* Plug.framework */; };
 		B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
 		B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
+		B57C8B2A1A8E748E00EAD570 /* NetworkActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57C8B291A8E748E00EAD570 /* NetworkActivityIndicator.swift */; };
 		B58D64791A898F89005A0002 /* Plug.h in Headers */ = {isa = PBXBuildFile; fileRef = B58D64681A898F81005A0002 /* Plug.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B58D647F1A898FBD005A0002 /* Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D64751A898F81005A0002 /* Plug.swift */; };
 		B58D64801A898FBD005A0002 /* PlugConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D64761A898F81005A0002 /* PlugConnection.swift */; };
@@ -84,6 +85,7 @@
 		B504E69C1A896E82001B414B /* Plug_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plug_Tests.swift; sourceTree = "<group>"; };
 		B504E6AF1A898110001B414B /* Plug.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Plug.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B572EB721A8CC96E00670D8E /* Plug.Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plug.Headers.swift; sourceTree = "<group>"; };
+		B57C8B291A8E748E00EAD570 /* NetworkActivityIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkActivityIndicator.swift; sourceTree = "<group>"; };
 		B58D64671A898F81005A0002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B58D64681A898F81005A0002 /* Plug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Plug.h; sourceTree = "<group>"; };
 		B58D646A1A898F81005A0002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				B58D64751A898F81005A0002 /* Plug.swift */,
+				B57C8B291A8E748E00EAD570 /* NetworkActivityIndicator.swift */,
 				B58D64761A898F81005A0002 /* PlugConnection.swift */,
 				B58D64771A898F81005A0002 /* PlugParameters.swift */,
 				B572EB721A8CC96E00670D8E /* Plug.Headers.swift */,
@@ -430,6 +433,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B58D647F1A898FBD005A0002 /* Plug.swift in Sources */,
+				B57C8B2A1A8E748E00EAD570 /* NetworkActivityIndicator.swift in Sources */,
 				B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */,
 				B58D64801A898FBD005A0002 /* PlugConnection.swift in Sources */,
 				B58D64811A898FBD005A0002 /* PlugParameters.swift in Sources */,

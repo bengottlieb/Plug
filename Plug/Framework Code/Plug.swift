@@ -54,6 +54,15 @@ extension Plug: NSURLSessionDownloadDelegate {
 		self[downloadTask]?.completedDownloadingToURL(location)
 	}
 
+	public func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
+		self[task]?.failedWithError(error)
+	}
+	
+	public func URLSession(session: NSURLSession, task: NSURLSessionTask, willPerformHTTPRedirection response: NSHTTPURLResponse, newRequest request: NSURLRequest, completionHandler: (NSURLRequest!) -> Void) {
+		println("Received redirect request from \(task.originalRequest)")
+		completionHandler(request)
+	}
+
 
 }
 
