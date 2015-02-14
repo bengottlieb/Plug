@@ -17,9 +17,11 @@ extension Plug {
 		}
 		
 		public var cachingPolicy: NSURLRequestCachePolicy = .ReloadIgnoringLocalCacheData
+		public var response: NSURLResponse?
 		
 		let method: Method
 		let URL: NSURL
+		var downloadToFile = false
 		var state: State = .NotStarted
 		var request: NSURLRequest?
 		let completionQueue: NSOperationQueue
@@ -36,8 +38,16 @@ extension Plug {
 		}
 		
 		lazy var task: NSURLSessionTask = {
-			self.task = Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
-			
+			if self.downloadToFile {
+				self.task = Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
+			} else {
+				self.task = Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
+					self.active = false
+					self.resultsError = error ?? response.error
+					self.resultsData = data
+					self.completionQueue.suspended = false
+				})
+			}
 			Plug.defaultManager.registerConnection(self)
 			return self.task
 		}()
@@ -59,22 +69,27 @@ extension Plug {
 			}
 			if let header = self.parameters.contentTypeHeader { self.addHeader(header) }
 
-			if Plug.defaultManager.autostartConnections { self.start() }
+			if Plug.defaultManager.autostartConnections {
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+					self.start()
+				}
+			}
 		}
 		
 		var resultsError: NSError?
-		var resultsURL: NSURL?
-		var resultsData: NSData? { return (self.resultsURL == nil) ? nil : NSData(contentsOfURL: self.resultsURL!) }
+		var resultsURL: NSURL? { didSet { if let url = self.resultsURL { self.resultsData = NSData(contentsOfURL: url) } } }
+		var resultsData: NSData?
 		
 		func failedWithError(error: NSError?) {
 			self.active = false
-			self.resultsError = error
+			self.response = self.task.response
+			self.resultsError = error ?? self.task.response?.error
 			self.completionQueue.suspended = false
 		}
 
 		public func addHeader(header: Plug.Header) {
 			if self.headers == nil { self.headers = Plug.defaultManager.defaultHeaders }
-			self.headers?.addHeader(header)
+			self.headers?.append(header)
 		}
 		
 		func completedDownloadingToURL(location: NSURL) {
@@ -97,7 +112,6 @@ extension Plug {
 			request.HTTPBody = self.parameters.bodyData
 			request.cachePolicy = self.cachingPolicy
 			
-			println("Generated request: \n\(request)")
 			return request
 		}
 	}

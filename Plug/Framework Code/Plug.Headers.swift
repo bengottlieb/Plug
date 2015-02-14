@@ -53,7 +53,7 @@ extension Plug {
 	
 	public struct Headers: Printable {
 		var headers: [Header] = []
-		mutating func addHeader(header: Header) {
+		public mutating func append(header: Header) {
 			for (index, existing) in enumerate(self.headers) {
 				if existing.isSameHeaderAs(header) {
 					self.headers[index] = header

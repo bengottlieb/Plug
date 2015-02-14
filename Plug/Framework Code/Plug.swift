@@ -45,7 +45,7 @@ public extension Plug {
 	}
 }
 
-extension Plug: NSURLSessionDelegate {
+extension Plug: NSURLSessionDataDelegate {
 	
 }
 
