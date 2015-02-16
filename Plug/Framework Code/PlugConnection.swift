@@ -54,6 +54,7 @@ extension Plug {
 		
 		init?(method meth: Method = .GET, URL url: NSURLConvertible, parameters params: Plug.Parameters? = nil) {
 			completionQueue = NSOperationQueue()
+			completionQueue.maxConcurrentOperationCount = 1
 			completionQueue.suspended = true
 			
 			parameters = params ?? .None
