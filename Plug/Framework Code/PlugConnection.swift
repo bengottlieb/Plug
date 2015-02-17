@@ -29,11 +29,13 @@ extension Plug {
 		var headers: Plug.Headers?
 		var active: Bool = false {
 			didSet {
-				if (oldValue && !self.active) {
-					NetworkActivityIndicator.sharedIndicator.decrement()
-				} else if (!oldValue && self.active) {
-					NetworkActivityIndicator.sharedIndicator.increment()
-				}
+				#if TARGET_OS_IPHONE
+					if (oldValue && !self.active) {
+						NetworkActivityIndicator.sharedIndicator.decrement()
+					} else if (!oldValue && self.active) {
+						NetworkActivityIndicator.sharedIndicator.increment()
+					}
+				#endif
 			}
 		}
 		

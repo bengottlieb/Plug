@@ -55,7 +55,8 @@ extension Plug {
 			switch (self) {
 			case .Form: fallthrough
 			case .JSON:
-				return .POST
+				if method == .GET { return .POST }
+				return method
 			default: return method
 			}
 		}

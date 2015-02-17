@@ -9,7 +9,7 @@
 import Foundation
 
 public class Plug: NSObject {
-	public enum Method: String, Printable { case GET = "GET", POST = "POST", DELETE = "DELETE"
+	public enum Method: String, Printable { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH"
 		public var description: String { return self.rawValue } 
 	}
 	
