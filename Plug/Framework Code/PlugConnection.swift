@@ -145,7 +145,8 @@ extension Plug.Connection {
 extension Plug.Connection: Printable {
 	public override var description: String {
 		var request = self.task.originalRequest
-		var string = "\(self.method) \(request.URL.absoluteString!) \(self.parameters): \(self.state)"
+		var noURL = "[no URL]"
+		var string = "\(self.method) \(request.URL?.absoluteString ?? noURL) \(self.parameters): \(self.state)"
 		
 		return string
 	}
@@ -177,14 +178,15 @@ extension Plug.Connection {		//actions
 
 extension NSURLRequest: Printable {
 	public override var description: String {
-		var str = (self.HTTPMethod ?? "[no method]") + " " + (self.URL.absoluteString ?? "[no URL]")
+		var str = (self.HTTPMethod ?? "[no method]") + " " + (self.URL?.absoluteString ?? "[no URL]")
 		
-		for (label, value) in (self.allHTTPHeaderFields as [String: String]) {
+		for (label, value) in (self.allHTTPHeaderFields as! [String: String]) {
 			str += "\n\t" + label + ": " + value
 		}
 		
 		if let data = self.HTTPBody {
-			str += "\n" + (NSString(data: data, encoding: NSUTF8StringEncoding) ?? "[unconvertible body: \(data.length) bytes]")
+			var dataString = NSString(data: data, encoding: NSUTF8StringEncoding) as! String
+			str += "\n" + (dataString ?? "[unconvertible body: \(data.length) bytes]")
 		}
 		
 		return str
