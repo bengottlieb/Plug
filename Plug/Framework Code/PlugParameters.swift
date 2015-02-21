@@ -18,7 +18,7 @@ extension Plug {
 		var stringValue: String {
 			switch (self) {
 			case .URL(let params):
-				return (reduce(params.keys, "?") { if let v = params[$1] { return $0 + "\($1)=\(v!.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!)&" }; return $0 } as String)
+				return (reduce(params.keys, "?") { if let v = params[$1] { return $0 + "\($1)=\(v!.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!)&" }; return $0 })
 				
 			case .Form(let params):
 				return reduce(params.keys, "") { if let v = params[$1] { return $0 + "\($1)=\(v!)&" }; return $0 }
@@ -27,7 +27,7 @@ extension Plug {
 				var error: NSError?
 				var data = NSJSONSerialization.dataWithJSONObject(object, options: nil, error: &error)
 				if error != nil { println("Error \(error) while JSON encoding \(object)") }
-				if let data = data { return (NSString(data: data, encoding: NSUTF8StringEncoding) as! String) ?? "" }
+				if let data = data { return NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "" }
 				return ""
 				
 			case .None:

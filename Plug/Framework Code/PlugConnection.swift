@@ -46,7 +46,9 @@ extension Plug {
 				self.task = Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
 					self.active = false
 					self.resultsError = error ?? response.error
-					self.resultsData = data
+					if error == nil || data.length > 0 {
+						self.resultsData = data
+					}
 					self.completionQueue.suspended = false
 				})
 			}
@@ -146,7 +148,7 @@ extension Plug.Connection: Printable {
 	public override var description: String {
 		var request = self.task.originalRequest
 		var noURL = "[no URL]"
-		var string = "\(self.method) \(request.URL?.absoluteString ?? noURL) \(self.parameters): \(self.state)"
+		var string = "\(self.method) \(request.URL) \(self.parameters): \(self.state)"
 		
 		return string
 	}
@@ -178,15 +180,15 @@ extension Plug.Connection {		//actions
 
 extension NSURLRequest: Printable {
 	public override var description: String {
-		var str = (self.HTTPMethod ?? "[no method]") + " " + (self.URL?.absoluteString ?? "[no URL]")
+		var str = (self.HTTPMethod ?? "[no method]") + " " + "\(self.URL)"
 		
 		for (label, value) in (self.allHTTPHeaderFields as! [String: String]) {
 			str += "\n\t" + label + ": " + value
 		}
 		
 		if let data = self.HTTPBody {
-			var dataString = NSString(data: data, encoding: NSUTF8StringEncoding) as! String
-			str += "\n" + (dataString ?? "[unconvertible body: \(data.length) bytes]")
+			var body = NSString(data: data, encoding: NSUTF8StringEncoding)
+			str += "\n" + (body?.description ?? "[unconvertible body: \(data.length) bytes]")
 		}
 		
 		return str
