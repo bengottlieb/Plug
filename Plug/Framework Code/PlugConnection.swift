@@ -165,14 +165,16 @@ extension Plug.Connection: Printable {
 	public override var description: String {
 		var request = self.task.originalRequest
 		var noURL = "[no URL]"
-		var string = "\(self.method) \(request.URL) \(self.parameters): \(self.state)"
+		var string = "\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"
+		string += "\(self.method) \(request.URL) \(self.parameters) [\(self.state)]"
 		if let response = self.response {
-			string += "\n\n" + response.description
+			string += "\n" + response.description
 		}
 		if let data = self.resultsData {
-			string += "\n\n" + (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as UTF8--")
+			string += "\n------------------------------------------------------------\n" + (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as UTF8--")
 		}
-		
+		if !string.hasSuffix("\n") { string += "\n" }
+		string += "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\n"
 		return string
 	}
 	

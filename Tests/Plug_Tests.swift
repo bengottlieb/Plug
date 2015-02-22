@@ -18,6 +18,7 @@ class Plug_TestPersistentDelegate: PlugPersistentDelegate {
 	
 	func connectionCompleted(connection: Plug.Connection, info: Plug.PersistenceInfo?) {
 		self.expectation?.fulfill()
+		XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
 	}
 	
 	init() {		
@@ -37,7 +38,7 @@ class Plug_Tests: XCTestCase {
         super.tearDown()
     }
     
-    func _testGET() {
+    func testGET() {
 		let expectation = expectationWithDescription("GET")
 		var url = "http://httpbin.org/get"
 		var params: Plug.Parameters = .None
@@ -57,7 +58,7 @@ class Plug_Tests: XCTestCase {
 				XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
 		})
 		
-		println("\(connection)")
+		println("\(connection.log())")
 
 		waitForExpectationsWithTimeout(10) { (error) in
 			
