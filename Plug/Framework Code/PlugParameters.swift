@@ -103,6 +103,10 @@ extension Plug {
 	}
 }
 
+public func ==(lhs: Plug.Parameters, rhs: Plug.Parameters) -> Bool {
+	return lhs.type == rhs.type && lhs.type == "None"
+}
+
 extension NSMutableDictionary {
 	convenience init(stringDictionary: [String: String?]) {
 		self.init()
@@ -127,3 +131,4 @@ extension NSMutableDictionary {
 		return result
 	}
 }
+

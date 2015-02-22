@@ -15,6 +15,7 @@ public class Plug: NSObject {
 	
 	public class var defaultManager: Plug { struct s { static let plug = Plug() }; return s.plug }
 	
+	public var maximumActiveConnections = 0
 	public var autostartConnections = true
 	public var temporaryDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory())!
 	public var sessionQueue: NSOperationQueue = NSOperationQueue()
@@ -34,21 +35,36 @@ public class Plug: NSObject {
 	}
 	
 	private var connections: [Int: Plug.Connection] = [:]
-	private var connectionQueue: [Plug.Connection] = []
 	private var serialQueue: NSOperationQueue = { var q = NSOperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
 
+	private var connectionQueue: [Plug.Connection] = []
+	private var activeConnections: [Plug.Connection] = []
+	
 }
 
 public extension Plug {
 	
 	func enqueue(connection: Plug.Connection) {
 		self.connectionQueue.append(connection)
-		connection.start()
+		
+		if self.maximumActiveConnections == 0 || self.activeConnections.count < self.maximumActiveConnections {
+			connection.start()
+		}
 	}
 
 	func dequeue(connection: Plug.Connection) {
 		if let index = find(self.connectionQueue, connection) {
 			self.connectionQueue.removeAtIndex(index)
+		}
+	}
+	
+	func connectionStarted(connection: Plug.Connection) {
+		self.activeConnections.append(connection)
+	}
+
+	func connectionStopped(connection: Plug.Connection) {
+		if let index = find(self.activeConnections, connection) {
+			self.activeConnections.removeAtIndex(index)
 		}
 	}
 }

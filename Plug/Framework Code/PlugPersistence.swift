@@ -22,13 +22,34 @@ public extension Plug {
 		}
 		
 		var persistentDelegates: [PersistenceInfo: PlugPersistentDelegate] = [:]
+		var persistentConnections: [Plug.Connection] = []
+		var queue: NSOperationQueue = { var q = NSOperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
 		
 		func registerPersisitentConnection(connection: Plug.Connection) {
-			
+			self.queue.addOperationWithBlock {
+				if find(self.persistentConnections, connection) == nil {
+					self.persistentConnections.append(connection)
+					self.savePersistentConnections()
+				}
+			}
 		}
 		
 		func unregisterPersisitentConnection(connection: Plug.Connection) {
-			
+			self.queue.addOperationWithBlock {
+				if let index = find(self.persistentConnections, connection) {
+					self.persistentConnections.removeAtIndex(index)
+					self.savePersistentConnections()
+				}
+			}
+		}
+		
+		var persistentCacheURL: NSURL = { NSURL(fileURLWithPath: "~/Library/Connections.json".stringByExpandingTildeInPath)! }()
+		func savePersistentConnections() {
+			var dictionaries: [NSDictionary] = self.persistentConnections.map { return $0.JSONRepresentation }
+			var error: NSError?
+			if let json = NSJSONSerialization.dataWithJSONObject(dictionaries, options: NSJSONWritingOptions.PrettyPrinted, error: &error) {
+				json.writeToURL(self.persistentCacheURL, atomically: true)
+			}
 		}
 	}
 }
@@ -36,13 +57,15 @@ public extension Plug {
 
 extension Plug.Connection {
 	public var JSONRepresentation: NSDictionary {
-		return [
+		var json = [
 			"url": self.URL.absoluteString ?? "",
-			"headers": self.headers?.dictionary ?? [:],
 			"method": self.method.rawValue,
 			"persistenceIdentifier": self.persistence.JSONValue,
-			"parameters": self.parameters.JSONValue ?? [:],
 		]
+
+		if let headers = self.headers { json["headers"] = headers.dictionary }
+		if self.parameters.type != "None" { json["parameters"] = self.parameters.JSONValue! }
+		return json
 	}
 	
 	public convenience init?(JSONRepresentation info: NSDictionary) {
@@ -102,3 +125,4 @@ public func ==(lhs: Plug.PersistenceInfo, rhs: Plug.PersistenceInfo) -> Bool {
 	}
 	return false
 }
+

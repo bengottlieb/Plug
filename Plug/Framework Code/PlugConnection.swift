@@ -197,28 +197,36 @@ extension Plug.Connection {		//actions
 	public func start() {
 		if (state != .Waiting && state != .Queued) { return }
 		
+		Plug.defaultManager.connectionStarted(self)
 		self.state = .Running
 		self.task.resume()
 		self.completionQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
 	}
 	
 	public func suspend() {
+		if self.state != .Running { return }
+		Plug.defaultManager.connectionStopped(self)
 		self.state = .Suspended
 		self.task.suspend()
 	}
 	
 	public func resume() {
+		if self.state != .Suspended { return }
+		Plug.defaultManager.connectionStarted(self)
 		self.state = .Running
 		self.task.resume()
 	}
 	
 	public func cancel() {
+		Plug.defaultManager.connectionStopped(self)
 		self.state = .Canceled
 		self.task.cancel()
 	}
 	
 	func complete(state: State) {
 		self.state = state
+		Plug.defaultManager.unregisterConnection(self)
+		Plug.defaultManager.connectionStopped(self)
 		Plug.defaultManager.dequeue(self)
 		self.completionQueue.suspended = false
 	}
@@ -241,6 +249,3 @@ extension NSURLRequest: Printable {
 	}
 }
 
-public func ==(lhs: Plug.Connection.Persistence, rhs: Plug.Connection.Persistence) -> Bool {
-	return true
-}
