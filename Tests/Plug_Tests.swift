@@ -27,9 +27,11 @@ class Plug_Tests: XCTestCase {
 		var url = "http://httpbin.org/get"
 		var params: Plug.Parameters = .None
 		
-		var connection = Plug.request(method: .GET, URL: url, parameters: params).completion({ (data) in
+		var connection = Plug.request(method: .GET, URL: url, parameters: params)
+			
+		connection.completion({ (data) in
 			var str = NSString(data: data, encoding: NSUTF8StringEncoding)
-				println("Data: \(str)")
+				println("Data: \(connection)")
 				expectation.fulfill()
 			}).error({error in
 				println("Got error: \(error)")
