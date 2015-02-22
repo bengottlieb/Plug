@@ -33,9 +33,13 @@ class Plug_Tests: XCTestCase {
 			var str = NSString(data: data, encoding: NSUTF8StringEncoding)
 				println("Data: \(connection)")
 				expectation.fulfill()
+
+				XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
 			}).error({error in
 				println("Got error: \(error)")
 				expectation.fulfill()
+				
+				XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
 		})
 		
 		println("\(connection)")

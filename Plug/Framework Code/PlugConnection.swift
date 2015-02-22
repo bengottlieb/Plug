@@ -9,17 +9,10 @@
 import Foundation
 
 extension Plug {
-	public struct PersistanceInfo {
-		public var objectKey: String?
-		public var instanceKey: String?
-	}
-}
-
-extension Plug {
 	public class Connection: NSObject {
-		public enum Relevance: Int { case Local, Server, Persistant }
-		public var relevance: Relevance = .Server
-		public var persistance: PersistanceInfo?
+		public enum Relevance: Int { case ResponseConsumedTransient, ResponseIgnored, ResponseConsumedPersistent }
+		public var relevance: Relevance = .ResponseConsumedTransient
+		public var persistence: PersistenceInfo?
 		
 		public enum State: String, Printable { case NotStarted = "Not Started", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Error"
 			public var description: String { return self.rawValue }
@@ -30,8 +23,8 @@ extension Plug {
 			didSet {
 				if self.state == oldValue { return }
 				#if TARGET_OS_IPHONE
-					if oldValue == .Running { NetworkActivityIndicator.sharedIndicator.decrement() }
-					if self.state.isRunning { NetworkActivityIndicator.sharedIndicator.increment() }
+					if oldValue == .Running { NetworkActivityIndicator.decrement() }
+					if self.state.isRunning { NetworkActivityIndicator.increment() }
 				#endif
 			}
 		}

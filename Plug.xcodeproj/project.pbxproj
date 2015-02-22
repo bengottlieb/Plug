@@ -30,6 +30,8 @@
 		B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
 		B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
 		B57C8B2A1A8E748E00EAD570 /* NetworkActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57C8B291A8E748E00EAD570 /* NetworkActivityIndicator.swift */; };
+		B580E0291A99867C0067F89D /* PlugPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B580E0281A99867C0067F89D /* PlugPersistence.swift */; };
+		B580E02A1A99867C0067F89D /* PlugPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B580E0281A99867C0067F89D /* PlugPersistence.swift */; };
 		B58D64791A898F89005A0002 /* Plug.h in Headers */ = {isa = PBXBuildFile; fileRef = B58D64681A898F81005A0002 /* Plug.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B58D647F1A898FBD005A0002 /* Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D64751A898F81005A0002 /* Plug.swift */; };
 		B58D64801A898FBD005A0002 /* PlugConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D64761A898F81005A0002 /* PlugConnection.swift */; };
@@ -89,6 +91,7 @@
 		B507A3C81A8E85BC008E3DB1 /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		B572EB721A8CC96E00670D8E /* Plug.Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plug.Headers.swift; sourceTree = "<group>"; };
 		B57C8B291A8E748E00EAD570 /* NetworkActivityIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkActivityIndicator.swift; sourceTree = "<group>"; };
+		B580E0281A99867C0067F89D /* PlugPersistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugPersistence.swift; sourceTree = "<group>"; };
 		B58D64671A898F81005A0002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B58D64681A898F81005A0002 /* Plug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Plug.h; sourceTree = "<group>"; };
 		B58D646A1A898F81005A0002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -207,6 +210,7 @@
 				B58D64751A898F81005A0002 /* Plug.swift */,
 				B57C8B291A8E748E00EAD570 /* NetworkActivityIndicator.swift */,
 				B58D64761A898F81005A0002 /* PlugConnection.swift */,
+				B580E0281A99867C0067F89D /* PlugPersistence.swift */,
 				B58D64771A898F81005A0002 /* PlugParameters.swift */,
 				B572EB721A8CC96E00670D8E /* Plug.Headers.swift */,
 				B58D64781A898F81005A0002 /* Protocols.swift */,
@@ -441,6 +445,7 @@
 				B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */,
 				B58D64801A898FBD005A0002 /* PlugConnection.swift in Sources */,
 				B58D64811A898FBD005A0002 /* PlugParameters.swift in Sources */,
+				B580E0291A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B58D64821A898FBD005A0002 /* Protocols.swift in Sources */,
 				B507A3C91A8E85BC008E3DB1 /* Errors.swift in Sources */,
 			);
@@ -458,6 +463,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B580E02A1A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B58D64831A898FBE005A0002 /* Plug.swift in Sources */,
 				B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */,
 				B58D64841A898FBE005A0002 /* PlugConnection.swift in Sources */,

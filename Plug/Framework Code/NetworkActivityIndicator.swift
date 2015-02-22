@@ -8,31 +8,35 @@
 
 import Foundation
 
+var s_NetworkActivityIndicator = NetworkActivityIndicator()
+
 public class NetworkActivityIndicator {
-	public class var sharedIndicator: NetworkActivityIndicator { struct s { static let indicator = NetworkActivityIndicator() }; return s.indicator }
-	
 	var usageCount = 0
 	
-	public func increment() {
-		if self.usageCount == 0 {
+	public class func increment() {
+		if s_NetworkActivityIndicator.usageCount == 0 {
 			dispatch_async(dispatch_get_main_queue()) {
 				UIApplication.sharedApplication().networkActivityIndicatorVisible = true
 			}
 		}
-		self.usageCount++
+		s_NetworkActivityIndicator.usageCount++
 	}
 
-	public func decrement() {
-		self.usageCount--
-		if self.usageCount < 0 {
+	public class func decrement() {
+		s_NetworkActivityIndicator.usageCount--
+		if s_NetworkActivityIndicator.usageCount < 0 {
 			println("******** Activity indicator underrun ********")
-			self.usageCount = 0
+			s_NetworkActivityIndicator.usageCount = 0
 		}
 		
-		if self.usageCount == 0 {
+		if s_NetworkActivityIndicator.usageCount == 0 {
 			dispatch_async(dispatch_get_main_queue()) {
 				UIApplication.sharedApplication().networkActivityIndicatorVisible = false
 			}
 		}
+	}
+	
+	public class var isVisible: Bool {
+		return s_NetworkActivityIndicator.usageCount > 0
 	}
 }
