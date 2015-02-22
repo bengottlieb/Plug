@@ -31,12 +31,12 @@ extension Plug {
 		}
 		public let persistence: Persistence
 		
-		public enum State: String, Printable { case NotStarted = "Not Started", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Completed with Error"
+		public enum State: String, Printable { case Waiting = "Waiting", Queued = "Queued", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Completed with Error"
 			public var description: String { return self.rawValue }
 			public var isRunning: Bool { return self == .Running }
-			public var hasStarted: Bool { return self != .NotStarted }
+			public var hasStarted: Bool { return self != .Waiting && self != .Queued }
 		}
-		public var state: State = .NotStarted {
+		public var state: State = .Waiting {
 			didSet {
 				if self.state == oldValue { return }
 				#if TARGET_OS_IPHONE
@@ -83,7 +83,7 @@ extension Plug {
 
 			if Plug.defaultManager.autostartConnections {
 				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-					self.start()
+					self.queue()
 				}
 			}
 		}
@@ -93,13 +93,12 @@ extension Plug {
 				self.task = Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
 			} else {
 				self.task = Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
-					self.state = (error == nil) ? .Completed : .CompletedWithError
 					self.response = response
 					self.resultsError = error ?? response.error
 					if error == nil || data.length > 0 {
 						self.resultsData = data
 					}
-					self.completionQueue.suspended = false
+					self.complete((error == nil) ? .Completed : .CompletedWithError)
 				})
 			}
 			Plug.defaultManager.registerConnection(self)
@@ -111,21 +110,19 @@ extension Plug {
 		var resultsData: NSData?
 		
 		func failedWithError(error: NSError?) {
-			self.state = .CompletedWithError
 			self.response = self.task.response
 			self.resultsError = error ?? self.task.response?.error
-			self.completionQueue.suspended = false
+			self.complete(.CompletedWithError)
 		}
 
 		func completedDownloadingToURL(location: NSURL) {
-			self.state = .Completed
 			var filename = "Plug-temp-\(location.lastPathComponent!.hash).tmp"
 			var error: NSError?
 			
 			self.resultsURL = Plug.defaultManager.temporaryDirectoryURL.URLByAppendingPathComponent(filename)
 			NSFileManager.defaultManager().moveItemAtURL(location, toURL: self.resultsURL!, error: &error)
 			
-			self.completionQueue.suspended = false
+			self.complete(.Completed)
 		}
 		
 		var defaultRequest: NSURLRequest {
@@ -192,8 +189,14 @@ extension Plug.Connection: Printable {
 }
 
 extension Plug.Connection {		//actions
+	public func queue() {
+		if (state != .Waiting) { return }
+		Plug.defaultManager.enqueue(self)
+	}
+	
 	public func start() {
-		assert(state == .NotStarted, "Trying to start an already started connection")
+		if (state != .Waiting && state != .Queued) { return }
+		
 		self.state = .Running
 		self.task.resume()
 		self.completionQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
@@ -212,6 +215,12 @@ extension Plug.Connection {		//actions
 	public func cancel() {
 		self.state = .Canceled
 		self.task.cancel()
+	}
+	
+	func complete(state: State) {
+		self.state = state
+		Plug.defaultManager.dequeue(self)
+		self.completionQueue.suspended = false
 	}
 }
 

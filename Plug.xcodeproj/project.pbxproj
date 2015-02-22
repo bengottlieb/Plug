@@ -34,6 +34,8 @@
 		B57C8B2A1A8E748E00EAD570 /* NetworkActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57C8B291A8E748E00EAD570 /* NetworkActivityIndicator.swift */; };
 		B580E0291A99867C0067F89D /* PlugPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B580E0281A99867C0067F89D /* PlugPersistence.swift */; };
 		B580E02A1A99867C0067F89D /* PlugPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B580E0281A99867C0067F89D /* PlugPersistence.swift */; };
+		B580E02F1A9A7B6B0067F89D /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B580E02E1A9A7B6B0067F89D /* libsqlite3.dylib */; };
+		B580E0301A9A7B730067F89D /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B580E02E1A9A7B6B0067F89D /* libsqlite3.dylib */; };
 		B58D64791A898F89005A0002 /* Plug.h in Headers */ = {isa = PBXBuildFile; fileRef = B58D64681A898F81005A0002 /* Plug.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B58D647F1A898FBD005A0002 /* Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D64751A898F81005A0002 /* Plug.swift */; };
 		B58D64801A898FBD005A0002 /* PlugConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D64761A898F81005A0002 /* PlugConnection.swift */; };
@@ -95,6 +97,7 @@
 		B572EB721A8CC96E00670D8E /* Plug.Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plug.Headers.swift; sourceTree = "<group>"; };
 		B57C8B291A8E748E00EAD570 /* NetworkActivityIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkActivityIndicator.swift; sourceTree = "<group>"; };
 		B580E0281A99867C0067F89D /* PlugPersistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugPersistence.swift; sourceTree = "<group>"; };
+		B580E02E1A9A7B6B0067F89D /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		B58D64671A898F81005A0002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B58D64681A898F81005A0002 /* Plug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Plug.h; sourceTree = "<group>"; };
 		B58D646A1A898F81005A0002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -124,6 +127,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B580E02F1A9A7B6B0067F89D /* libsqlite3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,6 +143,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B580E0301A9A7B730067F89D /* libsqlite3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,6 +153,7 @@
 		B504E60A1A89230F001B414B = {
 			isa = PBXGroup;
 			children = (
+				B580E02E1A9A7B6B0067F89D /* libsqlite3.dylib */,
 				B58D64741A898F81005A0002 /* Framework Code */,
 				B504E66A1A896980001B414B /* BuildFramework.sh */,
 				B58D64661A898F81005A0002 /* Plug_Mac */,
@@ -614,6 +620,7 @@
 		B504E6601A8968DC001B414B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -628,6 +635,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = Plug;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -637,6 +645,7 @@
 		B504E6611A8968DC001B414B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -702,6 +711,7 @@
 		B504E6C31A898111001B414B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -721,6 +731,7 @@
 				PRODUCT_NAME = Plug;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -729,6 +740,7 @@
 		B504E6C41A898111001B414B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;

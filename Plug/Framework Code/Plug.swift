@@ -34,7 +34,23 @@ public class Plug: NSObject {
 	}
 	
 	private var connections: [Int: Plug.Connection] = [:]
+	private var connectionQueue: [Plug.Connection] = []
 	private var serialQueue: NSOperationQueue = { var q = NSOperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
+
+}
+
+public extension Plug {
+	
+	func enqueue(connection: Plug.Connection) {
+		self.connectionQueue.append(connection)
+		connection.start()
+	}
+
+	func dequeue(connection: Plug.Connection) {
+		if let index = find(self.connectionQueue, connection) {
+			self.connectionQueue.removeAtIndex(index)
+		}
+	}
 }
 
 public extension Plug {
@@ -70,6 +86,12 @@ extension Plug {
 	
 	func registerConnection(connection: Plug.Connection) {
 		self.connections[connection.task.taskIdentifier] = connection
+		if connection.persistence.isPersistent { PersistenceManager.defaultManager.registerPersisitentConnection(connection) }
+	}
+	
+	func unregisterConnection(connection: Plug.Connection) {
+		self.connections.removeValueForKey(connection.task.taskIdentifier)
+		if connection.persistence.isPersistent { PersistenceManager.defaultManager.unregisterPersisitentConnection(connection) }
 	}
 	
 	subscript(task: NSURLSessionTask) -> Plug.Connection? {

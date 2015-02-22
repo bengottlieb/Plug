@@ -11,7 +11,7 @@ import Foundation
 public extension Plug {
 	public class PersistenceManager {
 		public class var defaultManager: PersistenceManager { struct s { static let mgr = PersistenceManager() }; return s.mgr }
-
+		
 		public func registerObject(object: PlugPersistentDelegate) {
 			self.persistentDelegates[object.persistenceInfo] = object
 		}
@@ -22,8 +22,17 @@ public extension Plug {
 		}
 		
 		var persistentDelegates: [PersistenceInfo: PlugPersistentDelegate] = [:]
+		
+		func registerPersisitentConnection(connection: Plug.Connection) {
+			
+		}
+		
+		func unregisterPersisitentConnection(connection: Plug.Connection) {
+			
+		}
 	}
 }
+
 
 extension Plug.Connection {
 	public var JSONRepresentation: NSDictionary {
