@@ -25,13 +25,6 @@ public extension Plug {
 	}
 }
 
-extension Plug.Connection {
-	
-	public func notifyPersistentDelegateOfCompletion() {
-		self.responseRelevance.persistentDelegate?.connectionCompleted(self, info: self.responseRelevance.persistentInfo)
-	}
-}
-
 public extension Plug {
 	public struct PersistenceInfo: Hashable, Equatable {
 		public var objectKey: String

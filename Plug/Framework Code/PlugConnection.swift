@@ -136,8 +136,11 @@ extension Plug {
 			
 			return request
 		}
+		public func notifyPersistentDelegateOfCompletion() {
+			self.responseRelevance.persistentDelegate?.connectionCompleted(self, info: self.responseRelevance.persistentInfo)
+		}
 	}
-	
+
 	var noopConnection: Plug.Connection { return Plug.Connection(URL: "about:blank")! }
 }
 
