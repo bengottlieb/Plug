@@ -8,43 +8,52 @@
 
 import Foundation
 
-
+extension Plug {
+	public struct PersistanceInfo {
+		public var objectKey: String?
+		public var instanceKey: String?
+	}
+}
 
 extension Plug {
 	public class Connection: NSObject {
-		enum State: String, Printable { case NotStarted = "Not Started", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled"
-			var description: String { return self.rawValue }
+		public enum Relevance: Int { case Local, Server, Persistant }
+		public var relevance: Relevance = .Server
+		public var persistance: PersistanceInfo?
+		
+		public enum State: String, Printable { case NotStarted = "Not Started", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Error"
+			public var description: String { return self.rawValue }
+			public var isRunning: Bool { return self == .Running }
+			public var hasStarted: Bool { return self != .NotStarted }
+		}
+		public var state: State = .NotStarted {
+			didSet {
+				if self.state == oldValue { return }
+				#if TARGET_OS_IPHONE
+					if oldValue == .Running { NetworkActivityIndicator.sharedIndicator.decrement() }
+					if self.state.isRunning { NetworkActivityIndicator.sharedIndicator.increment() }
+				#endif
+			}
 		}
 		
 		public var cachingPolicy: NSURLRequestCachePolicy = .ReloadIgnoringLocalCacheData
 		public var response: NSURLResponse?
 		
-		let method: Method
-		let URL: NSURL
-		var downloadToFile = false
-		var state: State = .NotStarted
-		var request: NSURLRequest?
-		let completionQueue: NSOperationQueue
-		let parameters: Plug.Parameters
-		var headers: Plug.Headers?
-		var active: Bool = false {
-			didSet {
-				#if TARGET_OS_IPHONE
-					if (oldValue && !self.active) {
-						NetworkActivityIndicator.sharedIndicator.decrement()
-					} else if (!oldValue && self.active) {
-						NetworkActivityIndicator.sharedIndicator.increment()
-					}
-				#endif
-			}
-		}
+		public let method: Method
+		public let URL: NSURL
+		public var downloadToFile = false
+		public var request: NSURLRequest?
+		public let completionQueue: NSOperationQueue
+		public let parameters: Plug.Parameters
+		public var headers: Plug.Headers?
 		
 		lazy var task: NSURLSessionTask = {
 			if self.downloadToFile {
 				self.task = Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
 			} else {
 				self.task = Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
-					self.active = false
+					self.state = .Completed
+					self.response = response
 					self.resultsError = error ?? response.error
 					if error == nil || data.length > 0 {
 						self.resultsData = data
@@ -86,7 +95,7 @@ extension Plug {
 		var resultsData: NSData?
 		
 		func failedWithError(error: NSError?) {
-			self.active = false
+			self.state = .CompletedWithError
 			self.response = self.task.response
 			self.resultsError = error ?? self.task.response?.error
 			self.completionQueue.suspended = false
@@ -98,7 +107,7 @@ extension Plug {
 		}
 		
 		func completedDownloadingToURL(location: NSURL) {
-			self.active = false
+			self.state = .Completed
 			var filename = "Plug-temp-\(location.lastPathComponent!.hash).tmp"
 			var error: NSError?
 			
@@ -149,6 +158,12 @@ extension Plug.Connection: Printable {
 		var request = self.task.originalRequest
 		var noURL = "[no URL]"
 		var string = "\(self.method) \(request.URL) \(self.parameters): \(self.state)"
+		if let response = self.response {
+			string += "\n\n" + response.description
+		}
+		if let data = self.resultsData {
+			string += "\n\n" + (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as UTF8--")
+		}
 		
 		return string
 	}
@@ -159,7 +174,6 @@ extension Plug.Connection {		//actions
 		assert(state == .NotStarted, "Trying to start an already started connection")
 		self.state = .Running
 		self.task.resume()
-		self.active = true
 	}
 	
 	public func suspend() {
@@ -182,7 +196,7 @@ extension NSURLRequest: Printable {
 	public override var description: String {
 		var str = (self.HTTPMethod ?? "[no method]") + " " + "\(self.URL)"
 		
-		for (label, value) in (self.allHTTPHeaderFields as! [String: String]) {
+		for (label, value) in (self.allHTTPHeaderFields as [String: String]) {
 			str += "\n\t" + label + ": " + value
 		}
 		
