@@ -38,8 +38,8 @@ public class Plug: NSObject {
 }
 
 public extension Plug {
-	public class func request(method: Method = .GET, URL: NSURLConvertible, parameters: Plug.Parameters? = nil, relevance: Plug.Connection.ResponseRelevance = .Transient) -> Plug.Connection {
-		var connection = Plug.Connection(method: method, URL: URL, parameters: parameters, relevance: relevance)
+	public class func request(method: Method = .GET, URL: NSURLConvertible, parameters: Plug.Parameters? = nil, persistence: Plug.Connection.Persistence = .Transient) -> Plug.Connection {
+		var connection = Plug.Connection(method: method, URL: URL, parameters: parameters, persistence: persistence)
 		
 		return connection ?? self.defaultManager.noopConnection
 	}

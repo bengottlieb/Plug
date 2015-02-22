@@ -10,7 +10,7 @@ import Foundation
 
 extension Plug {
 	public class Connection: NSObject {
-		public enum ResponseRelevance { case Transient, Ignored, Persistent(PersistenceInfo)
+		public enum Persistence { case Transient, PersistRequest, Persistent(PersistenceInfo)
 			public var isPersistent: Bool {
 				switch (self) {
 				case .Transient: return false
@@ -26,9 +26,9 @@ extension Plug {
 				}
 			}
 		}
-		public let responseRelevance: ResponseRelevance
+		public let persistence: Persistence
 		
-		public enum State: String, Printable { case NotStarted = "Not Started", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Error"
+		public enum State: String, Printable { case NotStarted = "Not Started", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Completed with Error"
 			public var description: String { return self.rawValue }
 			public var isRunning: Bool { return self == .Running }
 			public var hasStarted: Bool { return self != .NotStarted }
@@ -59,12 +59,12 @@ extension Plug {
 		}
 		
 		
-		public init?(method meth: Method = .GET, URL url: NSURLConvertible, parameters params: Plug.Parameters? = nil, relevance: ResponseRelevance = .Transient) {
+		public init?(method meth: Method = .GET, URL url: NSURLConvertible, parameters params: Plug.Parameters? = nil, persistence persist: Persistence = .Transient) {
 			completionQueue = NSOperationQueue()
 			completionQueue.maxConcurrentOperationCount = 1
 			completionQueue.suspended = true
 			
-			responseRelevance = relevance
+			persistence = persist
 			parameters = params ?? .None
 			
 			method = parameters.normalizeMethod(meth)
@@ -137,7 +137,7 @@ extension Plug {
 			return request
 		}
 		public func notifyPersistentDelegateOfCompletion() {
-			self.responseRelevance.persistentDelegate?.connectionCompleted(self, info: self.responseRelevance.persistentInfo)
+			self.persistence.persistentDelegate?.connectionCompleted(self, info: self.persistence.persistentInfo)
 		}
 	}
 
@@ -168,16 +168,16 @@ extension Plug.Connection: Printable {
 	public override var description: String {
 		var request = self.task.originalRequest
 		var noURL = "[no URL]"
-		var string = "\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"
+		var string =  "\n▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽\n"
 		string += "\(self.method) \(request.URL) \(self.parameters) [\(self.state)]"
 		if let response = self.response {
 			string += "\n" + response.description
 		}
 		if let data = self.resultsData {
-			string += "\n------------------------------------------------------------\n" + (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as UTF8--")
+			string += "\n===================================================================\n" + (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as UTF8--")
 		}
 		if !string.hasSuffix("\n") { string += "\n" }
-		string += "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\n"
+		string +=       "△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△\n"
 		return string
 	}
 	
@@ -227,6 +227,6 @@ extension NSURLRequest: Printable {
 	}
 }
 
-public func ==(lhs: Plug.Connection.ResponseRelevance, rhs: Plug.Connection.ResponseRelevance) -> Bool {
+public func ==(lhs: Plug.Connection.Persistence, rhs: Plug.Connection.Persistence) -> Bool {
 	return true
 }

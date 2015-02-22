@@ -72,7 +72,7 @@ class Plug_Tests: XCTestCase {
 		var url = "http://httpbin.org/get"
 		var params: Plug.Parameters = .None
 		
-		var connection = Plug.request(method: .GET, URL: url, parameters: params, relevance: .Persistent(persistentDelegate.persistenceInfo))
+		var connection = Plug.request(method: .GET, URL: url, parameters: params, persistence: .Persistent(persistentDelegate.persistenceInfo))
 		waitForExpectationsWithTimeout(10) { (error) in
 			
 		}
