@@ -11,27 +11,32 @@ import Foundation
 extension Plug {
 	public enum Parameters: Printable {
 		case None
-		case URL([String: String?])
-		case Form([String: String?])
+		case URL([String: String])
+		case Form([String: String])
 		case JSON(NSDictionary)
 		
 		var stringValue: String {
 			switch (self) {
 			case .URL(let params):
-				return (reduce(params.keys, "?") { if let v = params[$1] { return $0 + "\($1)=\(v!.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!)&" }; return $0 })
+				return (reduce(params.keys, "?") { if let v = params[$1] { return $0 + "\($1)=\(v.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!)&" }; return $0 })
 				
 			case .Form(let params):
-				return reduce(params.keys, "") { if let v = params[$1] { return $0 + "\($1)=\(v!)&" }; return $0 }
-			
+				return reduce(params.keys, "") { if let v = params[$1] { return $0 + "\($1)=\(v)&" }; return $0 }
+				
 			case .JSON(let object):
-				var error: NSError?
-				var data = NSJSONSerialization.dataWithJSONObject(object, options: nil, error: &error)
-				if error != nil { println("Error \(error) while JSON encoding \(object)") }
-				if let data = data { return NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "" }
-				return ""
+				return object.JSONString ?? ""
 				
 			case .None:
 				return ""
+			}
+		}
+		
+		var type: String {
+			switch (self) {
+			case .URL: return "URL"
+			case .Form: return "Form"
+			case .JSON: return "JSON"
+			default: return "None"
 			}
 		}
 		
@@ -70,13 +75,55 @@ extension Plug {
 		
 		public var description: String {
 			switch (self) {
-			case .URL(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v!), " }; return $0 } + "]"
-			case .Form(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v!), " }; return $0 } + "]"
+			case .URL(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
+			case .Form(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
 			case .JSON: return "[" + self.stringValue + "]"
 				
 			default: return ""
 			}
 		}
 		
+		public var JSONValue: [String: NSDictionary]? {
+			switch (self) {
+			case .URL(let params): return ["URL": NSMutableDictionary(stringDictionary: params)]
+			case .Form(let params): return ["Form": NSMutableDictionary(stringDictionary: params)]
+			case .JSON(let json): return ["JSON": json]
+				
+			default: return nil
+			}
+		}
+		
+		static func parametersFromJSON(dictionary: [String: NSDictionary]) -> Plug.Parameters {
+			if let urlParams = dictionary["URL"] as? [String: String] { return .URL(urlParams) }
+			if let formParams = dictionary["Form"] as? [String: String] { return .Form(formParams) }
+			if let JSONParams = dictionary["JSON"] { return .JSON(JSONParams) }
+			return .None
+		}
+		
+	}
+}
+
+extension NSMutableDictionary {
+	convenience init(stringDictionary: [String: String?]) {
+		self.init()
+		
+		for (key, value) in stringDictionary {
+			if value != nil {
+				self[key] = value!
+			}
+		}
+	}
+	
+	var stringDictionary: [String: String] {
+		var result: [String: String] = [:]
+		
+		for (key, value) in self {
+			if let str = value as? String {
+				if let key = key as? String {
+					result[key] = str
+				}
+			}
+		}
+		return result
 	}
 }

@@ -14,11 +14,18 @@ var persistentDelegate = Plug_TestPersistentDelegate()
 
 class Plug_TestPersistentDelegate: PlugPersistentDelegate {
 	var persistenceInfo = Plug.PersistenceInfo(objectKey: "test")
-	var expectation: XCTestExpectation? = nil
+	var expectations: [XCTestExpectation] = []
 	
 	func connectionCompleted(connection: Plug.Connection, info: Plug.PersistenceInfo?) {
-		self.expectation?.fulfill()
-		XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
+		if self.expectations.count > 0 {
+			let expectation = self.expectations[0]
+			expectation.fulfill()
+			self.expectations.removeAtIndex(0)
+		}
+		
+		if self.expectations.count == 0 {
+			XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
+		}
 	}
 	
 	init() {		
@@ -68,11 +75,20 @@ class Plug_Tests: XCTestCase {
     }
 	
 	func testPersistent() {
-		persistentDelegate.expectation = expectationWithDescription("GET")
+		persistentDelegate.expectations.append(expectationWithDescription("GET"))
+		persistentDelegate.expectations.append(expectationWithDescription("GET"))
 		var url = "http://httpbin.org/get"
 		var params: Plug.Parameters = .None
 		
 		var connection = Plug.request(method: .GET, URL: url, parameters: params, persistence: .Persistent(persistentDelegate.persistenceInfo))
+		var dict = connection.JSONRepresentation
+		var json = dict.JSONString
+		var error: NSError?
+		
+		if let dict = NSJSONSerialization.JSONObjectWithData(json!.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, options: nil, error: &error) as? NSDictionary {
+			var replacement = Plug.Connection(JSONRepresentation: dict)
+		}
+		
 		waitForExpectationsWithTimeout(10) { (error) in
 			
 		}

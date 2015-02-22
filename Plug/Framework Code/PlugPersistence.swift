@@ -26,13 +26,26 @@ public extension Plug {
 }
 
 extension Plug.Connection {
-	public var JSONRepresentation: [String: AnyObject] {
+	public var JSONRepresentation: NSDictionary {
 		return [
-			"url": self.URL,
+			"url": self.URL.absoluteString ?? "",
 			"headers": self.headers?.dictionary ?? [:],
 			"method": self.method.rawValue,
 			"persistenceIdentifier": self.persistence.JSONValue,
+			"parameters": self.parameters.JSONValue ?? [:],
 		]
+	}
+	
+	public convenience init?(JSONRepresentation info: NSDictionary) {
+		var url = (info["url"] as? String) ?? ""
+		var headers = (info["headers"] as? [String: String]) ?? [:]
+		var method = Plug.Method(rawValue: (info["method"] as? String) ?? "GET")
+		var persistance = Plug.PersistenceInfo(JSONValue: (info["persistenceIdentifier"] as? [String]) ?? [""])
+		var parametersData = (info["parameters"] as? [String: NSDictionary])
+		
+		var parameters = Plug.Parameters.parametersFromJSON(parametersData ?? [:])
+		
+		self.init(method: method ?? .GET, URL: url, parameters: parameters, persistence: .Persistent(persistance))
 	}
 }
 
@@ -51,6 +64,13 @@ public extension Plug {
 			var value = [self.objectKey]
 			if let instanceKey = self.instanceKey { value.append(instanceKey) }
 			return value
+		}
+		
+		public init(JSONValue: [String]) {
+			var oKey = JSONValue.count > 0 ? JSONValue[0] : ""
+			var iKey: String? = JSONValue.count > 1 ? JSONValue[1] : nil
+			
+			self.init(objectKey: oKey, instanceKey: iKey)
 		}
 	}
 }
