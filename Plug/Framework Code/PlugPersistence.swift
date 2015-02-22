@@ -16,11 +16,19 @@ public extension Plug {
 			self.persistentDelegates[object.persistenceInfo] = object
 		}
 		
-		public func delegateForPersistenceInfo(info: PersistenceInfo) -> PlugPersistentDelegate? {
-			return self.persistentDelegates[info];
+		public func delegateForPersistenceInfo(info: PersistenceInfo?) -> PlugPersistentDelegate? {
+			if let info = info { return self.persistentDelegates[info] }
+			return nil
 		}
 		
 		var persistentDelegates: [PersistenceInfo: PlugPersistentDelegate] = [:]
+	}
+}
+
+extension Plug.Connection {
+	
+	public func notifyPersistentDelegateOfCompletion() {
+		self.responseRelevance.persistentDelegate?.connectionCompleted(self, info: self.responseRelevance.persistentInfo)
 	}
 }
 
@@ -29,12 +37,18 @@ public extension Plug {
 		public var objectKey: String
 		public var instanceKey: String?
 		public var hashValue: Int { return self.objectKey.hash + (self.instanceKey?.hash ?? 0) }
-
+		
+		public init(objectKey oKey: String, instanceKey iKey: String? = nil) {
+			objectKey = oKey
+			instanceKey = iKey
+		}
 	}
 }
 
 public protocol PlugPersistentDelegate {
 	var persistenceInfo: Plug.PersistenceInfo { get }
+	
+	func connectionCompleted(connection: Plug.Connection, info: Plug.PersistenceInfo?)
 }
 
 public func ==(lhs: Plug.PersistenceInfo, rhs: Plug.PersistenceInfo) -> Bool {

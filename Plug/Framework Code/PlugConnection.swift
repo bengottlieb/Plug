@@ -10,8 +10,23 @@ import Foundation
 
 extension Plug {
 	public class Connection: NSObject {
-		public enum ResponseRelevance { case ConsumedTransient, Ignored, ConsumedPersistent(PersistenceInfo) }
-		public let relevance: ResponseRelevance
+		public enum ResponseRelevance { case Transient, Ignored, Persistent(PersistenceInfo)
+			public var isPersistent: Bool {
+				switch (self) {
+				case .Transient: return false
+				default: return true
+				}
+			}
+			public var persistentDelegate: PlugPersistentDelegate? { return PersistenceManager.defaultManager.delegateForPersistenceInfo(self.persistentInfo) }
+			
+			public var persistentInfo: PersistenceInfo? {
+				switch (self) {
+				case .Persistent(let info): return info
+				default: return nil
+				}
+			}
+		}
+		public let responseRelevance: ResponseRelevance
 		
 		public enum State: String, Printable { case NotStarted = "Not Started", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Error"
 			public var description: String { return self.rawValue }
@@ -38,13 +53,18 @@ extension Plug {
 		public let completionQueue: NSOperationQueue
 		public let parameters: Plug.Parameters
 		public var headers: Plug.Headers?
+		public func addHeader(header: Plug.Header) {
+			if self.headers == nil { self.headers = Plug.defaultManager.defaultHeaders }
+			self.headers?.append(header)
+		}
 		
-		init?(method meth: Method = .GET, URL url: NSURLConvertible, parameters params: Plug.Parameters? = nil, relevance responseRelevance: ResponseRelevance = .ConsumedTransient) {
+		
+		public init?(method meth: Method = .GET, URL url: NSURLConvertible, parameters params: Plug.Parameters? = nil, relevance: ResponseRelevance = .Transient) {
 			completionQueue = NSOperationQueue()
 			completionQueue.maxConcurrentOperationCount = 1
 			completionQueue.suspended = true
 			
-			relevance = responseRelevance
+			responseRelevance = relevance
 			parameters = params ?? .None
 			
 			method = parameters.normalizeMethod(meth)
@@ -70,7 +90,7 @@ extension Plug {
 				self.task = Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
 			} else {
 				self.task = Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
-					self.state = .Completed
+					self.state = (error == nil) ? .Completed : .CompletedWithError
 					self.response = response
 					self.resultsError = error ?? response.error
 					if error == nil || data.length > 0 {
@@ -94,11 +114,6 @@ extension Plug {
 			self.completionQueue.suspended = false
 		}
 
-		public func addHeader(header: Plug.Header) {
-			if self.headers == nil { self.headers = Plug.defaultManager.defaultHeaders }
-			self.headers?.append(header)
-		}
-		
 		func completedDownloadingToURL(location: NSURL) {
 			self.state = .Completed
 			var filename = "Plug-temp-\(location.lastPathComponent!.hash).tmp"
@@ -160,6 +175,10 @@ extension Plug.Connection: Printable {
 		
 		return string
 	}
+	
+	public func log() {
+		NSLog("\(self.description)")
+	}
 }
 
 extension Plug.Connection {		//actions
@@ -167,6 +186,7 @@ extension Plug.Connection {		//actions
 		assert(state == .NotStarted, "Trying to start an already started connection")
 		self.state = .Running
 		self.task.resume()
+		self.completionQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
 	}
 	
 	public func suspend() {
@@ -200,4 +220,8 @@ extension NSURLRequest: Printable {
 		
 		return str
 	}
+}
+
+public func ==(lhs: Plug.Connection.ResponseRelevance, rhs: Plug.Connection.ResponseRelevance) -> Bool {
+	return true
 }

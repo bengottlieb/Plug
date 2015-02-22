@@ -10,6 +10,21 @@ import UIKit
 import XCTest
 import Plug
 
+var persistentDelegate = Plug_TestPersistentDelegate()
+
+class Plug_TestPersistentDelegate: PlugPersistentDelegate {
+	var persistenceInfo = Plug.PersistenceInfo(objectKey: "test")
+	var expectation: XCTestExpectation? = nil
+	
+	func connectionCompleted(connection: Plug.Connection, info: Plug.PersistenceInfo?) {
+		self.expectation?.fulfill()
+	}
+	
+	init() {		
+		Plug.PersistenceManager.defaultManager.registerObject(self)
+	}
+}
+
 class Plug_Tests: XCTestCase {
     
     override func setUp() {
@@ -22,7 +37,7 @@ class Plug_Tests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
+    func _testGET() {
 		let expectation = expectationWithDescription("GET")
 		var url = "http://httpbin.org/get"
 		var params: Plug.Parameters = .None
@@ -50,8 +65,19 @@ class Plug_Tests: XCTestCase {
 
 		XCTAssert(true, "Pass")
     }
+	
+	func testPersistent() {
+		persistentDelegate.expectation = expectationWithDescription("GET")
+		var url = "http://httpbin.org/get"
+		var params: Plug.Parameters = .None
+		
+		var connection = Plug.request(method: .GET, URL: url, parameters: params, relevance: .Persistent(persistentDelegate.persistenceInfo))
+		waitForExpectationsWithTimeout(10) { (error) in
+			
+		}
+	}
     
-    func testPerformanceExample() {
+    func _testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock() {
             // Put the code you want to measure the time of here.
