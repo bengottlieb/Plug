@@ -13,7 +13,7 @@ extension Plug {
 		case None
 		case URL([String: String?])
 		case Form([String: String?])
-		case JSON(AnyObject)
+		case JSON(NSDictionary)
 		
 		var stringValue: String {
 			switch (self) {
@@ -77,5 +77,6 @@ extension Plug {
 			default: return ""
 			}
 		}
+		
 	}
 }

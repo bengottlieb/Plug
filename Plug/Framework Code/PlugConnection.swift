@@ -25,6 +25,9 @@ extension Plug {
 				default: return nil
 				}
 			}
+			
+			public var JSONValue: AnyObject { return self.persistentInfo?.JSONValue ?? [:] }
+				
 		}
 		public let persistence: Persistence
 		
@@ -163,6 +166,8 @@ extension Plug.Connection {
 		return self
 	}
 }
+
+
 
 extension Plug.Connection: Printable {
 	public override var description: String {

@@ -25,6 +25,17 @@ public extension Plug {
 	}
 }
 
+extension Plug.Connection {
+	public var JSONRepresentation: [String: AnyObject] {
+		return [
+			"url": self.URL,
+			"headers": self.headers?.dictionary ?? [:],
+			"method": self.method.rawValue,
+			"persistenceIdentifier": self.persistence.JSONValue,
+		]
+	}
+}
+
 public extension Plug {
 	public struct PersistenceInfo: Hashable, Equatable {
 		public var objectKey: String
@@ -34,6 +45,12 @@ public extension Plug {
 		public init(objectKey oKey: String, instanceKey iKey: String? = nil) {
 			objectKey = oKey
 			instanceKey = iKey
+		}
+		
+		public var JSONValue: [String] {
+			var value = [self.objectKey]
+			if let instanceKey = self.instanceKey { value.append(instanceKey) }
+			return value
 		}
 	}
 }
