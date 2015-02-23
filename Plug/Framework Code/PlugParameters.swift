@@ -93,13 +93,23 @@ extension Plug {
 			}
 		}
 		
-		static func parametersFromJSON(dictionary: [String: NSDictionary]) -> Plug.Parameters {
-			if let urlParams = dictionary["URL"] as? [String: String] { return .URL(urlParams) }
-			if let formParams = dictionary["Form"] as? [String: String] { return .Form(formParams) }
-			if let JSONParams = dictionary["JSON"] { return .JSON(JSONParams) }
-			return .None
+		init(dictionary: [String: NSDictionary]) {
+			if let urlParams = dictionary["URL"] as? [String: String] {
+				self = .URL(urlParams)
+				return
+			}
+			if let formParams = dictionary["Form"] as? [String: String] {
+				self = .Form(formParams)
+				return
+			}
+			
+			if let JSONParams = dictionary["JSON"] {
+				self = .JSON(JSONParams)
+				return
+			}
+			
+			self = .None
 		}
-		
 	}
 }
 
