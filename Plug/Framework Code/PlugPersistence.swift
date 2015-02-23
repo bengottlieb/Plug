@@ -59,8 +59,8 @@ extension Plug.Connection {
 	public var JSONRepresentation: NSDictionary {
 		var json = [
 			"url": self.URL.absoluteString ?? "",
-			"method": self.method.rawValue,
 			"persistenceIdentifier": self.persistence.JSONValue,
+			"method": self.method.rawValue
 		]
 
 		if let headers = self.headers { json["headers"] = headers.dictionary }
@@ -72,12 +72,12 @@ extension Plug.Connection {
 		var url = (info["url"] as? String) ?? ""
 		var headers = (info["headers"] as? [String: String]) ?? [:]
 		var method = Plug.Method(rawValue: (info["method"] as? String) ?? "GET")
-		var persistance = Plug.PersistenceInfo(JSONValue: (info["persistenceIdentifier"] as? [String]) ?? [""])
+		var persistance = Plug.PersistenceInfo(JSONValue: (info["persistenceIdentifier"] as? [String]) ?? [])
 		var parametersData = (info["parameters"] as? [String: NSDictionary])
 		
 		var parameters = Plug.Parameters.parametersFromJSON(parametersData ?? [:])
 		
-		self.init(method: method ?? .GET, URL: url, parameters: parameters, persistence: .Persistent(persistance))
+		self.init(method: method ?? .GET, URL: url, parameters: parameters, persistence: (persistance == nil) ? .PersistRequest : .Persistent(persistance!))
 	}
 }
 
@@ -98,11 +98,10 @@ public extension Plug {
 			return value
 		}
 		
-		public init(JSONValue: [String]) {
-			var oKey = JSONValue.count > 0 ? JSONValue[0] : ""
-			var iKey: String? = JSONValue.count > 1 ? JSONValue[1] : nil
+		public init?(JSONValue: [String]) {
+			if JSONValue.count == 0 { return nil }
 			
-			self.init(objectKey: oKey, instanceKey: iKey)
+			self.init(objectKey: JSONValue[0], instanceKey: JSONValue.count > 1 ? JSONValue[1] : nil)
 		}
 	}
 }

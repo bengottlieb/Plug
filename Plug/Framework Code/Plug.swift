@@ -37,7 +37,7 @@ public class Plug: NSObject {
 	private var connections: [Int: Plug.Connection] = [:]
 	private var serialQueue: NSOperationQueue = { var q = NSOperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
 
-	private var connectionQueue: [Plug.Connection] = []
+	private var waitingConnections: [Plug.Connection] = []
 	private var activeConnections: [Plug.Connection] = []
 	
 }
@@ -45,26 +45,45 @@ public class Plug: NSObject {
 public extension Plug {
 	
 	func enqueue(connection: Plug.Connection) {
-		self.connectionQueue.append(connection)
-		
-		if self.maximumActiveConnections == 0 || self.activeConnections.count < self.maximumActiveConnections {
-			connection.start()
+		self.serialQueue.addOperationWithBlock {
+			self.waitingConnections.append(connection)
+			self.updateQueue()
 		}
 	}
 
 	func dequeue(connection: Plug.Connection) {
-		if let index = find(self.connectionQueue, connection) {
-			self.connectionQueue.removeAtIndex(index)
+		self.serialQueue.addOperationWithBlock {
+			if let index = find(self.waitingConnections, connection) {
+				self.waitingConnections.removeAtIndex(index)
+			}
+			self.updateQueue()
 		}
 	}
 	
 	func connectionStarted(connection: Plug.Connection) {
-		self.activeConnections.append(connection)
+		self.serialQueue.addOperationWithBlock {
+			if let index = find(self.waitingConnections, connection) { self.waitingConnections.removeAtIndex(index) }
+			if find(self.activeConnections, connection) == -1 { self.activeConnections.append(connection) }
+		}
 	}
 
 	func connectionStopped(connection: Plug.Connection) {
-		if let index = find(self.activeConnections, connection) {
-			self.activeConnections.removeAtIndex(index)
+		self.serialQueue.addOperationWithBlock {
+			if let index = find(self.activeConnections, connection) {
+				self.activeConnections.removeAtIndex(index)
+			}
+			self.updateQueue()
+		}
+	}
+	
+	func updateQueue() {
+		self.serialQueue.addOperationWithBlock {
+			if self.waitingConnections.count > 0 && (self.maximumActiveConnections == 0 || self.activeConnections.count < self.maximumActiveConnections) {
+				var connection = self.waitingConnections[0]
+				self.waitingConnections.removeAtIndex(0)
+				self.activeConnections.append(connection)
+				connection.start()
+			}
 		}
 	}
 }

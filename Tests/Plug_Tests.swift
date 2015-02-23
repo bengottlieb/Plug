@@ -75,6 +75,8 @@ class Plug_Tests: XCTestCase {
     }
 	
 	func testPersistent() {
+		Plug.defaultManager.maximumActiveConnections = 1
+		
 		persistentDelegate.expectations.append(expectationWithDescription("GET"))
 		persistentDelegate.expectations.append(expectationWithDescription("GET"))
 		var url = "http://httpbin.org/get"

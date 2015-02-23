@@ -26,7 +26,7 @@ extension Plug {
 				}
 			}
 			
-			public var JSONValue: AnyObject { return self.persistentInfo?.JSONValue ?? [:] }
+			public var JSONValue: AnyObject { return self.persistentInfo?.JSONValue ?? [] }
 				
 		}
 		public let persistence: Persistence
