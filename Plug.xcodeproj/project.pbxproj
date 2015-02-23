@@ -468,13 +468,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B580E02A1A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B58D64831A898FBE005A0002 /* Plug.swift in Sources */,
 				B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */,
 				B58D64841A898FBE005A0002 /* PlugConnection.swift in Sources */,
 				B58D64851A898FBE005A0002 /* PlugParameters.swift in Sources */,
 				B507A3CA1A8E85BC008E3DB1 /* Errors.swift in Sources */,
 				B58D64861A898FBE005A0002 /* Protocols.swift in Sources */,
+				B580E02A1A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B55097A11A9A4FE7003E5155 /* JSON.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
