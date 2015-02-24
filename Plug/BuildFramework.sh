@@ -44,6 +44,8 @@ xcodebuild -target "${PROJECT_NAME}_iOS" -configuration ${CONFIGURATION} -sdk ip
 
 xcodebuild -target "${PROJECT_NAME}_Mac" -configuration ${CONFIGURATION} ONLY_ACTIVE_ARCH=NO BUILD_DIR="${BASE_BUILD_DIR}" BUILD_ROOT="${BUILD_ROOT}" clean build
 
+sleep 1s
+
 # Step 2. Copy the framework structure (from iphoneos build) to the universal folder
 echo "copying device framework"
 cp -R "${BASE_BUILD_DIR}/${CONFIGURATION}-iphoneos/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework" "${UNIVERSAL_OUTPUTFOLDER}/"

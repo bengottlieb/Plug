@@ -95,6 +95,9 @@ extension Plug {
 				self.task = Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
 					self.response = response
 					self.resultsError = error ?? response.error
+					if error != nil && error!.code == -1005 {
+						println("++++++++ Simulator comms issue, please restart the sim. ++++++++")
+					}
 					if error == nil || data.length > 0 {
 						self.resultsData = data
 					}
@@ -110,6 +113,9 @@ extension Plug {
 		var resultsData: NSData?
 		
 		func failedWithError(error: NSError?) {
+			if error != nil && error!.code == -1005 {
+				println("++++++++ Simulator comms issue, please restart the sim. ++++++++")
+			}
 			self.response = self.task.response
 			self.resultsError = error ?? self.task.response?.error
 			self.complete(.CompletedWithError)
