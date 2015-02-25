@@ -39,7 +39,7 @@ extension Plug {
 		public var state: State = .Waiting {
 			didSet {
 				if self.state == oldValue { return }
-				#if TARGET_OS_IPHONE
+				#if os(iOS)
 					if oldValue == .Running { NetworkActivityIndicator.decrement() }
 					if self.state.isRunning { NetworkActivityIndicator.increment() }
 				#endif
