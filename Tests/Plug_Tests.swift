@@ -23,6 +23,8 @@ class Plug_TestPersistentDelegate: PlugPersistentDelegate {
 			self.expectations.removeAtIndex(0)
 		}
 		
+		connection.log()
+		
 		if self.expectations.count == 0 {
 			XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
 		}
@@ -81,9 +83,12 @@ class Plug_Tests: XCTestCase {
 		persistentDelegate.expectations.append(expectationWithDescription("GET"))
 		var url = "http://httpbin.org/get"
 		var params: Plug.Parameters = .None
+		var headers = Plug.Headers([.Accept(["*/*"])])
 		
 		var connection = Plug.request(method: .GET, URL: url, parameters: params, persistence: .Persistent(persistentDelegate.persistenceInfo))
+		connection.headers = headers
 		var dict = connection.JSONRepresentation
+		
 		var json = dict.JSONString
 		var error: NSError?
 		

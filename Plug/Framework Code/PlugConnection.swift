@@ -9,7 +9,7 @@
 import Foundation
 
 extension Plug {
-	public class Connection: NSObject {
+	public class Connection: NSObject, Equatable {
 		public enum Persistence { case Transient, PersistRequest, Persistent(PersistenceInfo)
 			public var isPersistent: Bool {
 				switch (self) {
@@ -56,6 +56,18 @@ extension Plug {
 		public let completionQueue: NSOperationQueue
 		public let parameters: Plug.Parameters
 		public var headers: Plug.Headers?
+		public var startedAt: NSDate?
+		public var completedAt: NSDate?
+		public var elapsedTime: NSTimeInterval {
+			if let startedAt = self.startedAt {
+				if let completedAt = self.completedAt {
+					return abs(startedAt.timeIntervalSinceDate(completedAt))
+				} else {
+					return abs(startedAt.timeIntervalSinceNow)
+				}
+			}
+			return 0
+		}
 		public func addHeader(header: Plug.Header) {
 			if self.headers == nil { self.headers = Plug.defaultManager.defaultHeaders }
 			self.headers?.append(header)
@@ -173,19 +185,37 @@ extension Plug.Connection {
 
 
 extension Plug.Connection: Printable {
-	public override var description: String {
+	public override var description: String { return self.detailedDescription() }
+
+	public func detailedDescription(includeDelimiters: Bool = true) -> String {
 		var request = self.task.originalRequest
 		var noURL = "[no URL]"
-		var string =  "\n▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽\n"
-		string += "\(self.method) \(request.URL) \(self.parameters) [\(self.state)]"
-		if let response = self.response {
-			string += "\n" + response.description
+		var string = includeDelimiters ? "\n▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽\n" : ""
+		var durationString = self.elapsedTime > 0.0 ? String(format: "%.2f", self.elapsedTime) + " sec elapsed" : ""
+		
+		string += "\(self.method) \(request.URL) \(self.parameters) \(durationString) [\(self.state)]"
+		
+		for (label, header) in (self.headers?.dictionary ?? [:]) {
+			string += "\n   \(label): \(header)"
+		}
+		
+		if countElements(self.parameters.description) > 0 {
+			string += "\n Parameters: " + self.parameters.description
+		}
+		
+		if let response = self.response as? NSHTTPURLResponse {
+			string += "\n--------------------- Response ------------------------------------"
+			
+			for (label, header) in (response.allHeaderFields as [String: String]) {
+				string += "\n   \(label): \(header)"
+			}
 		}
 		if let data = self.resultsData {
-			string += "\n===================================================================\n" + (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as UTF8--")
+			string += "\n--------------------- Body ------------------------------------\n"
+			string += (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as UTF8--")
 		}
 		if !string.hasSuffix("\n") { string += "\n" }
-		string +=       "△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△\n"
+		if includeDelimiters { string +=       "△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△\n" }
 		return string
 	}
 	
@@ -206,6 +236,7 @@ extension Plug.Connection {		//actions
 		Plug.defaultManager.connectionStarted(self)
 		self.state = .Running
 		self.task.resume()
+		self.startedAt = NSDate()
 		self.completionQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
 	}
 	
@@ -227,14 +258,21 @@ extension Plug.Connection {		//actions
 		Plug.defaultManager.connectionStopped(self)
 		self.state = .Canceled
 		self.task.cancel()
+		NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionCancelled, object: self)
 	}
 	
 	func complete(state: State) {
 		self.state = state
+		self.completedAt = NSDate()
 		Plug.defaultManager.unregisterConnection(self)
 		Plug.defaultManager.connectionStopped(self)
 		Plug.defaultManager.dequeue(self)
 		self.completionQueue.suspended = false
+		if self.state == .Completed {
+			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionCompleted, object: self)
+		} else {
+			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionFailed, object: self, userInfo: (self.resultsError != nil) ? ["error": self.resultsError!] : nil)
+		}
 	}
 }
 
@@ -253,5 +291,9 @@ extension NSURLRequest: Printable {
 		
 		return str
 	}
+}
+
+public func ==(lhs: Plug.Connection, rhs: Plug.Connection) -> Bool {
+	return lhs === rhs
 }
 

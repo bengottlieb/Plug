@@ -62,13 +62,13 @@ extension Plug {
 			}
 			self.headers.append(header)
 		}
-		var dictionary: [String: String] {
+		public var dictionary: [String: String] {
 			var dict: [String: String] = [:]
 			
 			for header in self.headers { dict[header.label] = header.content }
 			return dict
 		}
-		init(_ headerList: [Header]) {
+		public init(_ headerList: [Header]) {
 			headers = headerList
 		}
 		

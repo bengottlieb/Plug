@@ -15,6 +15,14 @@ public class Plug: NSObject {
 	
 	public class var defaultManager: Plug { struct s { static let plug = Plug() }; return s.plug }
 	
+	public struct notifications {
+		public static let connectionQueued = "connectionQueued.com.standalone.plug"
+		public static let connectionStarted = "connectionStarted.com.standalone.plug"
+		public static let connectionCompleted = "connectionCompleted.com.standalone.plug"
+		public static let connectionCancelled = "connectionCancelled.com.standalone.plug"
+		public static let connectionFailed = "connectionFailed.com.standalone.plug"
+	}
+	
 	public var maximumActiveConnections = 0
 	public var autostartConnections = true
 	public var temporaryDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory())!
@@ -48,6 +56,7 @@ public extension Plug {
 		self.serialQueue.addOperationWithBlock {
 			self.waitingConnections.append(connection)
 			self.updateQueue()
+			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionQueued, object: connection)
 		}
 	}
 
@@ -64,6 +73,7 @@ public extension Plug {
 		self.serialQueue.addOperationWithBlock {
 			if let index = find(self.waitingConnections, connection) { self.waitingConnections.removeAtIndex(index) }
 			if find(self.activeConnections, connection) == -1 { self.activeConnections.append(connection) }
+			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionStarted, object: connection)
 		}
 	}
 
