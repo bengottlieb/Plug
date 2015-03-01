@@ -193,7 +193,7 @@ extension Plug.Connection: Printable {
 		var string = includeDelimiters ? "\n▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽\n" : ""
 		var durationString = self.elapsedTime > 0.0 ? String(format: "%.2f", self.elapsedTime) + " sec elapsed" : ""
 		
-		string += "\(self.method) \(request.URL) \(self.parameters) \(durationString) [\(self.state)]"
+		string += "\(self.method) \(request.URL) \(self.parameters) \(durationString) 〘\(self.state)〙"
 		
 		for (label, header) in (self.headers?.dictionary ?? [:]) {
 			string += "\n   \(label): \(header)"
@@ -204,14 +204,14 @@ extension Plug.Connection: Printable {
 		}
 		
 		if let response = self.response as? NSHTTPURLResponse {
-			string += "\n--------------------- Response ------------------------------------"
+			string += "\n╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍ [Response] ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍"
 			
 			for (label, header) in (response.allHeaderFields as [String: String]) {
 				string += "\n   \(label): \(header)"
 			}
 		}
 		if let data = self.resultsData {
-			string += "\n--------------------- Body ------------------------------------\n"
+			string += "\n╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍ [Body] ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍\n"
 			string += (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as UTF8--")
 		}
 		if !string.hasSuffix("\n") { string += "\n" }
