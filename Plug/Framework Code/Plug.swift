@@ -9,6 +9,8 @@
 import Foundation
 
 public class Plug: NSObject {
+	public enum ConnectionType: Int { case Offline, Wifi, WAN }
+	public enum QueueState: Int { case Paused, PausedDueToOffline, Running }
 	public enum Method: String, Printable { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH"
 		public var description: String { return self.rawValue } 
 	}
@@ -16,6 +18,8 @@ public class Plug: NSObject {
 	public class var defaultManager: Plug { struct s { static let plug = Plug() }; return s.plug }
 	
 	public struct notifications {
+		public static let onlineStatusChanged = "onlineStatusChanged.com.standalone.plug"
+
 		public static let connectionQueued = "connectionQueued.com.standalone.plug"
 		public static let connectionStarted = "connectionStarted.com.standalone.plug"
 		public static let connectionCompleted = "connectionCompleted.com.standalone.plug"
@@ -36,21 +40,53 @@ public class Plug: NSObject {
 	])
 	
 	public override init() {
+		var reachabilityClassReference : AnyObject.Type = NSClassFromString("Plug_Reachability")
+		var reachabilityClass : NSObject.Type = reachabilityClassReference as NSObject.Type
+		self.reachability = reachabilityClass()
+
 		super.init()
+		self.reachability.setValue(self, forKey: "delegate");
 
 		self.session = NSURLSession(configuration: self.configuration, delegate: self, delegateQueue: self.sessionQueue)
-	
 	}
+	
+	public var connectionType: ConnectionType = .Offline
 	
 	private var connections: [Int: Plug.Connection] = [:]
 	private var serialQueue: NSOperationQueue = { var q = NSOperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
 
 	private var waitingConnections: [Plug.Connection] = []
 	private var activeConnections: [Plug.Connection] = []
+	var queueState: QueueState = .PausedDueToOffline
 	
+	private var reachability: AnyObject
+	func setOnline(online: Bool, wifi: Bool) {
+		var newState = ConnectionType.Offline
+		
+		if online { newState = wifi ? .Wifi : .WAN }
+		
+		if newState == self.connectionType { return }
+		
+		self.connectionType = newState
+		
+		NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.onlineStatusChanged, object: nil)
+		if self.connectionType == .Offline {
+			if self.queueState == .Running { self.pauseQueue(); self.queueState = .PausedDueToOffline }
+		} else {
+			if self.queueState == .PausedDueToOffline { self.startQueue() }
+		}
+	}
 }
 
 public extension Plug {
+	func startQueue() {
+		self.queueState = .Running
+		self.updateQueue()
+	}
+	
+	func pauseQueue() {
+		self.queueState = .Paused
+	}
 	
 	func enqueue(connection: Plug.Connection) {
 		self.serialQueue.addOperationWithBlock {
@@ -88,6 +124,8 @@ public extension Plug {
 	
 	func updateQueue() {
 		self.serialQueue.addOperationWithBlock {
+			if self.queueState != .Running { return }
+			
 			if self.waitingConnections.count > 0 && (self.maximumActiveConnections == 0 || self.activeConnections.count < self.maximumActiveConnections) {
 				var connection = self.waitingConnections[0]
 				self.waitingConnections.removeAtIndex(0)
