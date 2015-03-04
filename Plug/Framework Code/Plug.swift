@@ -69,7 +69,9 @@ public class Plug: NSObject {
 		
 		self.connectionType = newState
 		
-		NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.onlineStatusChanged, object: nil)
+		dispatch_async(dispatch_get_main_queue()) {
+			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.onlineStatusChanged, object: nil)
+		}
 		if self.connectionType == .Offline {
 			if self.queueState == .Running { self.pauseQueue(); self.queueState = .PausedDueToOffline }
 		} else {
