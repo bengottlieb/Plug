@@ -71,15 +71,20 @@ static void PlugReachabilityCallback(SCNetworkReachabilityRef ref, SCNetworkReac
 }
 
 - (void) statusChanged: (SCNetworkReachabilityFlags) flags {
-	BOOL		online = (flags & kSCNetworkReachabilityFlagsReachable) == kSCNetworkReachabilityFlagsReachable;
+	BOOL		wifi = (flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0;
+	
+	if ((flags & (kSCNetworkReachabilityFlagsConnectionOnDemand | kSCNetworkReachabilityFlagsConnectionOnTraffic)) != 0) {
+		if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0) wifi = true;
+	}
+	
 	
 	#if TARGET_OS_IPHONE
-		BOOL	wifi = !((flags & kSCNetworkReachabilityFlagsIsWWAN) == kSCNetworkReachabilityFlagsIsWWAN);
+		BOOL	wan = ((flags & kSCNetworkReachabilityFlagsIsWWAN) == kSCNetworkReachabilityFlagsIsWWAN);
 	#else
-		BOOL	wifi = true;
+		BOOL	wan = false;
 	#endif
 	
-	[self.delegate setOnline: online wifi: wifi];
+	[self.delegate setOnline: wifi || wan wifi: wifi];
 }
 
 @end
