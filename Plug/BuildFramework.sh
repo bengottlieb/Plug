@@ -70,6 +70,29 @@ mkdir -p "${PROJECT_DIR}/Mac Framework/"
 rm -rf "${PROJECT_DIR}/Mac Framework/${FRAMEWORK_NAME}.framework"
 cp -R "${BASE_BUILD_DIR}/${CONFIGURATION}/${FRAMEWORK_NAME}.framework" "${PROJECT_DIR}/Mac Framework"
 
+# Step 7. Copy the iOS framework to the /iOS_Builds folder
+if [ ! -d "${IOS_FRAMEWORKS}" ]; then
+	mkdir "${IOS_FRAMEWORKS}"
+fi
+
+if [ -d "${IOS_FRAMEWORKS}${FRAMEWORK_NAME}.framework" ]; then
+	rm -rf "${IOS_FRAMEWORKS}${FRAMEWORK_NAME}.framework"
+fi
+
+cp -R "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}.framework" "${IOS_FRAMEWORKS}/${FRAMEWORK_NAME}.framework"
+
+
+# Step 8. Copy the Mac framework to the /Mac_Builds folder
+if [ ! -d "${MAC_FRAMEWORKS}" ]; then
+	mkdir "${MAC_FRAMEWORKS}"
+fi
+
+if [ -d "${MAC_FRAMEWORKS}${FRAMEWORK_NAME}.framework" ]; then
+	rm -rf "${MAC_FRAMEWORKS}${FRAMEWORK_NAME}.framework"
+fi
+
+cp -R "${BASE_BUILD_DIR}/${CONFIGURATION}/${FRAMEWORK_NAME}.framework" "${MAC_FRAMEWORKS}/${FRAMEWORK_NAME}.framework"
+
 
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch"
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :rev"
