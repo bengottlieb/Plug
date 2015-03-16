@@ -48,6 +48,7 @@ extension Plug {
 		
 		public var cachingPolicy: NSURLRequestCachePolicy = .ReloadIgnoringLocalCacheData
 		public var response: NSURLResponse?
+		public var statusCode: Int?
 		
 		public let method: Method
 		public let URL: NSURL
@@ -105,6 +106,7 @@ extension Plug {
 				self.task = Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
 			} else {
 				self.task = Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
+					if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
 					self.response = response
 					self.resultsError = error ?? response.error
 					if error != nil && error!.code == -1005 {
@@ -129,6 +131,7 @@ extension Plug {
 				println("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 			}
 			self.response = self.task.response
+			if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
 			self.resultsError = error ?? self.task.response?.error
 			self.complete(.CompletedWithError)
 		}
@@ -137,6 +140,8 @@ extension Plug {
 			var filename = "Plug-temp-\(location.lastPathComponent!.hash).tmp"
 			var error: NSError?
 			
+			self.response = self.task.response
+			if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
 			self.resultsURL = Plug.defaultManager.temporaryDirectoryURL.URLByAppendingPathComponent(filename)
 			NSFileManager.defaultManager().moveItemAtURL(location, toURL: self.resultsURL!, error: &error)
 			
