@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0620"
+   LastUpgradeVersion = "0630"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B504E6661A89690C001B414B"
-               BuildableName = "Combined Framework"
-               BlueprintName = "Combined Framework"
+               BuildableName = "Build Combined"
+               BlueprintName = "Build Combined"
                ReferencedContainer = "container:Plug.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -43,8 +43,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B504E6661A89690C001B414B"
-            BuildableName = "Combined Framework"
-            BlueprintName = "Combined Framework"
+            BuildableName = "Build Combined"
+            BlueprintName = "Build Combined"
             ReferencedContainer = "container:Plug.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -61,8 +61,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B504E6661A89690C001B414B"
-            BuildableName = "Combined Framework"
-            BlueprintName = "Combined Framework"
+            BuildableName = "Build Combined"
+            BlueprintName = "Build Combined"
             ReferencedContainer = "container:Plug.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
