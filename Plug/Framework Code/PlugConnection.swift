@@ -168,7 +168,7 @@ extension Plug {
 }
 
 extension Plug.Connection {
-	public func completion(completion: (NSData) -> Void, queue: NSOperationQueue? = nil) -> Self {
+	public func completion(queue: NSOperationQueue? = nil, completion: (NSData) -> Void) -> Self {
 		self.completionQueue.addOperationWithBlock {
 			(queue ?? NSOperationQueue.mainQueue()).addOperationWithBlock {
 				if let data = self.resultsData { completion(data) }
@@ -177,7 +177,7 @@ extension Plug.Connection {
 		return self
 	}
 
-	public func error(completion: (NSError) -> Void, queue: NSOperationQueue? = nil) -> Self {
+	public func error(queue: NSOperationQueue? = nil, completion: (NSError) -> Void) -> Self {
 		self.completionQueue.addOperationWithBlock {
 			(queue ?? NSOperationQueue.mainQueue()).addOperationWithBlock {
 				if let error = self.resultsError { completion(error) }

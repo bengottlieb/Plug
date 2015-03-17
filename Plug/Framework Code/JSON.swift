@@ -13,7 +13,7 @@ public protocol JSONObject {
 }
 
 extension NSString: JSONObject {
-	public var JSONString: String? { return self }
+	public var JSONString: String? { return (self as String) }
 }
 
 extension NSData: JSONObject {
@@ -34,7 +34,7 @@ extension NSDictionary: JSONObject {
 		
 		if let data = NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted, error: &error) {
 			if error != nil { println("Error \(error) while JSON encoding \(self)") }
-			return NSString(data: data, encoding: NSUTF8StringEncoding)
+			return (NSString(data: data, encoding: NSUTF8StringEncoding) as? String) ?? ""
 		}
 		return nil
 	}
@@ -46,7 +46,7 @@ extension NSArray: JSONObject {
 		
 		if let data = NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted, error: &error) {
 			if error != nil { println("Error \(error) while JSON encoding \(self)") }
-			return NSString(data: data, encoding: NSUTF8StringEncoding)
+			return (NSString(data: data, encoding: NSUTF8StringEncoding) as? String) ?? ""
 		}
 
 		return nil
