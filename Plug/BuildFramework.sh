@@ -6,18 +6,24 @@
 #  Created by Ben Gottlieb on 1/21/15.
 #  Copyright (c) 2015 Stand Alone, Inc. All rights reserved.
 
-BASE_BUILD_DIR=${BUILD_DIR}
+BASE_BUILD_DIR="Build/Products"	#${BUILD_DIR}
+echo "Build directory: $BASE_BUILD_DIR"
 FRAMEWORK_NAME="Plug"
 IOS_SUFFIX=""
 MAC_SUFFIX=""
-UNIVERSAL_OUTPUTFOLDER="Build/${CONFIGURATION}-universal"
+CONFIG=Release	#$CONFIGURATION
+UNIVERSAL_OUTPUTFOLDER="Build/${CONFIG}-universal"
+PROJECT_DIRECTORY=`pwd`
+PROJECT_NAME="Plug"
+IOS_FRAMEWORKS=/Users/ben/Documents/ManagedProjects/Frameworks/iOS_Builds
+MAC_FRAMEWORKS=/Users/ben/Documents/ManagedProjects/Frameworks/Mac_Builds
 
 GIT_BRANCH=`git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1/"`
 GIT_REV=`git rev-parse --short HEAD`
 
 BUILD_DATE=`date`
 
-IOS_PLIST_PATH="${PROJECT_DIR}/Plug/iOS/info.plist"
+IOS_PLIST_PATH="${PROJECT_DIRECTORY}/Plug/iOS/info.plist"
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :branch"
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :rev"
@@ -26,7 +32,7 @@ IOS_PLIST_PATH="${PROJECT_DIR}/Plug/iOS/info.plist"
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :rev string ${GIT_REV}"
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :built string ${BUILD_DATE}"
 
-MAC_PLIST_PATH="${PROJECT_DIR}/Plug/Mac/info.plist"
+MAC_PLIST_PATH="${PROJECT_DIRECTORY}/Plug/Mac/info.plist"
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch"
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :rev"
@@ -39,36 +45,36 @@ MAC_PLIST_PATH="${PROJECT_DIR}/Plug/Mac/info.plist"
 mkdir -p "${UNIVERSAL_OUTPUTFOLDER}"
 
 # Step 1. Build Device and Simulator versions
-xcodebuild -target "${PROJECT_NAME}_iOS" -configuration ${CONFIGURATION} -sdk iphoneos ONLY_ACTIVE_ARCH=NO  BUILD_DIR="${BASE_BUILD_DIR}" BUILD_ROOT="${BUILD_ROOT}" clean build
-xcodebuild -target "${PROJECT_NAME}_iOS" -configuration ${CONFIGURATION} -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO BUILD_DIR="${BASE_BUILD_DIR}" BUILD_ROOT="${BUILD_ROOT}" clean build
+xcodebuild -target "${PROJECT_NAME}_iOS" -configuration ${CONFIG} -sdk "iphoneos" ONLY_ACTIVE_ARCH=NO  BUILD_DIR="${BASE_BUILD_DIR}" BUILD_ROOT="${BUILD_ROOT}" clean build
+xcodebuild -target "${PROJECT_NAME}_iOS" -configuration ${CONFIG} -sdk "iphonesimulator" ONLY_ACTIVE_ARCH=NO BUILD_DIR="${BASE_BUILD_DIR}" BUILD_ROOT="${BUILD_ROOT}" clean build
 
-xcodebuild -target "${PROJECT_NAME}_Mac" -configuration ${CONFIGURATION} ONLY_ACTIVE_ARCH=NO BUILD_DIR="${BASE_BUILD_DIR}" BUILD_ROOT="${BUILD_ROOT}" clean build
+xcodebuild -target "${PROJECT_NAME}_Mac" -configuration ${CONFIG} ONLY_ACTIVE_ARCH=NO BUILD_DIR="${BASE_BUILD_DIR}" BUILD_ROOT="${BUILD_ROOT}" clean build
 
 sleep 1s
 
 # Step 2. Copy the framework structure (from iphoneos build) to the universal folder
 echo "copying device framework"
-cp -R "${BASE_BUILD_DIR}/${CONFIGURATION}-iphoneos/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework" "${UNIVERSAL_OUTPUTFOLDER}/"
+cp -R "${BASE_BUILD_DIR}/${CONFIG}-iphoneos/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework" "${UNIVERSAL_OUTPUTFOLDER}/"
 
 # Step 3. Copy Swift modules (from iphonesimulator build) to the copied framework directory
 echo "integrating sim framework"
-cp -R "${BASE_BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework/Modules/${FRAMEWORK_NAME}${IOS_SUFFIX}.swiftmodule/" "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework/Modules/${FRAMEWORK_NAME}${IOS_SUFFIX}.swiftmodule/"
+cp -R "${BASE_BUILD_DIR}/${CONFIG}-iphonesimulator/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework/Modules/${FRAMEWORK_NAME}${IOS_SUFFIX}.swiftmodule/" "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework/Modules/${FRAMEWORK_NAME}${IOS_SUFFIX}.swiftmodule/"
 
 # Step 4. Create universal binary file using lipo and place the combined executable in the copied framework directory
 echo "lipo'ing files"
-lipo -create -output "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework/${FRAMEWORK_NAME}${IOS_SUFFIX}" "${BASE_BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework/${FRAMEWORK_NAME}${IOS_SUFFIX}" "${BASE_BUILD_DIR}/${CONFIGURATION}-iphoneos/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework/${FRAMEWORK_NAME}${IOS_SUFFIX}"
+lipo -create -output "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework/${FRAMEWORK_NAME}${IOS_SUFFIX}" "${BASE_BUILD_DIR}/${CONFIG}-iphonesimulator/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework/${FRAMEWORK_NAME}${IOS_SUFFIX}" "${BASE_BUILD_DIR}/${CONFIG}-iphoneos/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework/${FRAMEWORK_NAME}${IOS_SUFFIX}"
 
 echo "copying to iOS Framework folder"
 # Step 5. Convenience step to copy the framework to the project's directory
-mkdir -p "${PROJECT_DIR}/iOS Framework/"
-rm -rf "${PROJECT_DIR}/iOS Framework/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework"
-cp -R "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework" "${PROJECT_DIR}/iOS Framework"
+mkdir -p "${PROJECT_DIRECTORY}/iOS Framework/"
+rm -rf "${PROJECT_DIRECTORY}/iOS Framework/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework"
+cp -R "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework" "${PROJECT_DIRECTORY}/iOS Framework"
 
 # Step 6. Copy the Mac framework
 echo "copying to Mac OS Framework folder"
-mkdir -p "${PROJECT_DIR}/Mac Framework/"
-rm -rf "${PROJECT_DIR}/Mac Framework/${FRAMEWORK_NAME}.framework"
-cp -R "${BASE_BUILD_DIR}/${CONFIGURATION}/${FRAMEWORK_NAME}.framework" "${PROJECT_DIR}/Mac Framework"
+mkdir -p "${PROJECT_DIRECTORY}/Mac Framework/"
+rm -rf "${PROJECT_DIRECTORY}/Mac Framework/${FRAMEWORK_NAME}.framework"
+cp -R "${BASE_BUILD_DIR}/${CONFIG}/${FRAMEWORK_NAME}.framework" "${PROJECT_DIRECTORY}/Mac Framework"
 
 # Step 7. Copy the iOS framework to the /iOS_Builds folder
 if [ ! -d "${IOS_FRAMEWORKS}" ]; then
@@ -91,7 +97,7 @@ if [ -d "${MAC_FRAMEWORKS}${FRAMEWORK_NAME}.framework" ]; then
 	rm -rf "${MAC_FRAMEWORKS}${FRAMEWORK_NAME}.framework"
 fi
 
-cp -R "${BASE_BUILD_DIR}/${CONFIGURATION}/${FRAMEWORK_NAME}.framework" "${MAC_FRAMEWORKS}/${FRAMEWORK_NAME}.framework"
+cp -R "${BASE_BUILD_DIR}/${CONFIG}/${FRAMEWORK_NAME}.framework" "${MAC_FRAMEWORKS}/${FRAMEWORK_NAME}.framework"
 
 
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch"
@@ -103,4 +109,4 @@ cp -R "${BASE_BUILD_DIR}/${CONFIGURATION}/${FRAMEWORK_NAME}.framework" "${MAC_FR
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :built"
 
 # Step 7. Convenience step to open the project's directory in Finder
-#open "${PROJECT_DIR}"
+#open "${PROJECT_DIRECTORY}"
