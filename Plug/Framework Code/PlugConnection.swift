@@ -106,7 +106,7 @@ extension Plug {
 				self.task = Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
 			} else {
 				self.task = Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
-					if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
+					if let httpResponse = response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
 					self.response = response
 					self.resultsError = error ?? response.error
 					if error != nil && error!.code == -1005 {
