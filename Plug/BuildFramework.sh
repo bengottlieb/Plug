@@ -24,31 +24,32 @@ GIT_REV=`git rev-parse --short HEAD`
 BUILD_DATE=`date`
 
 IOS_PLIST_PATH="${PROJECT_DIRECTORY}/Plug/iOS/info.plist"
-/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c
-/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :branch"
-/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :rev"
-/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :built"
+$(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :branch" 2> /dev/null)
+$(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :rev" 2> /dev/null)
+$(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :built" 2> /dev/null)
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :branch string ${GIT_BRANCH}"
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :rev string ${GIT_REV}"
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :built string ${BUILD_DATE}"
 
 MAC_PLIST_PATH="${PROJECT_DIRECTORY}/Plug/Mac/info.plist"
-/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c
-/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch"
-/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :rev"
-/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :built"
+$(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch" 2> /dev/null)
+$(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :rev" 2> /dev/null)
+$(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :built" 2> /dev/null)
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Add :branch string ${GIT_BRANCH}"
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Add :rev string ${GIT_REV}"
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Add :built string ${BUILD_DATE}"
 
+echo "plists updated"
 # make sure the output directory exists
 mkdir -p "${UNIVERSAL_OUTPUTFOLDER}"
 
 # Step 1. Build Device and Simulator versions
 xcodebuild -target "${PROJECT_NAME}_iOS" -configuration ${CONFIG} -sdk "iphoneos" ONLY_ACTIVE_ARCH=NO  BUILD_DIR="${BASE_BUILD_DIR}" BUILD_ROOT="${BUILD_ROOT}" clean build
 xcodebuild -target "${PROJECT_NAME}_iOS" -configuration ${CONFIG} -sdk "iphonesimulator" ONLY_ACTIVE_ARCH=NO BUILD_DIR="${BASE_BUILD_DIR}" BUILD_ROOT="${BUILD_ROOT}" clean build
+echo "iOS Build Complete"
 
 xcodebuild -target "${PROJECT_NAME}_Mac" -configuration ${CONFIG} ONLY_ACTIVE_ARCH=NO BUILD_DIR="${BASE_BUILD_DIR}" BUILD_ROOT="${BUILD_ROOT}" clean build
+echo "Mac Build Complete"
 
 sleep 1s
 
@@ -81,10 +82,11 @@ if [ ! -d "${IOS_FRAMEWORKS}" ]; then
 	mkdir "${IOS_FRAMEWORKS}"
 fi
 
-if [ -d "${IOS_FRAMEWORKS}${FRAMEWORK_NAME}.framework" ]; then
-	rm -rf "${IOS_FRAMEWORKS}${FRAMEWORK_NAME}.framework"
+if [ -d "${IOS_FRAMEWORKS}/${FRAMEWORK_NAME}.framework" ]; then
+	rm -rf "${IOS_FRAMEWORKS}/${FRAMEWORK_NAME}.framework"
 fi
 
+echo 'Copying: ${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}.framework  ${IOS_FRAMEWORKS}/${FRAMEWORK_NAME}.framework'
 cp -R "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}.framework" "${IOS_FRAMEWORKS}/${FRAMEWORK_NAME}.framework"
 
 
@@ -93,20 +95,20 @@ if [ ! -d "${MAC_FRAMEWORKS}" ]; then
 	mkdir "${MAC_FRAMEWORKS}"
 fi
 
-if [ -d "${MAC_FRAMEWORKS}${FRAMEWORK_NAME}.framework" ]; then
-	rm -rf "${MAC_FRAMEWORKS}${FRAMEWORK_NAME}.framework"
+if [ -d "${MAC_FRAMEWORKS}/${FRAMEWORK_NAME}.framework" ]; then
+	rm -rf "${MAC_FRAMEWORKS}/${FRAMEWORK_NAME}.framework"
 fi
 
 cp -R "${BASE_BUILD_DIR}/${CONFIG}/${FRAMEWORK_NAME}.framework" "${MAC_FRAMEWORKS}/${FRAMEWORK_NAME}.framework"
 
 
-/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch"
-/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :rev"
-/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :built"
+$(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch" 2> /dev/null)
+$(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :rev" 2> /dev/null)
+$(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :built" 2> /dev/null)
 
-/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :branch"
-/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :rev"
-/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :built"
+$(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :branch" 2> /dev/null)
+$(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :rev" 2> /dev/null)
+$(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :built" 2> /dev/null)
 
 # Step 7. Convenience step to open the project's directory in Finder
 #open "${PROJECT_DIRECTORY}"
