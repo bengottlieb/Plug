@@ -204,20 +204,20 @@ extension Plug.Connection: Printable {
 			string += "\n   \(label): \(header)"
 		}
 		
-		if countElements(self.parameters.description) > 0 {
+		if count(self.parameters.description) > 0 {
 			string += "\n Parameters: " + self.parameters.description
 		}
 		
 		if let response = self.response as? NSHTTPURLResponse {
 			string += "\n╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍ [Response] ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍"
 			
-			for (label, header) in (response.allHeaderFields as [String: String]) {
+			for (label, header) in (response.allHeaderFields as! [String: String]) {
 				string += "\n   \(label): \(header)"
 			}
 		}
 		if let data = self.resultsData {
 			string += "\n╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍ [Body] ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍\n"
-			string += (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as UTF8--")
+			string += (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as! UTF8--")
 		}
 		if !string.hasSuffix("\n") { string += "\n" }
 		if includeDelimiters { string +=       "△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△\n" }
@@ -285,7 +285,7 @@ extension NSURLRequest: Printable {
 	public override var description: String {
 		var str = (self.HTTPMethod ?? "[no method]") + " " + "\(self.URL)"
 		
-		for (label, value) in (self.allHTTPHeaderFields as [String: String]) {
+		for (label, value) in (self.allHTTPHeaderFields as! [String: String]) {
 			str += "\n\t" + label + ": " + value
 		}
 		

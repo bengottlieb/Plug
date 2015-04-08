@@ -13,7 +13,7 @@ public protocol JSONObject {
 }
 
 extension NSString: JSONObject {
-	public var JSONString: String? { return (self as String) }
+	public var JSONString: String? { return (self as! String) }
 }
 
 extension NSData: JSONObject {

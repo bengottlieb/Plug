@@ -41,7 +41,7 @@ public class Plug: NSObject {
 	
 	public override init() {
 		var reachabilityClassReference : AnyObject.Type = NSClassFromString("Plug_Reachability")
-		var reachabilityClass : NSObject.Type = reachabilityClassReference as NSObject.Type
+		var reachabilityClass : NSObject.Type = reachabilityClassReference as! NSObject.Type
 		self.reachability = reachabilityClass()
 
 		super.init()
