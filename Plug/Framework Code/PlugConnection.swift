@@ -232,9 +232,24 @@ extension Plug.Connection: Printable {
 		return string
 	}
 	
+	public func logErrorToFile() {
+		let errorsDir = "~/Library/Plug-Errors".stringByExpandingTildeInPath
+		var code = self.statusCode ?? 0
+		var filename = "\(code) \(self.URL) \(NSDate().description).txt".stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString("/", withString: "_")
+		var filepath = errorsDir.stringByAppendingPathComponent(filename)
+		
+		NSFileManager.defaultManager().createDirectoryAtPath(errorsDir, withIntermediateDirectories: true, attributes: nil, error: nil)
+		
+		var contents = self.detailedDescription(includeDelimiters: false)
+		
+		contents.writeToFile(filepath, atomically: true, encoding: NSUTF8StringEncoding, error: nil)
+		
+	}
+
 	public func log() {
 		NSLog("\(self.description)")
 	}
+	
 }
 
 extension Plug.Connection {		//actions
