@@ -216,8 +216,16 @@ extension Plug.Connection: Printable {
 			}
 		}
 		if let data = self.resultsData {
+			var error: NSError?
+			var json: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error)
+
 			string += "\n╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍ [Body] ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍\n"
-			string += (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as! UTF8--")
+
+			if let json = json as? NSObject {
+				string += json.description
+			} else {
+				string += (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as! UTF8--")
+			}
 		}
 		if !string.hasSuffix("\n") { string += "\n" }
 		if includeDelimiters { string +=       "△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△\n" }
