@@ -54,13 +54,13 @@ class Plug_Tests: XCTestCase {
 		
 		var connection = Plug.request(method: .GET, URL: url, parameters: params)
 			
-		connection.completion({ (data) in
+		connection.completion(completion: { (data) in
 			var str = NSString(data: data, encoding: NSUTF8StringEncoding)
 				println("Data: \(connection)")
 				expectation.fulfill()
 
 				XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
-			}).error({error in
+		}).error(completion: {error in
 				println("Got error: \(error)")
 				expectation.fulfill()
 				
@@ -72,7 +72,9 @@ class Plug_Tests: XCTestCase {
 		waitForExpectationsWithTimeout(10) { (error) in
 			
 		}
-
+		
+		connection.log()
+		connection.logErrorToFile(label: "test label")
 		XCTAssert(true, "Pass")
     }
 	

@@ -194,11 +194,12 @@ extension Plug.Connection: Printable {
 
 	public func detailedDescription(includeDelimiters: Bool = true) -> String {
 		var request = self.task.originalRequest
-		var noURL = "[no URL]"
+		var URL = "[no URL]"
+		if let url = request.URL { URL = url.description }
 		var string = includeDelimiters ? "\n▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽\n" : ""
 		var durationString = self.elapsedTime > 0.0 ? String(format: "%.2f", self.elapsedTime) + " sec elapsed" : ""
 		
-		string += "\(self.method) \(request.URL ?? noURL) \(self.parameters) \(durationString) 〘\(self.state)〙"
+		string += "\(self.method) \(URL) \(self.parameters) \(durationString) 〘\(self.state)〙"
 		
 		for (label, header) in (self.headers?.dictionary ?? [:]) {
 			string += "\n   \(label): \(header)"
@@ -232,10 +233,14 @@ extension Plug.Connection: Printable {
 		return string
 	}
 	
-	public func logErrorToFile() {
+	public func logErrorToFile(label: String = "") {
 		let errorsDir = "~/Library/Plug-Errors".stringByExpandingTildeInPath
 		var code = self.statusCode ?? 0
-		var filename = "\(code) \(self.URL) \(NSDate().description).txt".stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString("/", withString: "_")
+		var seconds = Int(NSDate().timeIntervalSinceReferenceDate)
+		var host = ""
+		if let url = request?.URL { host = url.host ?? "" }
+		var filename = "\(code) \(host) \(seconds).txt".stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString("/", withString: "_")
+		if label != "" { filename = label + "- " + filename }
 		var filepath = errorsDir.stringByAppendingPathComponent(filename)
 		
 		NSFileManager.defaultManager().createDirectoryAtPath(errorsDir, withIntermediateDirectories: true, attributes: nil, error: nil)
