@@ -198,7 +198,7 @@ extension Plug.Connection: Printable {
 		var string = includeDelimiters ? "\n▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽\n" : ""
 		var durationString = self.elapsedTime > 0.0 ? String(format: "%.2f", self.elapsedTime) + " sec elapsed" : ""
 		
-		string += "\(self.method) \(request.URL) \(self.parameters) \(durationString) 〘\(self.state)〙"
+		string += "\(self.method) \(request.URL ?? noURL) \(self.parameters) \(durationString) 〘\(self.state)〙"
 		
 		for (label, header) in (self.headers?.dictionary ?? [:]) {
 			string += "\n   \(label): \(header)"
