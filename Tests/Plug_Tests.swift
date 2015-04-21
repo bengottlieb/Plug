@@ -68,6 +68,7 @@ class Plug_Tests: XCTestCase {
 		})
 		
 		println("\(connection.log())")
+		connection.start()
 
 		waitForExpectationsWithTimeout(10) { (error) in
 			
@@ -78,10 +79,7 @@ class Plug_Tests: XCTestCase {
 		XCTAssert(true, "Pass")
     }
 	
-	func testPersistent() {
-		Plug.defaultManager.maximumActiveConnections = 1
-		
-		persistentDelegate.expectations.append(expectationWithDescription("GET"))
+	func testPersistent() {		
 		persistentDelegate.expectations.append(expectationWithDescription("GET"))
 		var url = "http://httpbin.org/get"
 		var params: Plug.Parameters = .None
@@ -96,6 +94,8 @@ class Plug_Tests: XCTestCase {
 		
 		if let dict = NSJSONSerialization.JSONObjectWithData(json!.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, options: nil, error: &error) as? NSDictionary {
 			var replacement = Plug.Connection(JSONRepresentation: dict)
+			
+			replacement?.start()
 		}
 		
 		waitForExpectationsWithTimeout(10) { (error) in

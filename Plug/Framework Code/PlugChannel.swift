@@ -18,15 +18,17 @@ extension Plug {
 		
 		public enum QueueState: Int { case Paused, PausedDueToOffline, Running }
 
-		static var defaultChannel: Channel = { return Channel(name: "default", maxSimultaneousConnections: 1) }()
-		static var allChannels: [Channel] = []
+		public static var defaultChannel: Channel = { return Channel(name: "default", maxSimultaneousConnections: 1) }()
+		public static var resourceChannel: Channel = { return Channel(name: "resources", maxSimultaneousConnections: 50) }()
+
+		static var allChannels: [String: Channel] = [:]
 		
 		init(name chName: String, maxSimultaneousConnections max: Int) {
 			name = chName
 			maxSimultaneousConnections = max
 			queue = NSOperationQueue()
 			queue.maxConcurrentOperationCount = max
-			Channel.allChannels.append(self)
+			Channel.allChannels[chName] = self
 		}
 
 
@@ -35,6 +37,17 @@ extension Plug {
 		internal var waitingConnections: [Plug.Connection] = []
 		internal var activeConnections: [Plug.Connection] = []
 		
+		var JSONRepresentation: NSDictionary {
+			return ["name": self.name, "max": self.maximumActiveConnections ]
+		}
+		
+		class func channelWithJSON(json: NSDictionary?) -> Plug.Channel {
+			var name = json?["name"] as? String ?? "default"
+			if let channel = self.allChannels[name] { return channel }
+			
+			var max = json?["max"] as? Int ?? 1
+			return Plug.Channel(name: name, maxSimultaneousConnections: max)
+		}
 		
 		func startQueue() {
 			self.queueState = .Running

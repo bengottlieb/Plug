@@ -90,7 +90,8 @@ extension Plug.Connection {
 		var json = [
 			"url": self.URL.absoluteString ?? "",
 			"persistenceIdentifier": self.persistence.JSONValue,
-			"method": self.method.rawValue
+			"method": self.method.rawValue,
+			"channel": self.channel.JSONRepresentation
 		]
 
 		if let headers = self.headers { json["headers"] = headers.dictionary }
@@ -103,11 +104,13 @@ extension Plug.Connection {
 		var headers = (info["headers"] as? [String: String]) ?? [:]
 		var method = Plug.Method(rawValue: (info["method"] as? String) ?? "GET")
 		var persistance = Plug.PersistenceInfo(JSONValue: (info["persistenceIdentifier"] as? [String]) ?? [])
+		var channelJSON = info["channel"] as? NSDictionary
+		var channel = Plug.Channel.channelWithJSON(channelJSON)
 		var parametersData = (info["parameters"] as? [String: NSDictionary])
 		
 		var parameters = Plug.Parameters(dictionary: parametersData ?? [:])
 		
-		self.init(method: method ?? .GET, URL: url, parameters: parameters, persistence: (persistance == nil) ? .PersistRequest : .Persistent(persistance!))
+		self.init(method: method ?? .GET, URL: url, parameters: parameters, persistence: (persistance == nil) ? .PersistRequest : .Persistent(persistance!), channel: channel)
 	}
 }
 

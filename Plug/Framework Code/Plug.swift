@@ -65,7 +65,7 @@ public class Plug: NSObject {
 			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.onlineStatusChanged, object: nil)
 		}
 		
-		for channel in Plug.Channel.allChannels {
+		for channel in Plug.Channel.allChannels.values {
 			if self.connectionType == .Offline {
 				if channel.queueState == .Running { channel.pauseQueue(); channel.queueState = .PausedDueToOffline }
 			} else {
