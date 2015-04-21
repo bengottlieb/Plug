@@ -27,6 +27,8 @@
 		B504E6A51A897087001B414B /* Plug.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B504E6461A8968DC001B414B /* Plug.framework */; };
 		B507A3C91A8E85BC008E3DB1 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B507A3C81A8E85BC008E3DB1 /* Errors.swift */; };
 		B507A3CA1A8E85BC008E3DB1 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B507A3C81A8E85BC008E3DB1 /* Errors.swift */; };
+		B5264A871AE68AED0062537C /* PlugChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5264A851AE68AA30062537C /* PlugChannel.swift */; };
+		B5264A881AE68AEE0062537C /* PlugChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5264A851AE68AA30062537C /* PlugChannel.swift */; };
 		B55097A01A9A4FE7003E5155 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B550979F1A9A4FE7003E5155 /* JSON.swift */; };
 		B55097A11A9A4FE7003E5155 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B550979F1A9A4FE7003E5155 /* JSON.swift */; };
 		B560B52A1AA4A15000F3161F /* PlugReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = B560B5261AA4A15000F3161F /* PlugReachability.h */; };
@@ -95,6 +97,7 @@
 		B504E69C1A896E82001B414B /* Plug_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plug_Tests.swift; sourceTree = "<group>"; };
 		B504E6AF1A898110001B414B /* Plug.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Plug.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B507A3C81A8E85BC008E3DB1 /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		B5264A851AE68AA30062537C /* PlugChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugChannel.swift; sourceTree = "<group>"; };
 		B550979F1A9A4FE7003E5155 /* JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
 		B560B5261AA4A15000F3161F /* PlugReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlugReachability.h; sourceTree = "<group>"; };
 		B560B5271AA4A15000F3161F /* PlugReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlugReachability.m; sourceTree = "<group>"; };
@@ -227,6 +230,7 @@
 			children = (
 				B560B5241AA4A15000F3161F /* ObjC */,
 				B58D64751A898F81005A0002 /* Plug.swift */,
+				B5264A851AE68AA30062537C /* PlugChannel.swift */,
 				B57C8B291A8E748E00EAD570 /* NetworkActivityIndicator.swift */,
 				B58D64761A898F81005A0002 /* PlugConnection.swift */,
 				B580E0281A99867C0067F89D /* PlugPersistence.swift */,
@@ -471,6 +475,7 @@
 				B560B52C1AA4A15000F3161F /* PlugReachability.m in Sources */,
 				B580E0291A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B58D64821A898FBD005A0002 /* Protocols.swift in Sources */,
+				B5264A871AE68AED0062537C /* PlugChannel.swift in Sources */,
 				B507A3C91A8E85BC008E3DB1 /* Errors.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -490,6 +495,7 @@
 				B58D64831A898FBE005A0002 /* Plug.swift in Sources */,
 				B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */,
 				B58D64841A898FBE005A0002 /* PlugConnection.swift in Sources */,
+				B5264A881AE68AEE0062537C /* PlugChannel.swift in Sources */,
 				B58D64851A898FBE005A0002 /* PlugParameters.swift in Sources */,
 				B507A3CA1A8E85BC008E3DB1 /* Errors.swift in Sources */,
 				B58D64861A898FBE005A0002 /* Protocols.swift in Sources */,

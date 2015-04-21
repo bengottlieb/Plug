@@ -59,6 +59,7 @@ extension Plug {
 		public var headers: Plug.Headers?
 		public var startedAt: NSDate?
 		public var completedAt: NSDate?
+		public let channel: Plug.Channel
 		public var elapsedTime: NSTimeInterval {
 			if let startedAt = self.startedAt {
 				if let completedAt = self.completedAt {
@@ -75,13 +76,14 @@ extension Plug {
 		}
 		
 		
-		public init?(method meth: Method = .GET, URL url: NSURLConvertible, parameters params: Plug.Parameters? = nil, persistence persist: Persistence = .Transient) {
+		public init?(method meth: Method = .GET, URL url: NSURLConvertible, parameters params: Plug.Parameters? = nil, persistence persist: Persistence = .Transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
 			completionQueue = NSOperationQueue()
 			completionQueue.maxConcurrentOperationCount = 1
 			completionQueue.suspended = true
 			
 			persistence = persist
 			parameters = params ?? .None
+			channel = chn
 			
 			method = parameters.normalizeMethod(meth)
 			URL = url.URL ?? NSURL()
@@ -260,13 +262,13 @@ extension Plug.Connection: Printable {
 extension Plug.Connection {		//actions
 	public func queue() {
 		if (state != .Waiting) { return }
-		Plug.defaultManager.enqueue(self)
+		self.channel.enqueue(self)
 	}
 	
 	public func start() {
 		if (state != .Waiting && state != .Queued) { return }
 		
-		Plug.defaultManager.connectionStarted(self)
+		self.channel.connectionStarted(self)
 		self.state = .Running
 		self.task.resume()
 		self.startedAt = NSDate()
@@ -275,20 +277,20 @@ extension Plug.Connection {		//actions
 	
 	public func suspend() {
 		if self.state != .Running { return }
-		Plug.defaultManager.connectionStopped(self)
+		self.channel.connectionStopped(self)
 		self.state = .Suspended
 		self.task.suspend()
 	}
 	
 	public func resume() {
 		if self.state != .Suspended { return }
-		Plug.defaultManager.connectionStarted(self)
+		self.channel.connectionStarted(self)
 		self.state = .Running
 		self.task.resume()
 	}
 	
 	public func cancel() {
-		Plug.defaultManager.connectionStopped(self)
+		self.channel.connectionStopped(self)
 		self.state = .Canceled
 		self.task.cancel()
 		NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionCancelled, object: self)
@@ -298,8 +300,8 @@ extension Plug.Connection {		//actions
 		self.state = state
 		self.completedAt = NSDate()
 		Plug.defaultManager.unregisterConnection(self)
-		Plug.defaultManager.connectionStopped(self)
-		Plug.defaultManager.dequeue(self)
+		self.channel.connectionStopped(self)
+		self.channel.dequeue(self)
 		self.completionQueue.suspended = false
 		if self.state == .Completed {
 			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionCompleted, object: self)

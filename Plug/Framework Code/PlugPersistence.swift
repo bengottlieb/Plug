@@ -51,7 +51,7 @@ public extension Plug {
 				if let json = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error) as? [NSDictionary] {
 					for dict in json {
 						if let connection = Plug.Connection(JSONRepresentation: dict) {
-							Plug.defaultManager.enqueue(connection)
+							connection.channel.enqueue(connection)
 						}
 					}
 				}
