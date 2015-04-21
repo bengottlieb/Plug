@@ -49,12 +49,13 @@ extension Plug {
 		public var cachingPolicy: NSURLRequestCachePolicy = .ReloadIgnoringLocalCacheData
 		public var response: NSURLResponse?
 		public var statusCode: Int?
+		public var completionQueue: NSOperationQueue?
 		
 		public let method: Method
 		public let URL: NSURL
 		public var downloadToFile = false
 		public var request: NSURLRequest?
-		public let completionQueue: NSOperationQueue
+		public let requestQueue: NSOperationQueue
 		public let parameters: Plug.Parameters
 		public var headers: Plug.Headers?
 		public var startedAt: NSDate?
@@ -77,9 +78,9 @@ extension Plug {
 		
 		
 		public init?(method meth: Method = .GET, URL url: NSURLConvertible, parameters params: Plug.Parameters? = nil, persistence persist: Persistence = .Transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
-			completionQueue = NSOperationQueue()
-			completionQueue.maxConcurrentOperationCount = 1
-			completionQueue.suspended = true
+			requestQueue = NSOperationQueue()
+			requestQueue.maxConcurrentOperationCount = 1
+			requestQueue.suspended = true
 			
 			persistence = persist
 			parameters = params ?? .None
@@ -170,18 +171,18 @@ extension Plug {
 }
 
 extension Plug.Connection {
-	public func completion(queue: NSOperationQueue? = nil, completion: (NSData) -> Void) -> Self {
-		self.completionQueue.addOperationWithBlock {
-			(queue ?? NSOperationQueue.mainQueue()).addOperationWithBlock {
+	public func completion(completion: (NSData) -> Void) -> Self {
+		self.requestQueue.addOperationWithBlock {
+			(self.completionQueue ?? NSOperationQueue.mainQueue()).addOperationWithBlock {
 				if let data = self.resultsData { completion(data) }
 			}
 		}
 		return self
 	}
 
-	public func error(queue: NSOperationQueue? = nil, completion: (NSError) -> Void) -> Self {
-		self.completionQueue.addOperationWithBlock {
-			(queue ?? NSOperationQueue.mainQueue()).addOperationWithBlock {
+	public func error(completion: (NSError) -> Void) -> Self {
+		self.requestQueue.addOperationWithBlock {
+			(self.completionQueue ?? NSOperationQueue.mainQueue()).addOperationWithBlock {
 				if let error = self.resultsError { completion(error) }
 			}
 		}
@@ -272,7 +273,7 @@ extension Plug.Connection {		//actions
 		self.state = .Running
 		self.task.resume()
 		self.startedAt = NSDate()
-		self.completionQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
+		self.requestQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
 	}
 	
 	public func suspend() {
@@ -302,7 +303,7 @@ extension Plug.Connection {		//actions
 		Plug.defaultManager.unregisterConnection(self)
 		self.channel.connectionStopped(self)
 		self.channel.dequeue(self)
-		self.completionQueue.suspended = false
+		self.requestQueue.suspended = false
 		if self.state == .Completed {
 			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionCompleted, object: self)
 		} else {
