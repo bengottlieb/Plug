@@ -56,23 +56,30 @@ public class Plug: NSObject {
 		var newState = ConnectionType.Offline
 		
 		if online { newState = wifi ? .Wifi : .WAN }
+		self.connectionType = newState
 		
+		self.updateChannelStates()
+
 		if newState == self.connectionType { return }
 		
-		self.connectionType = newState
 		
 		dispatch_async(dispatch_get_main_queue()) {
 			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.onlineStatusChanged, object: nil)
 		}
-		
-		for channel in Plug.Channel.allChannels.values {
-			if self.connectionType == .Offline {
-				if channel.queueState == .Running { channel.pauseQueue(); channel.queueState = .PausedDueToOffline }
-			} else {
-				if channel.queueState == .PausedDueToOffline { channel.startQueue() }
+	}
+	
+	func updateChannelStates() {
+		dispatch_async(dispatch_get_main_queue()) {
+			for channel in Plug.Channel.allChannels.values {
+				if self.connectionType == .Offline {
+					if channel.queueState == .Running { channel.pauseQueue(); channel.queueState = .PausedDueToOffline }
+				} else {
+					if channel.queueState == .PausedDueToOffline { channel.startQueue() }
+				}
 			}
 		}
 	}
+	
 	internal var channels: [Int: Plug.Channel] = [:]
 	internal var serialQueue: NSOperationQueue = { var q = NSOperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
 }

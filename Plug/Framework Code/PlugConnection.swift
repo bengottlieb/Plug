@@ -203,6 +203,8 @@ extension Plug.Connection: Printable {
 		var durationString = self.elapsedTime > 0.0 ? String(format: "%.2f", self.elapsedTime) + " sec elapsed" : ""
 		
 		string += "\(self.method) \(URL) \(self.parameters) \(durationString) 〘\(self.state) on \(self.channel.name)〙"
+		if let status = self.statusCode { string += " -> \(status)" }
+
 		
 		for (label, header) in (self.headers?.dictionary ?? [:]) {
 			string += "\n   \(label): \(header)"
@@ -262,7 +264,7 @@ extension Plug.Connection: Printable {
 
 extension Plug.Connection {		//actions
 	public func queue() {
-		if (state != .Waiting) { return }
+		if (self.state != .Waiting) { return }
 		self.channel.enqueue(self)
 	}
 	
