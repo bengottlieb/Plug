@@ -34,7 +34,7 @@ public class Plug: NSObject {
 	public var defaultHeaders = Plug.Headers([
 			.Accept(["application/json"]),
 			.AcceptEncoding("gzip;q=1.0,compress;q=0.5"),
-			.UserAgent("Plug-\(NSBundle.mainBundle().bundleIdentifier!)"),
+			.UserAgent("Plug-com.keyaxs.keyaxs"),
 	])
 	
 	public override init() {
@@ -121,13 +121,17 @@ extension Plug: NSURLSessionDownloadDelegate {
 
 extension Plug {
 	func registerConnection(connection: Plug.Connection) {
-		connection.channel.connections[connection.task.taskIdentifier] = connection
-		if connection.persistence.isPersistent { PersistenceManager.defaultManager.registerPersisitentConnection(connection) }
+		if let task = connection.task {
+			connection.channel.connections[task.taskIdentifier] = connection
+			if connection.persistence.isPersistent { PersistenceManager.defaultManager.registerPersisitentConnection(connection) }
+		}
 	}
 	
 	func unregisterConnection(connection: Plug.Connection) {
-		connection.channel.connections.removeValueForKey(connection.task.taskIdentifier)
-		if connection.persistence.isPersistent { PersistenceManager.defaultManager.unregisterPersisitentConnection(connection) }
+		if let task = connection.task {
+			connection.channel.connections.removeValueForKey(task.taskIdentifier)
+			if connection.persistence.isPersistent { PersistenceManager.defaultManager.unregisterPersisitentConnection(connection) }
+		}
 	}
 	
 	

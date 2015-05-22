@@ -104,11 +104,12 @@ extension Plug {
 			}
 		}
 		
-		lazy var task: NSURLSessionTask = {
+		var task: NSURLSessionTask?
+		func generateTask() -> NSURLSessionTask {
 			if self.downloadToFile {
-				self.task = Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
+				return Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
 			} else {
-				self.task = Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
+				return Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
 					if let httpResponse = response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
 					self.response = response
 					self.resultsError = error ?? response.error
@@ -121,9 +122,7 @@ extension Plug {
 					self.complete((error == nil) ? .Completed : .CompletedWithError)
 				})
 			}
-			Plug.defaultManager.registerConnection(self)
-			return self.task
-			}()
+		}
 		
 		var resultsError: NSError?
 		var resultsURL: NSURL? { didSet { if let url = self.resultsURL { self.resultsData = NSData(contentsOfURL: url) } } }
@@ -133,9 +132,9 @@ extension Plug {
 			if error != nil && error!.code == -1005 {
 				println("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 			}
-			self.response = self.task.response
+			self.response = self.task?.response
 			if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
-			self.resultsError = error ?? self.task.response?.error
+			self.resultsError = error ?? self.task?.response?.error
 			self.complete(.CompletedWithError)
 		}
 
@@ -143,7 +142,7 @@ extension Plug {
 			var filename = "Plug-temp-\(location.lastPathComponent!.hash).tmp"
 			var error: NSError?
 			
-			self.response = self.task.response
+			self.response = self.task?.response
 			if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
 			self.resultsURL = Plug.defaultManager.temporaryDirectoryURL.URLByAppendingPathComponent(filename)
 			NSFileManager.defaultManager().moveItemAtURL(location, toURL: self.resultsURL!, error: &error)
@@ -196,7 +195,7 @@ extension Plug.Connection: Printable {
 	public override var description: String { return self.detailedDescription() }
 
 	public func detailedDescription(includeDelimiters: Bool = true) -> String {
-		var request = self.task.originalRequest
+		var request = self.generateTask().originalRequest
 		var URL = "[no URL]"
 		if let url = request.URL { URL = url.description }
 		var string = includeDelimiters ? "\n▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽\n" : ""
@@ -273,7 +272,9 @@ extension Plug.Connection {		//actions
 		
 		self.channel.connectionStarted(self)
 		self.state = .Running
-		self.task.resume()
+		self.task = self.generateTask()
+		Plug.defaultManager.registerConnection(self)
+		self.task!.resume()
 		self.startedAt = NSDate()
 		self.requestQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
 	}
@@ -282,20 +283,20 @@ extension Plug.Connection {		//actions
 		if self.state != .Running { return }
 		self.channel.connectionStopped(self)
 		self.state = .Suspended
-		self.task.suspend()
+		self.task?.suspend()
 	}
 	
 	public func resume() {
 		if self.state != .Suspended { return }
 		self.channel.connectionStarted(self)
 		self.state = .Running
-		self.task.resume()
+		self.task?.resume()
 	}
 	
 	public func cancel() {
 		self.channel.connectionStopped(self)
 		self.state = .Canceled
-		self.task.cancel()
+		self.task?.cancel()
 		NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionCancelled, object: self)
 	}
 	

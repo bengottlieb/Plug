@@ -47,20 +47,20 @@ class Plug_Tests: XCTestCase {
         super.tearDown()
     }
     
-    func testGET() {
+    func testGET2() {
 		let expectation = expectationWithDescription("GET")
 		var url = "http://httpbin.org/get"
 		var params: Plug.Parameters = .None
 		
 		var connection = Plug.request(method: .GET, URL: url, parameters: params)
 			
-		connection.completion(completion: { (data) in
+		connection.completion({ (data) in
 			var str = NSString(data: data, encoding: NSUTF8StringEncoding)
 				println("Data: \(connection)")
 				expectation.fulfill()
 
 				XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
-		}).error(completion: {error in
+		}).error({error in
 				println("Got error: \(error)")
 				expectation.fulfill()
 				
@@ -79,7 +79,25 @@ class Plug_Tests: XCTestCase {
 		XCTAssert(true, "Pass")
     }
 	
-	func testPersistent() {		
+	func testKeyAXS() {
+		persistentDelegate.expectations.append(expectationWithDescription("GET"))
+		var url = "http://axs-doorstep.rhcloud.com:80/api/v1/account/login.json"
+		//url = "http://httpbin.org/get"
+		var request = Plug.request(method: .GET, URL: url, parameters: .None, persistence: .Persistent(persistentDelegate.persistenceInfo))
+		request.completion { data in
+			request.log()
+		}
+		request.addHeader(.BasicAuthorization("utd_client", "Pr4d00rz"))
+		request.addHeader(.Custom("login_email", "ben@standalone.com"))
+		request.addHeader(.Custom("login_password", "doorlock"))
+
+		request.start()
+		waitForExpectationsWithTimeout(10) { (error) in
+			
+		}
+	}
+	
+	func testPersistent2() {
 		persistentDelegate.expectations.append(expectationWithDescription("GET"))
 		var url = "http://httpbin.org/get"
 		var params: Plug.Parameters = .None
