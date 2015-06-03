@@ -72,7 +72,7 @@ extension Plug {
 			return 0
 		}
 		public func addHeader(header: Plug.Header) {
-			if self.headers == nil { self.headers = Plug.defaultManager.defaultHeaders }
+			if self.headers == nil { self.headers = Plug.manager.defaultHeaders }
 			self.headers?.append(header)
 		}
 		
@@ -97,7 +97,7 @@ extension Plug {
 			}
 			if let header = self.parameters.contentTypeHeader { self.addHeader(header) }
 
-			if Plug.defaultManager.autostartConnections {
+			if Plug.manager.autostartConnections {
 				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
 					self.queue()
 				}
@@ -107,9 +107,9 @@ extension Plug {
 		var task: NSURLSessionTask?
 		func generateTask() -> NSURLSessionTask {
 			if self.downloadToFile {
-				return Plug.defaultManager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
+				return Plug.manager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
 			} else {
-				return Plug.defaultManager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
+				return Plug.manager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
 					if let httpResponse = response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
 					self.response = response
 					self.resultsError = error ?? response.error
@@ -144,7 +144,7 @@ extension Plug {
 			
 			self.response = self.task?.response
 			if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
-			self.resultsURL = Plug.defaultManager.temporaryDirectoryURL.URLByAppendingPathComponent(filename)
+			self.resultsURL = Plug.manager.temporaryDirectoryURL.URLByAppendingPathComponent(filename)
 			NSFileManager.defaultManager().moveItemAtURL(location, toURL: self.resultsURL!, error: &error)
 			
 			self.complete(.Completed)
@@ -154,7 +154,7 @@ extension Plug {
 			var urlString = self.URL.absoluteString! + self.parameters.URLString
 			var request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
 			
-			request.allHTTPHeaderFields = (self.headers ?? Plug.defaultManager.defaultHeaders).dictionary
+			request.allHTTPHeaderFields = (self.headers ?? Plug.manager.defaultHeaders).dictionary
 			request.HTTPMethod = self.method.rawValue
 			request.HTTPBody = self.parameters.bodyData
 			request.cachePolicy = self.cachingPolicy
@@ -170,19 +170,19 @@ extension Plug {
 }
 
 extension Plug.Connection {
-	public func completion(completion: (NSData) -> Void) -> Self {
+	public func completion(completion: (Plug.Connection, NSData) -> Void) -> Self {
 		self.requestQueue.addOperationWithBlock {
 			(self.completionQueue ?? NSOperationQueue.mainQueue()).addOperationWithBlock {
-				if let data = self.resultsData { completion(data) }
+				if let data = self.resultsData { completion(self, data) }
 			}
 		}
 		return self
 	}
 
-	public func error(completion: (NSError) -> Void) -> Self {
+	public func error(completion: (Plug.Connection, NSError) -> Void) -> Self {
 		self.requestQueue.addOperationWithBlock {
 			(self.completionQueue ?? NSOperationQueue.mainQueue()).addOperationWithBlock {
-				if let error = self.resultsError { completion(error) }
+				if let error = self.resultsError { completion(self, error) }
 			}
 		}
 		return self
@@ -273,7 +273,7 @@ extension Plug.Connection {		//actions
 		self.channel.connectionStarted(self)
 		self.state = .Running
 		self.task = self.generateTask()
-		Plug.defaultManager.registerConnection(self)
+		Plug.manager.registerConnection(self)
 		self.task!.resume()
 		self.startedAt = NSDate()
 		self.requestQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
@@ -303,7 +303,7 @@ extension Plug.Connection {		//actions
 	func complete(state: State) {
 		self.state = state
 		self.completedAt = NSDate()
-		Plug.defaultManager.unregisterConnection(self)
+		Plug.manager.unregisterConnection(self)
 		self.channel.connectionStopped(self)
 		self.channel.dequeue(self)
 		self.requestQueue.suspended = false

@@ -25,7 +25,7 @@ extension Plug {
 		
 		init(name chName: String, maxSimultaneousConnections max: Int) {
 			name = chName
-			queueState = Plug.defaultManager.connectionType == .Offline ? .PausedDueToOffline : .Running
+			queueState = Plug.manager.connectionType == .Offline ? .PausedDueToOffline : .Running
 			maxSimultaneousConnections = max
 			queue = NSOperationQueue()
 			queue.maxConcurrentOperationCount = max
@@ -97,8 +97,8 @@ extension Plug {
 			return self.queueState == .Running
 //			if self.queueState == .Running { return true }
 //			if self.queueState == .PausedDueToOffline {
-//				if Plug.defaultManager.connectionType == .Offline { return false }
-//				Plug.defaultManager.updateChannelStates()
+//				if Plug.manager.connectionType == .Offline { return false }
+//				Plug.manager.updateChannelStates()
 //				return true
 //			}
 //			return false

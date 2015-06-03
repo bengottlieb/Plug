@@ -14,7 +14,7 @@ public class Plug: NSObject {
 		public var description: String { return self.rawValue } 
 	}
 	
-	public class var defaultManager: Plug { struct s { static let plug = Plug() }; return s.plug }
+	public static var manager = Plug()
 	
 	public struct notifications {
 		public static let onlineStatusChanged = "onlineStatusChanged.com.standalone.plug"
@@ -50,6 +50,7 @@ public class Plug: NSObject {
 	
 	public var connectionType: ConnectionType = .Offline
 	
+	public func setup() {}
 
 	private var reachability: AnyObject
 	func setOnline(online: Bool, wifi: Bool) {
@@ -88,7 +89,7 @@ public extension Plug {
 	public class func request(method: Method = .GET, URL: NSURLConvertible, parameters: Plug.Parameters? = nil, persistence: Plug.Connection.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Plug.Connection {
 		var connection = Plug.Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel)
 		
-		return connection ?? self.defaultManager.noopConnection
+		return connection ?? self.manager.noopConnection
 	}
 }
 
@@ -99,7 +100,7 @@ extension Plug: NSURLSessionDataDelegate {
 extension Plug: NSURLSessionDownloadDelegate {
 	
 	subscript(task: NSURLSessionTask) -> Plug.Channel? {
-		get { var channel: Plug.Channel?; self.serialQueue.addOperations( [ NSBlockOperation(block: { [unowned self] in channel = Plug.defaultManager.channels[task.taskIdentifier] } )], waitUntilFinished: true); return channel  }
+		get { var channel: Plug.Channel?; self.serialQueue.addOperations( [ NSBlockOperation(block: { [unowned self] in channel = Plug.manager.channels[task.taskIdentifier] } )], waitUntilFinished: true); return channel  }
 		set { self.serialQueue.addOperationWithBlock { [unowned self] in self.channels[task.taskIdentifier] = newValue } }
 	}
 	
