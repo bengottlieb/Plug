@@ -77,6 +77,7 @@ extension Plug {
 		}
 		
 		func connectionStarted(connection: Plug.Connection) {
+			self.startBackgroundTask()
 			self.queue.addOperationWithBlock {
 				if let index = find(self.waitingConnections, connection) { self.waitingConnections.removeAtIndex(index) }
 				if find(self.activeConnections, connection) == -1 { self.activeConnections.append(connection) }
@@ -95,24 +96,44 @@ extension Plug {
 		
 		var isRunning: Bool {
 			return self.queueState == .Running
-//			if self.queueState == .Running { return true }
-//			if self.queueState == .PausedDueToOffline {
-//				if Plug.manager.connectionType == .Offline { return false }
-//				Plug.manager.updateChannelStates()
-//				return true
-//			}
-//			return false
+		}
+		
+		var backgroundTaskID: UIBackgroundTaskIdentifier?
+		
+		func startBackgroundTask() {
+			if self.backgroundTaskID == nil {
+				self.queue.addOperationWithBlock {
+					self.backgroundTaskID = UIApplication.sharedApplication().beginBackgroundTaskWithName("plug.queue.\(self.name)", expirationHandler: {
+						self.endBackgroundTask(true)
+						self.pauseQueue()
+					})
+				}
+			}
+		}
+		
+		func endBackgroundTask(onlyClearTaskID: Bool) {
+			self.queue.addOperationWithBlock {
+				if let taskID = self.backgroundTaskID where !self.isRunning {
+					dispatch_async(dispatch_get_main_queue(), {
+						if (!onlyClearTaskID) { UIApplication.sharedApplication().endBackgroundTask(taskID) }
+					})
+					self.backgroundTaskID = nil
+				}
+			}
 		}
 		
 		func updateQueue() {
 			self.queue.addOperationWithBlock {
-				if !self.isRunning { return }
+				if !self.isRunning {
+					self.endBackgroundTask(false)
+					return
+				}
 				
 				if self.waitingConnections.count > 0 && (self.maximumActiveConnections == 0 || self.activeConnections.count < self.maximumActiveConnections) {
 					var connection = self.waitingConnections[0]
 					self.waitingConnections.removeAtIndex(0)
 					self.activeConnections.append(connection)
-					connection.start()
+					connection.run()
 				}
 			}
 		}

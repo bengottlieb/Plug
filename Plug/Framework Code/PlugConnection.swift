@@ -98,7 +98,7 @@ extension Plug {
 			if let header = self.parameters.contentTypeHeader { self.addHeader(header) }
 
 			if Plug.manager.autostartConnections {
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
 					self.queue()
 				}
 			}
@@ -269,7 +269,10 @@ extension Plug.Connection {		//actions
 	
 	public func start() {
 		if (state != .Waiting && state != .Queued) { return }
-		
+		self.queue()
+	}
+	
+	public func run() {
 		self.channel.connectionStarted(self)
 		self.state = .Running
 		self.task = self.generateTask()
