@@ -13,11 +13,11 @@ public protocol JSONObject {
 }
 
 extension NSString: JSONObject {
-	public var JSONString: String? { return (self as! String) }
+	public var JSONString: String? { return (self as String) }
 }
 
 extension NSData: JSONObject {
-	public var JSONString: String? { return self.base64EncodedStringWithOptions(nil) }
+	public var JSONString: String? { return self.base64EncodedStringWithOptions([]) }
 }
 
 extension NSNumber: JSONObject {
@@ -30,11 +30,11 @@ extension Bool: JSONObject {
 
 extension NSDictionary: JSONObject {
 	public var JSONString: String? {
-		var error: NSError?
-		
-		if let data = NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted, error: &error) {
-			if error != nil { println("Error \(error) while JSON encoding \(self)") }
+		do {
+			let data = try NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
 			return (NSString(data: data, encoding: NSUTF8StringEncoding) as? String) ?? ""
+		} catch let error as NSError {
+			print("error while deserializing a JSON object: \(error)")
 		}
 		return nil
 	}
@@ -42,11 +42,11 @@ extension NSDictionary: JSONObject {
 
 extension NSArray: JSONObject {
 	public var JSONString: String? {
-		var error: NSError?
-		
-		if let data = NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted, error: &error) {
-			if error != nil { println("Error \(error) while JSON encoding \(self)") }
+		do {
+			let data = try NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
 			return (NSString(data: data, encoding: NSUTF8StringEncoding) as? String) ?? ""
+		} catch let error as NSError {
+			print("error while deserializing a JSON object: \(error)")
 		}
 
 		return nil

@@ -9,7 +9,7 @@
 import Foundation
 
 extension Plug {
-	public enum Parameters: Printable {
+	public enum Parameters: CustomStringConvertible {
 		case None
 		case URL([String: String])
 		case Form([String: String])
@@ -18,10 +18,10 @@ extension Plug {
 		var stringValue: String {
 			switch (self) {
 			case .URL(let params):
-				return (reduce(params.keys, "?") { if let v = params[$1] { return $0 + "\($1)=\(v.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!)&" }; return $0 })
+				return (params.keys.reduce("?") { if let v = params[$1] { return $0 + "\($1)=\(v.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!)&" }; return $0 })
 				
 			case .Form(let params):
-				return reduce(params.keys, "") { if let v = params[$1] { return $0 + "\($1)=\(v)&" }; return $0 }
+				return params.keys.reduce("") { if let v = params[$1] { return $0 + "\($1)=\(v)&" }; return $0 }
 				
 			case .JSON(let object):
 				return object.JSONString ?? ""
@@ -75,8 +75,8 @@ extension Plug {
 		
 		public var description: String {
 			switch (self) {
-			case .URL(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
-			case .Form(let params): return reduce(params.keys, "[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
+			case .URL(let params): return params.keys.reduce("[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
+			case .Form(let params): return params.keys.reduce("[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
 			case .JSON: return "[" + self.stringValue + "]"
 				
 			default: return ""

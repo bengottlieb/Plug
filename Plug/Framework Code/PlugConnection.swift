@@ -9,7 +9,7 @@
 import Foundation
 
 extension Plug {
-	public class Connection: NSObject, Equatable {
+	public class Connection: NSObject {
 		public enum Persistence { case Transient, PersistRequest, Persistent(PersistenceInfo)
 			public var isPersistent: Bool {
 				switch (self) {
@@ -31,7 +31,7 @@ extension Plug {
 		}
 		public let persistence: Persistence
 		
-		public enum State: String, Printable { case Waiting = "Waiting", Queued = "Queued", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Completed with Error"
+		public enum State: String, CustomStringConvertible { case Waiting = "Waiting", Queued = "Queued", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Completed with Error"
 			public var description: String { return self.rawValue }
 			public var isRunning: Bool { return self == .Running }
 			public var hasStarted: Bool { return self != .Waiting && self != .Queued }
@@ -91,7 +91,7 @@ extension Plug {
 			
 			super.init()
 			if url.URL == nil {
-				println("Unable to create a connection with URL: \(url)")
+				print("Unable to create a connection with URL: \(url)")
 
 				return nil
 			}
@@ -105,18 +105,18 @@ extension Plug {
 		}
 		
 		var task: NSURLSessionTask?
-		func generateTask() -> NSURLSessionTask {
+		func generateTask() -> NSURLSessionTask? {
 			if self.downloadToFile {
-				return Plug.manager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: nil)
+				return Plug.manager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { url, response, error in })
 			} else {
 				return Plug.manager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
 					if let httpResponse = response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
 					self.response = response
-					self.resultsError = error ?? response.error
+					self.resultsError = error ?? response?.error
 					if error != nil && error!.code == -1005 {
-						println("++++++++ Simulator comms issue, please restart the sim. ++++++++")
+						print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 					}
-					if error == nil || data.length > 0 {
+					if error == nil || (data != nil && data!.length > 0) {
 						self.resultsData = data
 					}
 					self.complete((error == nil) ? .Completed : .CompletedWithError)
@@ -130,7 +130,7 @@ extension Plug {
 		
 		func failedWithError(error: NSError?) {
 			if error != nil && error!.code == -1005 {
-				println("++++++++ Simulator comms issue, please restart the sim. ++++++++")
+				print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 			}
 			self.response = self.task?.response
 			if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
@@ -139,20 +139,23 @@ extension Plug {
 		}
 
 		func completedDownloadingToURL(location: NSURL) {
-			var filename = "Plug-temp-\(location.lastPathComponent!.hash).tmp"
-			var error: NSError?
+			let filename = "Plug-temp-\(location.lastPathComponent!.hash).tmp"
 			
 			self.response = self.task?.response
 			if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
 			self.resultsURL = Plug.manager.temporaryDirectoryURL.URLByAppendingPathComponent(filename)
-			NSFileManager.defaultManager().moveItemAtURL(location, toURL: self.resultsURL!, error: &error)
+			do {
+				try NSFileManager.defaultManager().moveItemAtURL(location, toURL: self.resultsURL!)
+			} catch let error as NSError {
+				print("error while saving a moving a downloaded URL: \(error)")
+			}
 			
 			self.complete(.Completed)
 		}
 		
 		var defaultRequest: NSURLRequest {
-			var urlString = self.URL.absoluteString! + self.parameters.URLString
-			var request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
+			let urlString = self.URL.absoluteString + self.parameters.URLString
+			let request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
 			
 			request.allHTTPHeaderFields = (self.headers ?? Plug.manager.defaultHeaders).dictionary
 			request.HTTPMethod = self.method.rawValue
@@ -191,15 +194,15 @@ extension Plug.Connection {
 
 
 
-extension Plug.Connection: Printable {
+extension Plug.Connection {
 	public override var description: String { return self.detailedDescription() }
 
 	public func detailedDescription(includeDelimiters: Bool = true) -> String {
-		var request = self.generateTask().originalRequest
+		guard let request = self.generateTask()?.originalRequest else { return "--empty connectionu--" }
 		var URL = "[no URL]"
 		if let url = request.URL { URL = url.description }
 		var string = includeDelimiters ? "\n▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽\n" : ""
-		var durationString = self.elapsedTime > 0.0 ? String(format: "%.2f", self.elapsedTime) + " sec elapsed" : ""
+		let durationString = self.elapsedTime > 0.0 ? String(format: "%.2f", self.elapsedTime) + " sec elapsed" : ""
 		
 		string += "\(self.method) \(URL) \(self.parameters) \(durationString) 〘\(self.state) on \(self.channel.name)〙"
 		if let status = self.statusCode { string += " -> \(status)" }
@@ -209,7 +212,7 @@ extension Plug.Connection: Printable {
 			string += "\n   \(label): \(header)"
 		}
 		
-		if count(self.parameters.description) > 0 {
+		if self.parameters.description.characters.count > 0 {
 			string += "\n Parameters: " + self.parameters.description
 		}
 		
@@ -221,8 +224,12 @@ extension Plug.Connection: Printable {
 			}
 		}
 		if let data = self.resultsData {
-			var error: NSError?
-			var json: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error)
+			var json: AnyObject?
+			do {
+				json = try NSJSONSerialization.JSONObjectWithData(data, options: [])
+			} catch {
+				json = nil
+			}
 
 			string += "\n╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍ [Body] ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍\n"
 
@@ -239,19 +246,25 @@ extension Plug.Connection: Printable {
 	
 	public func logErrorToFile(label: String = "") {
 		let errorsDir = "~/Library/Plug-Errors".stringByExpandingTildeInPath
-		var code = self.statusCode ?? 0
-		var seconds = Int(NSDate().timeIntervalSinceReferenceDate)
+		let code = self.statusCode ?? 0
+		let seconds = Int(NSDate().timeIntervalSinceReferenceDate)
 		var host = ""
 		if let url = request?.URL { host = url.host ?? "" }
 		var filename = "\(code) \(host) \(seconds).txt".stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString("/", withString: "_")
 		if label != "" { filename = label + "- " + filename }
-		var filepath = errorsDir.stringByAppendingPathComponent(filename)
+		let filepath = errorsDir.stringByAppendingPathComponent(filename)
 		
-		NSFileManager.defaultManager().createDirectoryAtPath(errorsDir, withIntermediateDirectories: true, attributes: nil, error: nil)
+		do {
+			try NSFileManager.defaultManager().createDirectoryAtPath(errorsDir, withIntermediateDirectories: true, attributes: nil)
+		} catch _ {
+		}
 		
-		var contents = self.detailedDescription(includeDelimiters: false)
+		let contents = self.detailedDescription(false)
 		
-		contents.writeToFile(filepath, atomically: true, encoding: NSUTF8StringEncoding, error: nil)
+		do {
+			try contents.writeToFile(filepath, atomically: true, encoding: NSUTF8StringEncoding)
+		} catch _ {
+		}
 		
 	}
 
@@ -318,16 +331,18 @@ extension Plug.Connection {		//actions
 	}
 }
 
-extension NSURLRequest: Printable {
+extension NSURLRequest {
 	public override var description: String {
 		var str = (self.HTTPMethod ?? "[no method]") + " " + "\(self.URL)"
 		
-		for (label, value) in (self.allHTTPHeaderFields as! [String: String]) {
-			str += "\n\t" + label + ": " + value
+		if let fields = self.allHTTPHeaderFields {
+			for (label, value) in fields {
+				str += "\n\t" + label + ": " + value
+			}
 		}
 		
 		if let data = self.HTTPBody {
-			var body = NSString(data: data, encoding: NSUTF8StringEncoding)
+			let body = NSString(data: data, encoding: NSUTF8StringEncoding)
 			str += "\n" + (body?.description ?? "[unconvertible body: \(data.length) bytes]")
 		}
 		

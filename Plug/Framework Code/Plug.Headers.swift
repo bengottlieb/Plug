@@ -26,23 +26,23 @@ extension Plug {
 			case .BasicAuthorization: return "Authorization"
 			case .UserAgent: return "User-Agent"
 				
-			case .Custom(let label, let content): return label
+			case .Custom(let label,  _): return label
 			}
 		}
 		
 		var content: String {
 			switch (self) {
 			case .Accept(let types):
-				var content = types.reduce("") { "\($0)\($1);" }
+				let content = types.reduce("") { "\($0)\($1);" }
 				return content.stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: ";"))
 				
 			case .AcceptEncoding(let encoding): return encoding
 			case .ContentType(let type): return type
 			case .BasicAuthorization(let user, let pass):
-				return "Basic " + ("\(user):\(pass)".dataUsingEncoding(NSUTF8StringEncoding)?.base64EncodedStringWithOptions(nil) ?? "")
+				return "Basic " + ("\(user):\(pass)".dataUsingEncoding(NSUTF8StringEncoding)?.base64EncodedStringWithOptions([]) ?? "")
 			case .UserAgent(let agent): return agent
 				
-			case .Custom(let label, let content): return content
+			case .Custom(_, let content): return content
 			}
 		}
 		
@@ -51,10 +51,10 @@ extension Plug {
 		}
 	}
 	
-	public struct Headers: Printable {
+	public struct Headers: CustomStringConvertible {
 		var headers: [Header] = []
 		public mutating func append(header: Header) {
-			for (index, existing) in enumerate(self.headers) {
+			for (index, existing) in self.headers.enumerate() {
 				if existing.isSameHeaderAs(header) {
 					self.headers[index] = header
 					return

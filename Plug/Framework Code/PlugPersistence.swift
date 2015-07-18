@@ -27,7 +27,7 @@ public extension Plug {
 		
 		func registerPersisitentConnection(connection: Plug.Connection) {
 			self.queue.addOperationWithBlock {
-				if find(self.persistentConnections, connection) == nil {
+				if self.persistentConnections.indexOf(connection) == nil {
 					self.persistentConnections.append(connection)
 					self.queuePersistentConnectionSave()
 				}
@@ -36,7 +36,7 @@ public extension Plug {
 		
 		func unregisterPersisitentConnection(connection: Plug.Connection) {
 			self.queue.addOperationWithBlock {
-				if let index = find(self.persistentConnections, connection) {
+				if let index = self.persistentConnections.indexOf(connection) {
 					self.persistentConnections.removeAtIndex(index)
 					self.queuePersistentConnectionSave()
 				}
@@ -47,21 +47,26 @@ public extension Plug {
 			self.persistentCacheURL = fromURL ?? self.defaultPersistentCacheURL
 			
 			if let data = NSData(contentsOfURL: self.persistentCacheURL!) {
-				var error: NSError?
-				if let json = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error) as? [NSDictionary] {
-					for dict in json {
-						if let connection = Plug.Connection(JSONRepresentation: dict) {
-							connection.channel.enqueue(connection)
+				do {
+					if let json = try NSJSONSerialization.JSONObjectWithData(data, options: []) as? [NSDictionary] {
+						for dict in json {
+							if let connection = Plug.Connection(JSONRepresentation: dict) {
+								connection.channel.enqueue(connection)
+							}
 						}
 					}
-				}
+				} catch {}
 			}
 		}
 		
 		var defaultPersistentCacheURL = NSURL(fileURLWithPath: "~/Library/Communications/Pending_Connections.json".stringByExpandingTildeInPath)
 		var persistentCacheURL: NSURL? { didSet {
 			if let url = self.persistentCacheURL {
-				NSFileManager.defaultManager().createDirectoryAtURL(url.URLByDeletingLastPathComponent!, withIntermediateDirectories: true, attributes: nil, error: nil)
+				do {
+					try NSFileManager.defaultManager().createDirectoryAtURL(url.URLByDeletingLastPathComponent!, withIntermediateDirectories: true, attributes: nil)
+				} catch let error as NSError {
+					print("error while loading cached URLs: \(error)")
+				}
 			}
 		}}
 		
@@ -75,10 +80,12 @@ public extension Plug {
 		func savePersistentConnections() {
 			self.saveTimer = nil
 			if self.persistentCacheURL == nil { return }
-			var dictionaries: [NSDictionary] = self.persistentConnections.map { return $0.JSONRepresentation }
-			var error: NSError?
-			if let json = NSJSONSerialization.dataWithJSONObject(dictionaries, options: NSJSONWritingOptions.PrettyPrinted, error: &error) {
+			let dictionaries: [NSDictionary] = self.persistentConnections.map { return $0.JSONRepresentation }
+			do {
+				let json = try NSJSONSerialization.dataWithJSONObject(dictionaries, options: NSJSONWritingOptions.PrettyPrinted)
 				json.writeToURL(self.persistentCacheURL!, atomically: true)
+			} catch let error as NSError {
+				print("error while saving a persistent connection: \(error)")
 			}
 		}
 	}
@@ -100,15 +107,15 @@ extension Plug.Connection {
 	}
 	
 	public convenience init?(JSONRepresentation info: NSDictionary) {
-		var url = (info["url"] as? String) ?? ""
-		var headers = (info["headers"] as? [String: String]) ?? [:]
-		var method = Plug.Method(rawValue: (info["method"] as? String) ?? "GET")
-		var persistance = Plug.PersistenceInfo(JSONValue: (info["persistenceIdentifier"] as? [String]) ?? [])
-		var channelJSON = info["channel"] as? NSDictionary
-		var channel = Plug.Channel.channelWithJSON(channelJSON)
-		var parametersData = (info["parameters"] as? [String: NSDictionary])
+		let url = (info["url"] as? String) ?? ""
+		//var headers = (info["headers"] as? [String: String]) ?? [:]
+		let method = Plug.Method(rawValue: (info["method"] as? String) ?? "GET")
+		let persistance = Plug.PersistenceInfo(JSONValue: (info["persistenceIdentifier"] as? [String]) ?? [])
+		let channelJSON = info["channel"] as? NSDictionary
+		let channel = Plug.Channel.channelWithJSON(channelJSON)
+		let parametersData = (info["parameters"] as? [String: NSDictionary])
 		
-		var parameters = Plug.Parameters(dictionary: parametersData ?? [:])
+		let parameters = Plug.Parameters(dictionary: parametersData ?? [:])
 		
 		self.init(method: method ?? .GET, URL: url, parameters: parameters, persistence: (persistance == nil) ? .PersistRequest : .Persistent(persistance!), channel: channel)
 	}

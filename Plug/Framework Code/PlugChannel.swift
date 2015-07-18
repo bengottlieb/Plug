@@ -43,10 +43,10 @@ extension Plug {
 		}
 		
 		class func channelWithJSON(json: NSDictionary?) -> Plug.Channel {
-			var name = json?["name"] as? String ?? "default"
+			let name = json?["name"] as? String ?? "default"
 			if let channel = self.allChannels[name] { return channel }
 			
-			var max = json?["max"] as? Int ?? 1
+			let max = json?["max"] as? Int ?? 1
 			return Plug.Channel(name: name, maxSimultaneousConnections: max)
 		}
 		
@@ -69,7 +69,7 @@ extension Plug {
 		
 		func dequeue(connection: Plug.Connection) {
 			self.queue.addOperationWithBlock {
-				if let index = find(self.waitingConnections, connection) {
+				if let index = self.waitingConnections.indexOf(connection) {
 					self.waitingConnections.removeAtIndex(index)
 				}
 				self.updateQueue()
@@ -79,15 +79,15 @@ extension Plug {
 		func connectionStarted(connection: Plug.Connection) {
 			self.startBackgroundTask()
 			self.queue.addOperationWithBlock {
-				if let index = find(self.waitingConnections, connection) { self.waitingConnections.removeAtIndex(index) }
-				if find(self.activeConnections, connection) == -1 { self.activeConnections.append(connection) }
+				if let index = self.waitingConnections.indexOf(connection) { self.waitingConnections.removeAtIndex(index) }
+				if self.activeConnections.indexOf(connection) == -1 { self.activeConnections.append(connection) }
 				NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionStarted, object: connection)
 			}
 		}
 		
 		func connectionStopped(connection: Plug.Connection) {
 			self.queue.addOperationWithBlock {
-				if let index = find(self.activeConnections, connection) {
+				if let index = self.activeConnections.indexOf(connection) {
 					self.activeConnections.removeAtIndex(index)
 				}
 				self.updateQueue()
@@ -98,29 +98,34 @@ extension Plug {
 			return self.queueState == .Running
 		}
 		
-		var backgroundTaskID: UIBackgroundTaskIdentifier?
-		
-		func startBackgroundTask() {
-			if self.backgroundTaskID == nil {
+		#if os(iOS)
+			var backgroundTaskID: UIBackgroundTaskIdentifier?
+			
+			func startBackgroundTask() {
+				if self.backgroundTaskID == nil {
+					self.queue.addOperationWithBlock {
+						self.backgroundTaskID = UIApplication.sharedApplication().beginBackgroundTaskWithName("plug.queue.\(self.name)", expirationHandler: {
+							self.endBackgroundTask(true)
+							self.pauseQueue()
+						})
+					}
+				}
+			}
+			
+			func endBackgroundTask(onlyClearTaskID: Bool) {
 				self.queue.addOperationWithBlock {
-					self.backgroundTaskID = UIApplication.sharedApplication().beginBackgroundTaskWithName("plug.queue.\(self.name)", expirationHandler: {
-						self.endBackgroundTask(true)
-						self.pauseQueue()
-					})
+					if let taskID = self.backgroundTaskID where !self.isRunning {
+						dispatch_async(dispatch_get_main_queue(), {
+							if (!onlyClearTaskID) { UIApplication.sharedApplication().endBackgroundTask(taskID) }
+						})
+						self.backgroundTaskID = nil
+					}
 				}
 			}
-		}
-		
-		func endBackgroundTask(onlyClearTaskID: Bool) {
-			self.queue.addOperationWithBlock {
-				if let taskID = self.backgroundTaskID where !self.isRunning {
-					dispatch_async(dispatch_get_main_queue(), {
-						if (!onlyClearTaskID) { UIApplication.sharedApplication().endBackgroundTask(taskID) }
-					})
-					self.backgroundTaskID = nil
-				}
-			}
-		}
+		#else
+			func startBackgroundTask() {}
+			func endBackgroundTask(onlyClearTaskID: Bool) {}
+		#endif
 		
 		func updateQueue() {
 			self.queue.addOperationWithBlock {
@@ -130,7 +135,7 @@ extension Plug {
 				}
 				
 				if self.waitingConnections.count > 0 && (self.maximumActiveConnections == 0 || self.activeConnections.count < self.maximumActiveConnections) {
-					var connection = self.waitingConnections[0]
+					let connection = self.waitingConnections[0]
 					self.waitingConnections.removeAtIndex(0)
 					self.activeConnections.append(connection)
 					connection.run()

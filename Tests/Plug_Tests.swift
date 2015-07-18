@@ -49,25 +49,25 @@ class Plug_Tests: XCTestCase {
     
     func testGET2() {
 		let expectation = expectationWithDescription("GET")
-		var url = "http://httpbin.org/get"
-		var params: Plug.Parameters = .None
+		let url = "http://httpbin.org/get"
+		let params: Plug.Parameters = .None
 		
-		var connection = Plug.request(method: .GET, URL: url, parameters: params)
+		let connection = Plug.request(.GET, URL: url, parameters: params)
 			
 		connection.completion({ (conn, data) in
-			var str = NSString(data: data, encoding: NSUTF8StringEncoding)
-				println("Data: \(connection)")
-				expectation.fulfill()
+			let str = NSString(data: data, encoding: NSUTF8StringEncoding)
+			print("Data: \(connection): \(str)")
+			expectation.fulfill()
 
-				XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
+			XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
 		}).error({conn, error in
-				println("Got error: \(error)")
-				expectation.fulfill()
-				
-				XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
+			print("Got error: \(error)")
+			expectation.fulfill()
+			
+			XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
 		})
 		
-		println("\(connection.log())")
+		print("\(connection.log())")
 		connection.start()
 
 		waitForExpectationsWithTimeout(10) { (error) in
@@ -75,15 +75,15 @@ class Plug_Tests: XCTestCase {
 		}
 		
 		connection.log()
-		connection.logErrorToFile(label: "test label")
+		connection.logErrorToFile("test label")
 		XCTAssert(true, "Pass")
     }
 	
 	func testKeyAXS() {
 		persistentDelegate.expectations.append(expectationWithDescription("GET"))
-		var url = "http://axs-doorstep.rhcloud.com:80/api/v1/account/login.json"
+		let url = "http://axs-doorstep.rhcloud.com:80/api/v1/account/login.json"
 		//url = "http://httpbin.org/get"
-		var request = Plug.request(method: .GET, URL: url, parameters: .None, persistence: .Persistent(persistentDelegate.persistenceInfo))
+		let request = Plug.request(.GET, URL: url, parameters: .None, persistence: .Persistent(persistentDelegate.persistenceInfo))
 		request.completion { data in
 			request.log()
 		}
@@ -99,21 +99,24 @@ class Plug_Tests: XCTestCase {
 	
 	func testPersistent2() {
 		persistentDelegate.expectations.append(expectationWithDescription("GET"))
-		var url = "http://httpbin.org/get"
-		var params: Plug.Parameters = .None
-		var headers = Plug.Headers([.Accept(["*/*"])])
+		let url = "http://httpbin.org/get"
+		let params: Plug.Parameters = .None
+		let headers = Plug.Headers([.Accept(["*/*"])])
 		
-		var connection = Plug.request(method: .GET, URL: url, parameters: params, persistence: .Persistent(persistentDelegate.persistenceInfo))
+		let connection = Plug.request(.GET, URL: url, parameters: params, persistence: .Persistent(persistentDelegate.persistenceInfo))
 		connection.headers = headers
-		var dict = connection.JSONRepresentation
+		let dict = connection.JSONRepresentation
 		
-		var json = dict.JSONString
-		var error: NSError?
+		let json = dict.JSONString
 		
-		if let dict = NSJSONSerialization.JSONObjectWithData(json!.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, options: nil, error: &error) as? NSDictionary {
-			var replacement = Plug.Connection(JSONRepresentation: dict)
-			
-			replacement?.start()
+		do {
+			if let dict = try NSJSONSerialization.JSONObjectWithData(json!.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, options: []) as? NSDictionary {
+				let replacement = Plug.Connection(JSONRepresentation: dict)
+				
+				replacement?.start()
+			}
+		} catch let error as NSError {
+			print("Error while decoding JSON: \(error)")
 		}
 		
 		waitForExpectationsWithTimeout(10) { (error) in

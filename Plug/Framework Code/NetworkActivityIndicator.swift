@@ -28,7 +28,7 @@ public class NetworkActivityIndicator: NSObject {
 	public class func decrement() {
 		s_NetworkActivityIndicator.usageCount--
 		if s_NetworkActivityIndicator.usageCount < 0 {
-			println("******** Activity indicator underrun ********")
+			print("******** Activity indicator underrun ********")
 			s_NetworkActivityIndicator.usageCount = 0
 		}
 		

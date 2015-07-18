@@ -24,11 +24,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func applicationDidEnterBackground(application: UIApplication) {
-		var url = "https://serenitynow.herokuapp.com/devices/online"
-		var args = ["device": ["udid": UIDevice.currentDevice().identifierForVendor.UUIDString]]
+		let url = "https://serenitynow.herokuapp.com/devices/online"
+		let args = ["device": ["udid": UIDevice.currentDevice().identifierForVendor!.UUIDString]]
 	
-		Plug.request(method: .DELETE, URL: url, parameters: Plug.Parameters.JSON(args)).completion { conn, data in
-			println("got it \(NSString(data: data, encoding: NSUTF8StringEncoding))")
+		Plug.request(.DELETE, URL: url, parameters: Plug.Parameters.JSON(args)).completion { conn, data in
+			print("got it \(NSString(data: data, encoding: NSUTF8StringEncoding))")
 		}.start()
 	}
 

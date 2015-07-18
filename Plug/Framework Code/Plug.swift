@@ -10,7 +10,7 @@ import Foundation
 
 public class Plug: NSObject {
 	public enum ConnectionType: Int { case Offline, Wifi, WAN }
-	public enum Method: String, Printable { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH"
+	public enum Method: String, CustomStringConvertible { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH"
 		public var description: String { return self.rawValue } 
 	}
 	
@@ -27,7 +27,7 @@ public class Plug: NSObject {
 	}
 	
 	public var autostartConnections = true
-	public var temporaryDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory())!
+	public var temporaryDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory())
 	public var sessionQueue: NSOperationQueue = NSOperationQueue()
 	public var configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
 	public var session: NSURLSession!
@@ -38,8 +38,8 @@ public class Plug: NSObject {
 	])
 	
 	public override init() {
-		var reachabilityClassReference : AnyObject.Type = NSClassFromString("Plug_Reachability")
-		var reachabilityClass : NSObject.Type = reachabilityClassReference as! NSObject.Type
+		let reachabilityClassReference : AnyObject.Type = NSClassFromString("Plug_Reachability")!
+		let reachabilityClass : NSObject.Type = reachabilityClassReference as! NSObject.Type
 		self.reachability = reachabilityClass()
 
 		super.init()
@@ -87,7 +87,7 @@ public class Plug: NSObject {
 
 public extension Plug {
 	public class func request(method: Method = .GET, URL: NSURLConvertible, parameters: Plug.Parameters? = nil, persistence: Plug.Connection.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Plug.Connection {
-		var connection = Plug.Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel)
+		let connection = Plug.Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel)
 		
 		return connection ?? self.manager.noopConnection
 	}
@@ -97,10 +97,16 @@ extension Plug: NSURLSessionDataDelegate {
 	
 }
 
-extension Plug: NSURLSessionDownloadDelegate {
+extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate {
 	
 	subscript(task: NSURLSessionTask) -> Plug.Channel? {
-		get { var channel: Plug.Channel?; self.serialQueue.addOperations( [ NSBlockOperation(block: { [unowned self] in channel = Plug.manager.channels[task.taskIdentifier] } )], waitUntilFinished: true); return channel  }
+		get {
+			var channel: Plug.Channel?
+			self.serialQueue.addOperations( [ NSBlockOperation(block: {
+				channel = Plug.manager.channels[task.taskIdentifier]
+			} )], waitUntilFinished: true)
+			return channel  }
+		
 		set { self.serialQueue.addOperationWithBlock { [unowned self] in self.channels[task.taskIdentifier] = newValue } }
 	}
 	
@@ -112,8 +118,8 @@ extension Plug: NSURLSessionDownloadDelegate {
 		self[task]?[task]?.failedWithError(error)
 	}
 	
-	public func URLSession(session: NSURLSession, task: NSURLSessionTask, willPerformHTTPRedirection response: NSHTTPURLResponse, newRequest request: NSURLRequest, completionHandler: (NSURLRequest!) -> Void) {
-		println("Received redirect request from \(task.originalRequest)")
+	public func URLSession(session: NSURLSession, task: NSURLSessionTask, willPerformHTTPRedirection response: NSHTTPURLResponse, newRequest request: NSURLRequest, completionHandler: (NSURLRequest?) -> Void) {
+		print("Received redirect request from \(task.originalRequest)")
 		completionHandler(request)
 	}
 
