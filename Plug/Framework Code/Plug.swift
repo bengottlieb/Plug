@@ -40,7 +40,7 @@ public class Plug: NSObject {
 	public override init() {
 		let reachabilityClassReference : AnyObject.Type = NSClassFromString("Plug_Reachability")!
 		let reachabilityClass : NSObject.Type = reachabilityClassReference as! NSObject.Type
-		self.reachability = reachabilityClass()
+		self.reachability = reachabilityClass.init()
 
 		super.init()
 		self.reachability.setValue(self, forKey: "delegate");

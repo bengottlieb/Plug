@@ -59,7 +59,7 @@ public extension Plug {
 			}
 		}
 		
-		var defaultPersistentCacheURL = NSURL(fileURLWithPath: "~/Library/Communications/Pending_Connections.json".stringByExpandingTildeInPath)
+		var defaultPersistentCacheURL = NSURL(fileURLWithPath: ("~/Library/Communications/Pending_Connections.json" as NSString).stringByExpandingTildeInPath)
 		var persistentCacheURL: NSURL? { didSet {
 			if let url = self.persistentCacheURL {
 				do {

@@ -245,14 +245,14 @@ extension Plug.Connection {
 	}
 	
 	public func logErrorToFile(label: String = "") {
-		let errorsDir = "~/Library/Plug-Errors".stringByExpandingTildeInPath
+		let errorsDir = ("~/Library/Plug-Errors" as NSString).stringByExpandingTildeInPath
 		let code = self.statusCode ?? 0
 		let seconds = Int(NSDate().timeIntervalSinceReferenceDate)
 		var host = ""
 		if let url = request?.URL { host = url.host ?? "" }
 		var filename = "\(code) \(host) \(seconds).txt".stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString("/", withString: "_")
 		if label != "" { filename = label + "- " + filename }
-		let filepath = errorsDir.stringByAppendingPathComponent(filename)
+		let filepath = (errorsDir as NSString).stringByAppendingPathComponent(filename)
 		
 		do {
 			try NSFileManager.defaultManager().createDirectoryAtPath(errorsDir, withIntermediateDirectories: true, attributes: nil)
