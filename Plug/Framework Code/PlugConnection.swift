@@ -47,7 +47,11 @@ extension Plug {
 		}
 		
 		public var cachingPolicy: NSURLRequestCachePolicy = .ReloadIgnoringLocalCacheData
-		public var response: NSURLResponse?
+		public var response: NSURLResponse? { didSet {
+			if let resp = response as? NSHTTPURLResponse {
+				self.responseHeaders = Headers(dictionary: resp.allHeaderFields)
+			}
+		}}
 		public var statusCode: Int?
 		public var completionQueue: NSOperationQueue?
 		
@@ -58,6 +62,7 @@ extension Plug {
 		public let requestQueue: NSOperationQueue
 		public let parameters: Plug.Parameters
 		public var headers: Plug.Headers?
+		public var responseHeaders: Plug.Headers?
 		public var startedAt: NSDate?
 		public var completedAt: NSDate?
 		public let channel: Plug.Channel
@@ -216,10 +221,10 @@ extension Plug.Connection {
 			string += "\n Parameters: " + self.parameters.description
 		}
 		
-		if let response = self.response as? NSHTTPURLResponse {
+		if self.response != nil {
 			string += "\n╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍ [Response] ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍"
 			
-			for (label, header) in (response.allHeaderFields as! [String: String]) {
+			for (label, header) in self.responseHeaders?.dictionary ?? [:] {
 				string += "\n   \(label): \(header)"
 			}
 		}

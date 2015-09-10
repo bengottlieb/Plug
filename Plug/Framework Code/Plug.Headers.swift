@@ -18,7 +18,7 @@ extension Plug {
 		
 		case Custom(String, String)
 		
-		var label: String {
+		public var label: String {
 			switch (self) {
 			case .Accept: return "Accept"
 			case .AcceptEncoding: return "Accept-Encoding"
@@ -30,7 +30,7 @@ extension Plug {
 			}
 		}
 		
-		var content: String {
+		public var content: String {
 			switch (self) {
 			case .Accept(let types):
 				let content = types.reduce("") { "\($0)\($1);" }
@@ -46,8 +46,19 @@ extension Plug {
 			}
 		}
 		
-		func isSameHeaderAs(header: Header) -> Bool {
+		public func isSameHeaderAs(header: Header) -> Bool {
 			return self.label == header.label
+		}
+		
+		public init(label: String, content: String) {
+			switch label {
+			case "Accept": self = .Accept(content.componentsSeparatedByString(","))
+			case "Accept-Encoding": self = .AcceptEncoding(content)
+			case "Content-Type": self = .AcceptEncoding(content)
+			case "User-Agent": self = .AcceptEncoding(content)
+				
+			default: self = .Custom(label, content)
+			}
 		}
 	}
 	
@@ -62,6 +73,15 @@ extension Plug {
 			}
 			self.headers.append(header)
 		}
+		
+		init(dictionary: NSDictionary) {
+			if let dict = dictionary as? [String: String] {
+				for (key, value) in dict {
+					self.headers.append(Header(label: key, content: value))
+				}
+			}
+		}
+		
 		public var dictionary: [String: String] {
 			var dict: [String: String] = [:]
 			
@@ -74,6 +94,15 @@ extension Plug {
 		
 		public var description: String {
 			return self.dictionary.description
+		}
+		
+		public subscript(key: String) -> Header? {
+			get {
+				for header in self.headers {
+					if header.label == key { return header }
+				}
+				return nil
+			}
 		}
 	}
 }
