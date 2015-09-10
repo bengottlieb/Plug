@@ -37,6 +37,11 @@ public class Plug: NSObject {
 			.UserAgent("Plug-com.keyaxs.keyaxs"),
 	])
 	
+	class public var libraryDirectoryURL: NSURL {
+		return NSURL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.LibraryDirectory, [.UserDomainMask], true).first!)
+	}
+	class public var plugDirectoryURL: NSURL { return self.libraryDirectoryURL.URLByAppendingPathComponent("Plug") }
+	
 	public override init() {
 		let reachabilityClassReference : AnyObject.Type = NSClassFromString("Plug_Reachability")!
 		let reachabilityClass : NSObject.Type = reachabilityClassReference as! NSObject.Type
