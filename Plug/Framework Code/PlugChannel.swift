@@ -14,7 +14,7 @@ extension Plug {
 		public var maximumActiveConnections = 0
 		public var queueState: QueueState = .PausedDueToOffline
 		public let name: String
-		public var maxSimultaneousConnections = 1 { didSet { self.queue.maxConcurrentOperationCount = self.maxSimultaneousConnections }}
+		public var maxSimultaneousConnections = 1// { didSet { self.queue.maxConcurrentOperationCount = self.maxSimultaneousConnections }}
 		
 		public enum QueueState: Int { case Paused, PausedDueToOffline, Running }
 
@@ -28,7 +28,7 @@ extension Plug {
 			queueState = Plug.manager.connectionType == .Offline ? .PausedDueToOffline : .Running
 			maxSimultaneousConnections = max
 			queue = NSOperationQueue()
-			queue.maxConcurrentOperationCount = max
+			queue.maxConcurrentOperationCount = 1//max
 			Channel.allChannels[chName] = self
 		}
 

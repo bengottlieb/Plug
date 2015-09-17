@@ -89,7 +89,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B504E6131A89230F001B414B /* TestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B504E6131A89230F001B414B /* PlugTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlugTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B504E6461A8968DC001B414B /* Plug.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Plug.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B504E66A1A896980001B414B /* BuildFramework.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = BuildFramework.sh; path = Plug/BuildFramework.sh; sourceTree = "<group>"; };
 		B504E6981A896E82001B414B /* Plug Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Plug Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -169,7 +169,7 @@
 		B504E6141A89230F001B414B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B504E6131A89230F001B414B /* TestHost.app */,
+				B504E6131A89230F001B414B /* PlugTest.app */,
 				B504E6461A8968DC001B414B /* Plug.framework */,
 				B504E6981A896E82001B414B /* Plug Tests.xctest */,
 				B504E6AF1A898110001B414B /* Plug.framework */,
@@ -281,9 +281,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		B504E6121A89230F001B414B /* TestHost */ = {
+		B504E6121A89230F001B414B /* PlugTest */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B504E6321A89230F001B414B /* Build configuration list for PBXNativeTarget "TestHost" */;
+			buildConfigurationList = B504E6321A89230F001B414B /* Build configuration list for PBXNativeTarget "PlugTest" */;
 			buildPhases = (
 				B504E60F1A89230F001B414B /* Sources */,
 				B504E6101A89230F001B414B /* Frameworks */,
@@ -295,9 +295,9 @@
 			dependencies = (
 				B504E65C1A8968DC001B414B /* PBXTargetDependency */,
 			);
-			name = TestHost;
+			name = PlugTest;
 			productName = Plug;
-			productReference = B504E6131A89230F001B414B /* TestHost.app */;
+			productReference = B504E6131A89230F001B414B /* PlugTest.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B504E6451A8968DC001B414B /* Plug_iOS */ = {
@@ -394,7 +394,7 @@
 			projectRoot = "";
 			targets = (
 				B504E6661A89690C001B414B /* Build Combined */,
-				B504E6121A89230F001B414B /* TestHost */,
+				B504E6121A89230F001B414B /* PlugTest */,
 				B504E6451A8968DC001B414B /* Plug_iOS */,
 				B504E6AE1A898110001B414B /* Plug_Mac */,
 				B504E6971A896E82001B414B /* Plug Tests */,
@@ -515,7 +515,7 @@
 		};
 		B58D64981A899FE9005A0002 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B504E6121A89230F001B414B /* TestHost */;
+			target = B504E6121A89230F001B414B /* PlugTest */;
 			targetProxy = B58D64971A899FE9005A0002 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -796,7 +796,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B504E6321A89230F001B414B /* Build configuration list for PBXNativeTarget "TestHost" */ = {
+		B504E6321A89230F001B414B /* Build configuration list for PBXNativeTarget "PlugTest" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B504E6331A89230F001B414B /* Debug */,
