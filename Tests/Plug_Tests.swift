@@ -79,24 +79,6 @@ class Plug_Tests: XCTestCase {
 		XCTAssert(true, "Pass")
     }
 	
-	func testKeyAXS() {
-		persistentDelegate.expectations.append(expectationWithDescription("GET"))
-		let url = "http://axs-doorstep.rhcloud.com:80/api/v1/account/login.json"
-		//url = "http://httpbin.org/get"
-		let request = Plug.request(.GET, URL: url, parameters: .None, persistence: .Persistent(persistentDelegate.persistenceInfo))
-		request.completion { data in
-			request.log()
-		}
-		request.addHeader(.BasicAuthorization("utd_client", "Pr4d00rz"))
-		request.addHeader(.Custom("login_email", "ben@standalone.com"))
-		request.addHeader(.Custom("login_password", "doorlock"))
-
-		request.start()
-		waitForExpectationsWithTimeout(10) { (error) in
-			
-		}
-	}
-	
 	func testPersistent2() {
 		persistentDelegate.expectations.append(expectationWithDescription("GET"))
 		let url = "http://httpbin.org/get"
