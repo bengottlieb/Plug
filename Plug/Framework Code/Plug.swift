@@ -34,7 +34,7 @@ public class Plug: NSObject {
 	public var defaultHeaders = Plug.Headers([
 			.Accept(["application/json"]),
 			.AcceptEncoding("gzip;q=1.0,compress;q=0.5"),
-			.UserAgent("plug-\(NSBundle.mainBundle().bundleIdentifier)"),
+			.UserAgent("plug-\(NSBundle.mainBundle().bundleIdentifier!)"),
 	])
 	
 	class public var libraryDirectoryURL: NSURL {
