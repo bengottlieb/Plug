@@ -91,7 +91,7 @@ public class Plug: NSObject {
 }
 
 public extension Plug {
-	public class func request(method: Method = .GET, URL: NSURLConvertible, parameters: Plug.Parameters? = nil, persistence: Plug.Connection.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Plug.Connection {
+	public class func request(method: Method = .GET, URL: NSURLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Connection.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Plug.Connection {
 		let connection = Plug.Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel)
 		
 		return connection ?? self.manager.noopConnection

@@ -8,13 +8,13 @@
 
 import Foundation
 
-public protocol NSURLConvertible {
+public protocol NSURLLike {
 	var URL: NSURL? { get }
 }
 
-public protocol NSURLRequestConvertible {
+public protocol NSURLRequestLike {
 	var URL: NSURLRequest? { get }
 }
 
-extension NSURL: NSURLConvertible { public var URL: NSURL? { return self } }
-extension String: NSURLConvertible { public var URL: NSURL? { return NSURL(string: self) } }
+extension NSURL: NSURLLike { public var URL: NSURL? { return self } }
+extension String: NSURLLike { public var URL: NSURL? { return NSURL(string: self) } }

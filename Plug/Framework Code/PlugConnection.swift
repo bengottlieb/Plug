@@ -82,7 +82,7 @@ extension Plug {
 		}
 		
 		
-		public init?(method meth: Method = .GET, URL url: NSURLConvertible, parameters params: Plug.Parameters? = nil, persistence persist: Persistence = .Transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
+		public init?(method meth: Method = .GET, URL url: NSURLLike, parameters params: Plug.Parameters? = nil, persistence persist: Persistence = .Transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
 			requestQueue = NSOperationQueue()
 			requestQueue.maxConcurrentOperationCount = 1
 			requestQueue.suspended = true
