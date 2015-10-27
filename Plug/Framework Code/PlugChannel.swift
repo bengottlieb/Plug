@@ -32,7 +32,7 @@ extension Plug {
 			Channel.allChannels[chName] = self
 		}
 
-
+		internal var unfinishedConnections: Set<Plug.Connection> = []
 		internal var connections: [Int: Plug.Connection] = [:]
 		private let queue: NSOperationQueue
 		internal var waitingConnections: [Plug.Connection] = []
@@ -59,6 +59,10 @@ extension Plug {
 			self.queueState = .Paused
 		}
 		
+		var allConnections: [Plug.Connection] {
+			return self.activeConnections + self.waitingConnections
+		}
+		
 		func enqueue(connection: Plug.Connection) {
 			self.queue.addOperationWithBlock {
 				self.waitingConnections.append(connection)
@@ -67,8 +71,15 @@ extension Plug {
 			}
 		}
 		
+		func addConnectionToChannel(connection: Plug.Connection) {
+			self.queue.addOperationWithBlock {
+				self.unfinishedConnections.insert(connection)
+			}
+		}
+		
 		func dequeue(connection: Plug.Connection) {
 			self.queue.addOperationWithBlock {
+				self.unfinishedConnections.remove(connection)
 				if let index = self.waitingConnections.indexOf(connection) {
 					self.waitingConnections.removeAtIndex(index)
 				}
@@ -147,6 +158,13 @@ extension Plug {
 		subscript(task: NSURLSessionTask) -> Plug.Connection? {
 			get { var connection: Plug.Connection?; self.queue.addOperations( [ NSBlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true); return connection  }
 			set { self.queue.addOperationWithBlock { self.connections[task.taskIdentifier] = newValue } }
+		}
+		
+		func existingConnectionWithMethod(method: Method, URL: NSURLLike, parameters: Plug.Parameters?) -> Connection? {
+			for connection in self.unfinishedConnections {
+				if connection.URLLike == URL && connection.method == method { return connection }
+			}
+			return nil
 		}
 	}
 }

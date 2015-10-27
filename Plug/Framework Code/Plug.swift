@@ -34,7 +34,7 @@ public class Plug: NSObject {
 	public var defaultHeaders = Plug.Headers([
 			.Accept(["application/json"]),
 			.AcceptEncoding("gzip;q=1.0,compress;q=0.5"),
-			.UserAgent("plug-\(NSBundle.mainBundle().bundleIdentifier!)"),
+			.UserAgent("plug-\(NSBundle.mainBundle().bundleIdentifier ?? "")"),
 	])
 	
 	class public var libraryDirectoryURL: NSURL {
@@ -92,9 +92,15 @@ public class Plug: NSObject {
 
 public extension Plug {
 	public class func request(method: Method = .GET, URL: NSURLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Connection.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Plug.Connection {
-		let connection = Plug.Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel)
+		if let connection = channel.existingConnectionWithMethod(method, URL: URL, parameters: parameters) {
+			return connection
+		}
 		
-		return connection ?? self.manager.noopConnection
+		if let connection = Plug.Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel) {
+			return connection
+		}
+		
+		return self.manager.noopConnection
 	}
 }
 

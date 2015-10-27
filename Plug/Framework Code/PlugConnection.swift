@@ -54,9 +54,11 @@ extension Plug {
 		}}
 		public var statusCode: Int?
 		public var completionQueue: NSOperationQueue?
+		public var completionBlocks: [(Plug.Connection, NSData) -> Void] = []
+		public var errorBlocks: [(Plug.Connection, NSError) -> Void] = []
 		
 		public let method: Method
-		public let URL: NSURL
+		public var URL: NSURL { get { return self.URLLike.URL ?? NSURL() } }
 		public var downloadToFile = false
 		public var request: NSURLRequest?
 		public let requestQueue: NSOperationQueue
@@ -66,6 +68,7 @@ extension Plug {
 		public var startedAt: NSDate?
 		public var completedAt: NSDate?
 		public let channel: Plug.Channel
+		internal let URLLike: NSURLLike
 		public var elapsedTime: NSTimeInterval {
 			if let startedAt = self.startedAt {
 				if let completedAt = self.completedAt {
@@ -92,9 +95,10 @@ extension Plug {
 			channel = chn
 			
 			method = parameters.normalizeMethod(meth)
-			URL = url.URL ?? NSURL()
+			URLLike = url
 			
 			super.init()
+			channel.addConnectionToChannel(self)
 			if url.URL == nil {
 				print("Unable to create a connection with URL: \(url)")
 
@@ -179,20 +183,12 @@ extension Plug {
 
 extension Plug.Connection {
 	public func completion(completion: (Plug.Connection, NSData) -> Void) -> Self {
-		self.requestQueue.addOperationWithBlock {
-			(self.completionQueue ?? NSOperationQueue.mainQueue()).addOperationWithBlock {
-				if let data = self.resultsData { completion(self, data) }
-			}
-		}
+		self.completionBlocks.append(completion)
 		return self
 	}
 
 	public func error(completion: (Plug.Connection, NSError) -> Void) -> Self {
-		self.requestQueue.addOperationWithBlock {
-			(self.completionQueue ?? NSOperationQueue.mainQueue()).addOperationWithBlock {
-				if let error = self.resultsError { completion(self, error) }
-			}
-		}
+		self.errorBlocks.append(completion)
 		return self
 	}
 }
@@ -327,6 +323,17 @@ extension Plug.Connection {		//actions
 		Plug.manager.unregisterConnection(self)
 		self.channel.connectionStopped(self)
 		self.channel.dequeue(self)
+		
+		self.requestQueue.addOperationWithBlock {
+			if let data = self.resultsData {
+				let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
+				for block in self.completionBlocks {
+					let op = NSBlockOperation(block: { block(self, data) })
+					queue.addOperations([op], waitUntilFinished: true)
+				}
+			}
+		}
+
 		self.requestQueue.suspended = false
 		if self.state == .Completed {
 			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionCompleted, object: self)
@@ -356,6 +363,7 @@ extension NSURLRequest {
 }
 
 public func ==(lhs: Plug.Connection, rhs: Plug.Connection) -> Bool {
-	return lhs === rhs
+	if !lhs.URLLike.isEqual(rhs.URLLike) { return false }
+	return lhs.parameters == rhs.parameters && lhs.method == rhs.method
 }
 

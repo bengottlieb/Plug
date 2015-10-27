@@ -114,7 +114,20 @@ extension Plug {
 }
 
 public func ==(lhs: Plug.Parameters, rhs: Plug.Parameters) -> Bool {
-	return lhs.type == rhs.type && lhs.type == "None"
+	switch (lhs, rhs) {
+	case (.URL(let lhString), .URL(let rhString)):
+		return lhString == rhString
+		
+	case (.Form(let lhString), .Form(let rhString)):
+		return lhString == rhString
+		
+	case (.JSON(let lhJson), .JSON(let rhJson)):
+		return lhJson == rhJson
+	
+	case (.None, .None): return true
+		
+	default: return false
+	}
 }
 
 extension NSMutableDictionary {
