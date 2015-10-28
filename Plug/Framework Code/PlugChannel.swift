@@ -63,8 +63,16 @@ extension Plug {
 			return self.activeConnections + self.waitingConnections
 		}
 		
+		func serialize(block: () -> Void) {
+			if NSOperationQueue.currentQueue() == self.queue {
+				block()
+			} else {
+				self.queue.addOperations([ NSBlockOperation(block: block) ], waitUntilFinished: true)
+			}
+		}
+		
 		func enqueue(connection: Plug.Connection) {
-			self.queue.addOperationWithBlock {
+			self.serialize {
 				self.waitingConnections.append(connection)
 				self.updateQueue()
 				NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionQueued, object: connection)
@@ -72,13 +80,13 @@ extension Plug {
 		}
 		
 		func addConnectionToChannel(connection: Plug.Connection) {
-			self.queue.addOperationWithBlock {
+			self.serialize {
 				self.unfinishedConnections.insert(connection)
 			}
 		}
 		
 		func dequeue(connection: Plug.Connection) {
-			self.queue.addOperationWithBlock {
+			self.serialize {
 				self.unfinishedConnections.remove(connection)
 				if let index = self.waitingConnections.indexOf(connection) {
 					self.waitingConnections.removeAtIndex(index)
@@ -89,7 +97,7 @@ extension Plug {
 		
 		func connectionStarted(connection: Plug.Connection) {
 			self.startBackgroundTask()
-			self.queue.addOperationWithBlock {
+			self.serialize {
 				if let index = self.waitingConnections.indexOf(connection) { self.waitingConnections.removeAtIndex(index) }
 				if self.activeConnections.indexOf(connection) == -1 { self.activeConnections.append(connection) }
 				NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionStarted, object: connection)
@@ -97,7 +105,7 @@ extension Plug {
 		}
 		
 		func connectionStopped(connection: Plug.Connection) {
-			self.queue.addOperationWithBlock {
+			self.serialize {
 				if let index = self.activeConnections.indexOf(connection) {
 					self.activeConnections.removeAtIndex(index)
 				}
@@ -114,7 +122,7 @@ extension Plug {
 			
 			func startBackgroundTask() {
 				if self.backgroundTaskID == nil {
-					self.queue.addOperationWithBlock {
+					self.serialize {
 						self.backgroundTaskID = UIApplication.sharedApplication().beginBackgroundTaskWithName("plug.queue.\(self.name)", expirationHandler: {
 							self.endBackgroundTask(true)
 							self.pauseQueue()
@@ -124,7 +132,7 @@ extension Plug {
 			}
 			
 			func endBackgroundTask(onlyClearTaskID: Bool) {
-				self.queue.addOperationWithBlock {
+				self.serialize {
 					if let taskID = self.backgroundTaskID where !self.isRunning {
 						dispatch_async(dispatch_get_main_queue(), {
 							if (!onlyClearTaskID) { UIApplication.sharedApplication().endBackgroundTask(taskID) }
@@ -139,7 +147,7 @@ extension Plug {
 		#endif
 		
 		func updateQueue() {
-			self.queue.addOperationWithBlock {
+			self.serialize {
 				if !self.isRunning {
 					self.endBackgroundTask(false)
 					return
@@ -157,7 +165,7 @@ extension Plug {
 
 		subscript(task: NSURLSessionTask) -> Plug.Connection? {
 			get { var connection: Plug.Connection?; self.queue.addOperations( [ NSBlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true); return connection  }
-			set { self.queue.addOperationWithBlock { self.connections[task.taskIdentifier] = newValue } }
+			set { self.serialize { self.connections[task.taskIdentifier] = newValue } }
 		}
 		
 		func existingConnectionWithMethod(method: Method, URL: NSURLLike, parameters: Plug.Parameters?) -> Connection? {

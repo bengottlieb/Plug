@@ -88,7 +88,6 @@ extension Plug {
 		public init?(method meth: Method = .GET, URL url: NSURLLike, parameters params: Plug.Parameters? = nil, persistence persist: Persistence = .Transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
 			requestQueue = NSOperationQueue()
 			requestQueue.maxConcurrentOperationCount = 1
-			requestQueue.suspended = true
 			
 			persistence = persist
 			parameters = params ?? .None
@@ -108,7 +107,7 @@ extension Plug {
 
 			if Plug.manager.autostartConnections {
 				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-					self.queue()
+					self.start()
 				}
 			}
 		}
@@ -183,12 +182,12 @@ extension Plug {
 
 extension Plug.Connection {
 	public func completion(completion: (Plug.Connection, NSData) -> Void) -> Self {
-		self.completionBlocks.append(completion)
+		self.requestQueue.addOperationWithBlock { self.completionBlocks.append(completion) }
 		return self
 	}
 
 	public func error(completion: (Plug.Connection, NSError) -> Void) -> Self {
-		self.errorBlocks.append(completion)
+		self.requestQueue.addOperationWithBlock { self.errorBlocks.append(completion) }
 		return self
 	}
 }
@@ -276,14 +275,9 @@ extension Plug.Connection {
 }
 
 extension Plug.Connection {		//actions
-	public func queue() {
-		if (self.state != .Waiting) { return }
-		self.channel.enqueue(self)
-	}
-	
 	public func start() {
 		if (state != .Waiting && state != .Queued) { return }
-		self.queue()
+		self.channel.enqueue(self)
 	}
 	
 	public func run() {
@@ -293,7 +287,6 @@ extension Plug.Connection {		//actions
 		Plug.manager.registerConnection(self)
 		self.task!.resume()
 		self.startedAt = NSDate()
-		self.requestQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
 	}
 	
 	public func suspend() {
@@ -333,8 +326,8 @@ extension Plug.Connection {		//actions
 				}
 			}
 		}
+		self.requestQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
 
-		self.requestQueue.suspended = false
 		if self.state == .Completed {
 			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionCompleted, object: self)
 		} else {

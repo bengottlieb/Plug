@@ -103,7 +103,7 @@ class Plug_Tests: XCTestCase {
 			print("Error while decoding JSON: \(error)")
 		}
 		
-		waitForExpectationsWithTimeout(10) { (error) in
+		waitForExpectationsWithTimeout(1000) { (error) in
 			
 		}
 	}
