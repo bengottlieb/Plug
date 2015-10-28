@@ -51,9 +51,10 @@ class Plug_Tests: XCTestCase {
 		let expectation = expectationWithDescription("GET")
 		let url = "http://httpbin.org/get"
 		let params: Plug.Parameters = .None
+		var completionCount = 0
 		
-		let connection = Plug.request(.GET, URL: url, parameters: params)
-		let connection2 = Plug.request(.GET, URL: url, parameters: params)
+		let connection = Plug.request(.GET, URL: url, parameters: params).completion { c, d in completionCount++ }
+		let connection2 = Plug.request(.GET, URL: url, parameters: params).completion { c, d in completionCount++ }
 		XCTAssert(connection == connection2, "Identical connections should be identical")
 
 		connection.completion({ (conn, data) in
@@ -73,7 +74,7 @@ class Plug_Tests: XCTestCase {
 		connection.start()
 
 		waitForExpectationsWithTimeout(10) { (error) in
-			
+			XCTAssert(completionCount == 2, "Failed to complete one or more connections")
 		}
 		
 		connection.log()
