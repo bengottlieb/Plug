@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import UIKit
 
 extension Plug {
 	public class Channel {
