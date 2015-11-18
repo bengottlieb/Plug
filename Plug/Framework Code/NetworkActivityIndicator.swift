@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 var s_NetworkActivityIndicator = NetworkActivityIndicator()
 
