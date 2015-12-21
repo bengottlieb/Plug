@@ -22,11 +22,5 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
-	<key>branch</key>
-	<string>swift_2</string>
-	<key>built</key>
-	<string>Tue Sep 29 21:49:19 CDT 2015</string>
-	<key>rev</key>
-	<string>f8ebc92</string>
 </dict>
 </plist>
