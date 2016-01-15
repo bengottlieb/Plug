@@ -18,6 +18,7 @@ extension Plug {
 		var stringValue: String {
 			switch (self) {
 			case .URL(let params):
+				if params.keys.count == 0 { return "" }
 				return (params.keys.reduce("?") { if let v = params[$1] { return $0 + "\($1)=\(v.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!)&" }; return $0 })
 				
 			case .Form(let params):
@@ -40,7 +41,7 @@ extension Plug {
 			}
 		}
 		
-		var URLString: String {
+		public var URLString: String {
 			switch (self) {
 			case .URL: return self.stringValue
 			default: return ""
