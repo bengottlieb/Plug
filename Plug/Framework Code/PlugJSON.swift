@@ -32,6 +32,12 @@ extension Bool: JSONObject {
 	public var JSONString: String? { return self ? "true" : "false" }
 }
 
+extension JSONObject {
+	func log() {
+		print("\(self.JSONString)")
+	}
+}
+
 extension NSDictionary: JSONObject {
 	public var JSONString: String? {
 		do {
@@ -114,6 +120,17 @@ extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
 			return dict[components: components]
 		}
 	}
+
+	public var JSONString: String? {
+		do {
+			let data = try NSJSONSerialization.dataWithJSONObject(self as! AnyObject, options: .PrettyPrinted)
+			return (NSString(data: data, encoding: NSUTF8StringEncoding) as? String) ?? ""
+		} catch let error as NSError {
+			print("error while deserializing a JSON object: \(error)")
+		}
+		
+		return nil
+	}
 }
 
 extension Array {
@@ -141,4 +158,17 @@ extension Array {
 			return dict[components: components]
 		}
 	}
+
+	public var JSONString: String? {
+		do {
+			let data = try NSJSONSerialization.dataWithJSONObject((self as! AnyObject) as! [AnyObject], options: .PrettyPrinted)
+			return (NSString(data: data, encoding: NSUTF8StringEncoding) as? String) ?? ""
+		} catch let error as NSError {
+			print("error while deserializing a JSON object: \(error)")
+		}
+		
+		return nil
+	}
+	
+	var description: String { return self.JSONString ?? "" }
 }
