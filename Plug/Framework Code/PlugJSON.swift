@@ -33,8 +33,12 @@ extension Bool: JSONObject {
 }
 
 extension JSONObject {
-	func log() {
-		print("\(self.JSONString)")
+	public func log() {
+		if let string = self.JSONString {
+			print("\(string)")
+		} else {
+			print("\(self)")
+		}
 	}
 }
 
@@ -85,13 +89,6 @@ public extension NSData {
 	}
 }
 
-public protocol JSONKey {
-	func toString() -> String
-}
-extension String: JSONKey {
-	public func toString() -> String { return self }
-}
-
 let JSONSeparatorsCharacterSet = NSCharacterSet(charactersInString: ".[]")
 extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
 //	public func path(path: String) -> AnyObject? {
@@ -133,7 +130,16 @@ extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
 	}
 }
 
-extension Array {
+extension Dictionary: JSONObject {
+	public var JSONString: String? {
+		if let dict = (self as? AnyObject) as? NSDictionary {
+			return dict.JSONString
+		}
+		return nil
+	}
+}
+
+extension Array: JSONObject {
 	public subscript(path: String) -> AnyObject? {
 		let components = path.componentsSeparatedByCharactersInSet(JSONSeparatorsCharacterSet)
 		return self[components: components]
