@@ -9,6 +9,7 @@
 import UIKit
 import XCTest
 import Plug
+import Gulliver
 
 var persistentDelegate = Plug_TestPersistentDelegate()
 

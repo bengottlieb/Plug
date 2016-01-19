@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Gulliver
 
 extension Plug {
 	public class Connection: NSObject {

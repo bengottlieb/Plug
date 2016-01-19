@@ -1,0 +1,10 @@
+framework module Gulliver {
+  umbrella header "Gulliver.h"
+
+  export *
+  module * { export * }
+}
+
+module Gulliver.Swift {
+    header "Gulliver-Swift.h"
+}
