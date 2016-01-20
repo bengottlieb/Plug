@@ -56,9 +56,7 @@
 		B58D64951A899094005A0002 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D648F1A899094005A0002 /* ViewController.swift */; };
 		B58D64961A899285005A0002 /* Plug.h in Headers */ = {isa = PBXBuildFile; fileRef = B58D646B1A898F81005A0002 /* Plug.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B5E0C14F1C4EE14F009D501E /* Gulliver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; };
-		B5E0C1501C4EE14F009D501E /* Gulliver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; };
 		B5E0C1511C4EE14F009D501E /* GulliverEXT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */; };
-		B5E0C1521C4EE14F009D501E /* GulliverEXT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */; };
 		B5E0C1531C4EE187009D501E /* Gulliver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B5E0C1541C4EE187009D501E /* GulliverEXT.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B5E0C1551C4EF131009D501E /* Gulliver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; };
@@ -161,8 +159,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5E0C1521C4EE14F009D501E /* GulliverEXT.framework in Frameworks */,
-				B5E0C1501C4EE14F009D501E /* Gulliver.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
