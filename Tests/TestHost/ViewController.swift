@@ -22,7 +22,7 @@ class ViewController: UIViewController {
 	
 	func onlineStatusChanged() {
 		dispatch_async(dispatch_get_main_queue()) {
-			switch (Plug.manager.connectionType) {
+			switch (Plug.connectionType) {
 			case .Offline: self.statusLabel.text = "Offline"
 			case .Wifi: self.statusLabel.text = "WiFi"
 			case .WAN: self.statusLabel.text = "WAN"

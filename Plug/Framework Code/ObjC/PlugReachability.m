@@ -10,7 +10,7 @@
 @import SystemConfiguration;
 
 @protocol Plug_ReachabilityDelegate <NSObject>
-- (void) setOnline: (BOOL) online wifi: (BOOL) wifi;
+- (void) setOnlineViaWifi: (BOOL) wifi orWAN: (BOOL) wan;
 @end
 
 @interface Plug_Reachability ()
@@ -72,7 +72,7 @@ static void PlugReachabilityCallback(SCNetworkReachabilityRef ref, SCNetworkReac
 
 - (void) statusChanged: (SCNetworkReachabilityFlags) flags {
 	BOOL		wifi = (flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0;
-	
+	NSLog(@"Flags: %d", flags);
 	if ((flags & (kSCNetworkReachabilityFlagsConnectionOnDemand | kSCNetworkReachabilityFlagsConnectionOnTraffic)) != 0) {
 		if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0) wifi = true;
 	}
@@ -84,7 +84,7 @@ static void PlugReachabilityCallback(SCNetworkReachabilityRef ref, SCNetworkReac
 		BOOL	wan = false;
 	#endif
 	
-	[self.delegate setOnline: wifi || wan wifi: wifi];
+	[self.delegate setOnlineViaWifi: wifi orWAN: wan];
 }
 
 @end

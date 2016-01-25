@@ -81,7 +81,7 @@ extension Plug {
 			return 0
 		}
 		public func addHeader(header: Plug.Header) {
-			if self.headers == nil { self.headers = Plug.manager.defaultHeaders }
+			if self.headers == nil { self.headers = Plug.instance.defaultHeaders }
 			self.headers?.append(header)
 		}
 		
@@ -106,7 +106,7 @@ extension Plug {
 			}
 			if let header = self.parameters.contentTypeHeader { self.addHeader(header) }
 
-			if Plug.manager.autostartConnections {
+			if Plug.instance.autostartConnections {
 				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
 					self.start()
 				}
@@ -116,9 +116,9 @@ extension Plug {
 		var task: NSURLSessionTask?
 		func generateTask() -> NSURLSessionTask? {
 			if self.downloadToFile {
-				return Plug.manager.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { url, response, error in })
+				return Plug.instance.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { url, response, error in })
 			} else {
-				return Plug.manager.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
+				return Plug.instance.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
 					if let httpResponse = response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
 					self.response = response
 					self.resultsError = error ?? response?.error
@@ -152,7 +152,7 @@ extension Plug {
 			
 			self.response = self.task?.response
 			if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
-			self.resultsURL = Plug.manager.temporaryDirectoryURL.URLByAppendingPathComponent(filename)
+			self.resultsURL = Plug.instance.temporaryDirectoryURL.URLByAppendingPathComponent(filename)
 			do {
 				try NSFileManager.defaultManager().moveItemAtURL(location, toURL: self.resultsURL!)
 			} catch let error as NSError {
@@ -166,7 +166,7 @@ extension Plug {
 			let urlString = self.URL.absoluteString + self.parameters.URLString
 			let request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
 			
-			request.allHTTPHeaderFields = (self.headers ?? Plug.manager.defaultHeaders).dictionary
+			request.allHTTPHeaderFields = (self.headers ?? Plug.instance.defaultHeaders).dictionary
 			request.HTTPMethod = self.method.rawValue
 			request.HTTPBody = self.parameters.bodyData
 			request.cachePolicy = self.cachingPolicy
@@ -178,7 +178,7 @@ extension Plug {
 		}
 	}
 
-	var noopConnection: Plug.Connection { return Plug.Connection(URL: "about:blank")! }
+	static var noopConnection: Plug.Connection { return Plug.Connection(URL: "about:blank")! }
 }
 
 extension Plug.Connection {
@@ -285,7 +285,7 @@ extension Plug.Connection {		//actions
 		self.channel.connectionStarted(self)
 		self.state = .Running
 		self.task = self.generateTask()
-		Plug.manager.registerConnection(self)
+		Plug.instance.registerConnection(self)
 		self.task!.resume()
 		self.startedAt = NSDate()
 	}
@@ -314,7 +314,7 @@ extension Plug.Connection {		//actions
 	func complete(state: State) {
 		self.state = state
 		self.completedAt = NSDate()
-		Plug.manager.unregisterConnection(self)
+		Plug.instance.unregisterConnection(self)
 		self.channel.connectionStopped(self)
 		self.channel.dequeue(self)
 		

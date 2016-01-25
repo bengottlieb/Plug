@@ -14,7 +14,9 @@ public class Plug: NSObject {
 		public var description: String { return self.rawValue } 
 	}
 	
-	public static var manager = Plug()
+	public static let instance = Plug()
+	public static var connectionType = ConnectionType.Offline
+	public static var online: Bool { return self.connectionType != .Offline }
 	
 	public struct notifications {
 		public static let onlineStatusChanged = "onlineStatusChanged.com.standalone.plug"
@@ -53,22 +55,26 @@ public class Plug: NSObject {
 		self.session = NSURLSession(configuration: self.configuration, delegate: self, delegateQueue: self.sessionQueue)
 	}
 	
-	public var connectionType: ConnectionType = .Offline
 	
 	public func setup() {}
 
 	private var reachability: AnyObject
-	func setOnline(online: Bool, wifi: Bool) {
+	func setOnlineViaWifi(wifi: Bool, orWAN wan: Bool) {
 		var newState = ConnectionType.Offline
 		
-		if online { newState = wifi ? .Wifi : .WAN }
-		self.connectionType = newState
+		if wifi {
+			newState = .Wifi
+		} else if wan {
+			newState = .WAN
+		} else {
+			newState = .Offline
+		}
 		
 		self.updateChannelStates()
-
-		if newState == self.connectionType { return }
+		print("online via WAN: \(wan), wifi: \(wifi)")
+		if newState == Plug.connectionType { return }
 		
-		
+		Plug.connectionType = newState
 		dispatch_async(dispatch_get_main_queue()) {
 			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.onlineStatusChanged, object: nil)
 		}
@@ -77,7 +83,7 @@ public class Plug: NSObject {
 	func updateChannelStates() {
 		dispatch_async(dispatch_get_main_queue()) {
 			for channel in Plug.Channel.allChannels.values {
-				if self.connectionType == .Offline {
+				if Plug.connectionType == .Offline {
 					if channel.queueState == .Running { channel.pauseQueue(); channel.queueState = .PausedDueToOffline }
 				} else {
 					if channel.queueState == .PausedDueToOffline { channel.startQueue() }
@@ -100,7 +106,7 @@ public extension Plug {
 			return connection
 		}
 		
-		return self.manager.noopConnection
+		return self.noopConnection
 	}
 }
 
@@ -114,7 +120,7 @@ extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate {
 		get {
 			var channel: Plug.Channel?
 			self.serialQueue.addOperations( [ NSBlockOperation(block: {
-				channel = Plug.manager.channels[task.taskIdentifier]
+				channel = Plug.instance.channels[task.taskIdentifier]
 			} )], waitUntilFinished: true)
 			return channel  }
 		
