@@ -71,7 +71,7 @@ public class Plug: NSObject {
 		}
 		
 		self.updateChannelStates()
-		print("online via WAN: \(wan), wifi: \(wifi)")
+		//print("online via WAN: \(wan), wifi: \(wifi)")
 		if newState == Plug.connectionType { return }
 		
 		Plug.connectionType = newState

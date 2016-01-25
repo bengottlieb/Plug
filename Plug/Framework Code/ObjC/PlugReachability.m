@@ -71,8 +71,7 @@ static void PlugReachabilityCallback(SCNetworkReachabilityRef ref, SCNetworkReac
 }
 
 - (void) statusChanged: (SCNetworkReachabilityFlags) flags {
-	BOOL		wifi = (flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0;
-	NSLog(@"Flags: %d", flags);
+	BOOL		wifi = (flags & kSCNetworkReachabilityFlagsReachable) != 0;
 	if ((flags & (kSCNetworkReachabilityFlagsConnectionOnDemand | kSCNetworkReachabilityFlagsConnectionOnTraffic)) != 0) {
 		if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0) wifi = true;
 	}
