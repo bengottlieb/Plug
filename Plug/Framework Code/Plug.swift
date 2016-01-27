@@ -37,7 +37,7 @@ public class Plug: NSObject {
 	var configuration: NSURLSessionConfiguration {
 		let config = NSURLSessionConfiguration.defaultSessionConfiguration()
 		
-		if let timeout = self.timeout { config.timeoutIntervalForResource = timeout }
+		if let timeout = self.timeout { config.timeoutIntervalForRequest = timeout }
 		return config
 	}
 	public var session: NSURLSession!

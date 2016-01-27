@@ -25,7 +25,11 @@ public extension NSURLResponse {
 	}
 }
 
-
+public extension NSError {
+	public var isTimeoutError: Bool {
+		return self.domain == NSURLErrorDomain && self.code == -1001
+	}
+}
 
 /*
 kCFURLErrorUnknown   = -998,

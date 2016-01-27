@@ -18,6 +18,7 @@ class Plug_TestPersistentDelegate: PlugPersistentDelegate {
 	var expectations: [XCTestExpectation] = []
 	
 	func connectionCompleted(connection: Plug.Connection, info: Plug.PersistenceInfo?) {
+		if info == nil { return }
 		if self.expectations.count > 0 {
 			let expectation = self.expectations[0]
 			expectation.fulfill()
@@ -27,7 +28,7 @@ class Plug_TestPersistentDelegate: PlugPersistentDelegate {
 		connection.log()
 		
 		if self.expectations.count == 0 {
-			XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
+		//	XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
 		}
 	}
 	
@@ -126,5 +127,48 @@ class Plug_Tests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
-    
+	
+	func testTimeout() {
+		let expectation = expectationWithDescription("GET")
+		let url = "https://192.168.1.62"
+		
+		Plug.instance.timeout = 2
+		let request = Plug.request(.GET, URL: url)
+		
+		request.error { req, error in
+			XCTAssert(error.isTimeout, "Should have timed out")
+			expectation.fulfill()
+		}
+		
+		request.start()
+		
+		waitForExpectationsWithTimeout(10) { (error) in
+			
+		}
+	}
+	
+	func testTimeoutLargeDownload() {
+		let expectation = expectationWithDescription("GET")
+		let url = "https://dl.dropboxusercontent.com/u/85235/Freddie.pdf"
+		
+		Plug.instance.timeout = 10
+		let request = Plug.request(.GET, URL: url)
+		
+		request.error { req, error in
+			XCTAssert(!error.isTimeout, "Should not have timed out")
+			expectation.fulfill()
+		}
+		
+		request.completion { req, data in
+			print("Downloaded \(data.length)")
+			expectation.fulfill()
+		}
+		
+		request.start()
+		
+		waitForExpectationsWithTimeout(200) { (error) in
+			
+		}
+	}
+	
 }

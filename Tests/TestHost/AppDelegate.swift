@@ -20,6 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		Plug.instance.timeout = 5.0
 		
+		let largeURL = NSURL(string: "https://developer.apple.com/services-account/download?path=/iOS/iAd_Producer_5.1/iAd_Producer_5.1.dmg")!
+		
 		let url = NSURL(string: "https://192.168.1.62")!
 		let request = Plug.request(.GET, URL: url)
 		
