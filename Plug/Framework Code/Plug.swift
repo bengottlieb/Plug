@@ -28,10 +28,18 @@ public class Plug: NSObject {
 		public static let connectionFailed = "connectionFailed.com.standalone.plug"
 	}
 	
+	public var timeout: NSTimeInterval? { didSet {
+		self.rebuildSession()
+	}}
 	public var autostartConnections = true
 	public var temporaryDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory())
 	public var sessionQueue: NSOperationQueue = NSOperationQueue()
-	public var configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+	var configuration: NSURLSessionConfiguration {
+		let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+		
+		if let timeout = self.timeout { config.timeoutIntervalForRequest = timeout }
+		return config
+	}
 	public var session: NSURLSession!
 	public var defaultHeaders = Plug.Headers([
 			.Accept(["application/json"]),
@@ -51,7 +59,11 @@ public class Plug: NSObject {
 
 		super.init()
 		self.reachability.setValue(self, forKey: "delegate");
-
+		self.rebuildSession()
+	}
+	
+	public func rebuildSession() {
+		NSLog("Building session, timeout: \(self.timeout)")
 		self.session = NSURLSession(configuration: self.configuration, delegate: self, delegateQueue: self.sessionQueue)
 	}
 	
