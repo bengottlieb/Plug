@@ -325,6 +325,12 @@ extension Plug.Connection {		//actions
 					let op = NSBlockOperation(block: { block(self, data) })
 					queue.addOperations([op], waitUntilFinished: true)
 				}
+			} else if let error = self.resultsError {
+				let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
+				for block in self.errorBlocks {
+					let op = NSBlockOperation(block: { block(self, error) })
+					queue.addOperations([op], waitUntilFinished: true)
+				}
 			}
 		}
 		self.requestQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })

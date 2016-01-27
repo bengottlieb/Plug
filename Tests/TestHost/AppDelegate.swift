@@ -17,6 +17,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 		Plug.instance.setup()
+		
+		Plug.instance.timeout = 5.0
+		
+		let url = NSURL(string: "https://192.168.1.62")!
+		let request = Plug.request(.GET, URL: url)
+		
+		request.completion { req, data in
+			print("complete")
+		}
+		
+		request.error { req, error in
+			print("Error: \(error)")
+		}
+		
+		request.start()
+		
 		return true
 	}
 
