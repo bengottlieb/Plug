@@ -29,7 +29,13 @@ public class Plug: NSObject {
 	}
 	
 	public var timeout: NSTimeInterval? { didSet {
-		self.rebuildSession()
+		if timeout != oldValue {
+			if self.areConnectionsInFlight {
+				NSLog("Unable to set timeout, connections are in flight")
+				return
+			}
+			self.rebuildSession()
+		}
 	}}
 	public var autostartConnections = true
 	public var temporaryDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory())
@@ -62,8 +68,16 @@ public class Plug: NSObject {
 		self.rebuildSession()
 	}
 	
+	public var areConnectionsInFlight: Bool {
+		for (_, channel) in Plug.Channel.allChannels {
+			if channel.unfinishedConnections.count > 0 {
+				return true
+			}
+		}
+		return false
+	}
+	
 	public func rebuildSession() {
-		NSLog("Building session, timeout: \(self.timeout)")
 		self.session = NSURLSession(configuration: self.configuration, delegate: self, delegateQueue: self.sessionQueue)
 	}
 	
