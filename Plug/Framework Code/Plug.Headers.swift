@@ -54,7 +54,7 @@ extension Plug {
 			switch label {
 			case "Accept": self = .Accept(content.componentsSeparatedByString(","))
 			case "Accept-Encoding": self = .AcceptEncoding(content)
-			case "Content-Type": self = .AcceptEncoding(content)
+			case "Content-Type": self = .ContentType(content)
 			case "User-Agent": self = .AcceptEncoding(content)
 				
 			default: self = .Custom(label, content)

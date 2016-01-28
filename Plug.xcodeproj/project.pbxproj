@@ -38,6 +38,7 @@
 		B560B52D1AA4A15000F3161F /* PlugReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B560B5271AA4A15000F3161F /* PlugReachability.m */; };
 		B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
 		B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
+		B57AEF441C59C1AE007611F0 /* sample_image.png in Resources */ = {isa = PBXBuildFile; fileRef = B57AEF431C59C1AE007611F0 /* sample_image.png */; };
 		B580E0291A99867C0067F89D /* PlugPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B580E0281A99867C0067F89D /* PlugPersistence.swift */; };
 		B580E02A1A99867C0067F89D /* PlugPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B580E0281A99867C0067F89D /* PlugPersistence.swift */; };
 		B58D64791A898F89005A0002 /* Plug.h in Headers */ = {isa = PBXBuildFile; fileRef = B58D64681A898F81005A0002 /* Plug.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -124,6 +125,7 @@
 		B560B5261AA4A15000F3161F /* PlugReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlugReachability.h; sourceTree = "<group>"; };
 		B560B5271AA4A15000F3161F /* PlugReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlugReachability.m; sourceTree = "<group>"; };
 		B572EB721A8CC96E00670D8E /* Plug.Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plug.Headers.swift; sourceTree = "<group>"; };
+		B57AEF431C59C1AE007611F0 /* sample_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sample_image.png; sourceTree = "<group>"; };
 		B580E0281A99867C0067F89D /* PlugPersistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugPersistence.swift; sourceTree = "<group>"; };
 		B58D64671A898F81005A0002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B58D64681A898F81005A0002 /* Plug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Plug.h; sourceTree = "<group>"; };
@@ -276,6 +278,7 @@
 		B58D64871A899094005A0002 /* TestHost */ = {
 			isa = PBXGroup;
 			children = (
+				B57AEF431C59C1AE007611F0 /* sample_image.png */,
 				B58D64881A899094005A0002 /* AppDelegate.swift */,
 				B58D64891A899094005A0002 /* LaunchScreen.xib */,
 				B58D648B1A899094005A0002 /* Main.storyboard */,
@@ -451,6 +454,7 @@
 				B58D64931A899094005A0002 /* Images.xcassets in Resources */,
 				B5F5EF881C497E1500284AF8 /* json_sample_1.json in Resources */,
 				B58D64911A899094005A0002 /* LaunchScreen.xib in Resources */,
+				B57AEF441C59C1AE007611F0 /* sample_image.png in Resources */,
 				B58D64921A899094005A0002 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

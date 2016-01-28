@@ -7,7 +7,10 @@
 //
 
 import Foundation
-import Gulliver
+
+#if os(iOS)
+	import Gulliver
+#endif
 
 extension Plug {
 	public class Connection: NSObject {
@@ -165,8 +168,10 @@ extension Plug {
 		var defaultRequest: NSURLRequest {
 			let urlString = self.URL.absoluteString + self.parameters.URLString
 			let request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
+			var headers = (self.headers ?? Plug.instance.defaultHeaders)
 			
-			request.allHTTPHeaderFields = (self.headers ?? Plug.instance.defaultHeaders).dictionary
+			headers = self.parameters.addRequiredHeaders(headers)
+			request.allHTTPHeaderFields = headers.dictionary
 			request.HTTPMethod = self.method.rawValue
 			request.HTTPBody = self.parameters.bodyData
 			request.cachePolicy = self.cachingPolicy

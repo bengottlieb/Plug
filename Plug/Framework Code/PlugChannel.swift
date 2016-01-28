@@ -7,7 +7,9 @@
 //
 
 import Foundation
-import UIKit
+#if os(iOS)
+	import UIKit
+#endif
 
 extension Plug {
 	public class Channel {
