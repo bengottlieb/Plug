@@ -170,7 +170,6 @@ extension Plug {
 			let request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
 			let headers = (self.headers ?? Plug.instance.defaultHeaders)
 			
-		//	headers = self.parameters.addRequiredHeaders(headers)
 			request.allHTTPHeaderFields = headers.dictionary
 			request.HTTPMethod = self.method.rawValue
 			request.HTTPBody = self.parameters.bodyData
@@ -218,7 +217,7 @@ extension Plug.Connection {
 			string += "\n   \(label): \(header)"
 		}
 		
-		if self.parameters.description.characters.count > 0 {
+		if !self.parameters.description.isEmpty {
 			string += "\n Parameters: " + self.parameters.description
 		}
 		

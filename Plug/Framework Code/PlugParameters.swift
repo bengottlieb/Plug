@@ -9,7 +9,7 @@
 import Foundation
 
 extension Plug {
-	public class FormComponents: Equatable {
+	public class FormComponents: Equatable, CustomStringConvertible {
 		var fields: [String: String] = [:]
 		var fileURLs: [(name: String, mimeType: String, url: NSURL)] = []
 		var boundary = FormComponents.generateBoundaryString()
@@ -71,6 +71,38 @@ extension Plug {
 		
 		public init(fields dictionary: [String: String]) {
 			fields = dictionary
+		}
+		
+		public var description: String {
+			var string = ""
+			
+			for (key, value) in self.fields {
+				for line in ["--\(self.boundary)\n",
+					"Content-Disposition: form-data; name=\"\(key)\"\n\n",
+					"\(value)\n"
+					] {
+						string += line
+				}
+			}
+			
+			for (name, mimeType, url) in self.fileURLs {
+				guard let filedata = NSData(contentsOfURL: url) else { continue }
+				guard let path = url.path else { continue }
+				let filename = (path as NSString).lastPathComponent
+				
+				for line in ["--\(self.boundary)\n",
+					"Content-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\n",
+					"Content-Type: \(mimeType)\n\n"
+					] {
+						string += line
+				}
+				string += "<<<<<<\(filedata.length) bytes>>>>>>\n"
+				string += "\(self.boundary)\n"
+			}
+			
+			string += "--\(self.boundary)--\n"
+			
+			return string
 		}
 	}
 	
@@ -161,15 +193,6 @@ extension Plug {
 			}
 		}
 		
-//		func addRequiredHeaders(var headers: Plug.Headers) -> Plug.Headers {
-//			switch self {
-//			case .Form(let components):
-//				headers.append(Plug.Header.ContentType(components.contentTypeHeader))
-//			default: break
-//			}
-//			return headers
-//		}
-//		
 		init(dictionary: [String: NSDictionary]) {
 			if let urlParams = dictionary["URL"] as? [String: String] {
 				self = .URL(urlParams)
