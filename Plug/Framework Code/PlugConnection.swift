@@ -168,9 +168,9 @@ extension Plug {
 		var defaultRequest: NSURLRequest {
 			let urlString = self.URL.absoluteString + self.parameters.URLString
 			let request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
-			var headers = (self.headers ?? Plug.instance.defaultHeaders)
+			let headers = (self.headers ?? Plug.instance.defaultHeaders)
 			
-			headers = self.parameters.addRequiredHeaders(headers)
+		//	headers = self.parameters.addRequiredHeaders(headers)
 			request.allHTTPHeaderFields = headers.dictionary
 			request.HTTPMethod = self.method.rawValue
 			request.HTTPBody = self.parameters.bodyData

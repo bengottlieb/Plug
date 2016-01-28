@@ -135,6 +135,7 @@ extension Plug {
 		
 		var contentTypeHeader: Plug.Header? {
 			switch (self) {
+			case .Form(let components): return .ContentType(components.contentTypeHeader)
 			case .JSON: return .ContentType("application/json")
 			default: return nil
 			}
@@ -160,15 +161,15 @@ extension Plug {
 			}
 		}
 		
-		func addRequiredHeaders(var headers: Plug.Headers) -> Plug.Headers {
-			switch self {
-			case .Form(let components):
-				headers.append(Plug.Header.ContentType(components.contentTypeHeader))
-			default: break
-			}
-			return headers
-		}
-		
+//		func addRequiredHeaders(var headers: Plug.Headers) -> Plug.Headers {
+//			switch self {
+//			case .Form(let components):
+//				headers.append(Plug.Header.ContentType(components.contentTypeHeader))
+//			default: break
+//			}
+//			return headers
+//		}
+//		
 		init(dictionary: [String: NSDictionary]) {
 			if let urlParams = dictionary["URL"] as? [String: String] {
 				self = .URL(urlParams)
