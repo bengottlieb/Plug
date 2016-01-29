@@ -97,6 +97,13 @@ extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
 		return self[components: components]
 	}
 	
+	public subscript(int int: String) -> Int? {
+		let components = int.componentsSeparatedByCharactersInSet(JSONSeparatorsCharacterSet)
+		if let integer = self[components: components] as? Int { return integer }
+		if let str = self[components: components] as? String { return Int(str) }
+		return nil
+	}
+	
 	public subscript(components comps: [String]) -> AnyObject? {
 		guard let dict = (self as? AnyObject) as? [String: AnyObject] else { return nil }
 		var components = comps
@@ -143,6 +150,13 @@ extension Array: JSONObject {
 	public subscript(path: String) -> AnyObject? {
 		let components = path.componentsSeparatedByCharactersInSet(JSONSeparatorsCharacterSet)
 		return self[components: components]
+	}
+	
+	public subscript(int int: String) -> Int? {
+		let components = int.componentsSeparatedByCharactersInSet(JSONSeparatorsCharacterSet)
+		if let integer = self[components: components] as? Int { return integer }
+		if let str = self[components: components] as? String { return Int(str) }
+		return nil
 	}
 	
 	public subscript(components comps: [String]) -> AnyObject? {
