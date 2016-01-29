@@ -278,8 +278,8 @@
 		B58D64871A899094005A0002 /* TestHost */ = {
 			isa = PBXGroup;
 			children = (
-				B57AEF431C59C1AE007611F0 /* sample_image.png */,
 				B58D64881A899094005A0002 /* AppDelegate.swift */,
+				B57AEF431C59C1AE007611F0 /* sample_image.png */,
 				B58D64891A899094005A0002 /* LaunchScreen.xib */,
 				B58D648B1A899094005A0002 /* Main.storyboard */,
 				B58D648D1A899094005A0002 /* Images.xcassets */,

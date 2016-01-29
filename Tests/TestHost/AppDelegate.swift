@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func testMimeUpload() {
 		let fileURL = NSBundle.mainBundle().URLForResource("sample_image", withExtension: "png")
 		let url = "http://posttestserver.com/post.php"
-		let payloadDict = ["Test": "Field 1"]
+		let payloadDict = ["Sample_Item": ["embedded": "data goes here", "Test": "Field 1", "one-level-more": ["name": "Bonzai", "career": "Buckaroo"]]]
 		
 		let components = Plug.FormComponents(fields: payloadDict)
 		components.addFile(fileURL, name: "test file", mimeType: "image/png")

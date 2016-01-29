@@ -10,12 +10,12 @@ import Foundation
 
 extension Plug {
 	public class FormComponents: Equatable, CustomStringConvertible {
-		var fields: [String: String] = [:]
+		var fields: JSONDictionary = [:]
 		var fileURLs: [(name: String, mimeType: String, url: NSURL)] = []
 		var boundary = FormComponents.generateBoundaryString()
 		var contentTypeHeader: String { return "multipart/form-data; boundary=\(self.boundary)" }
 		
-		public subscript(key: String) -> String? {
+		public subscript(key: String) -> AnyObject? {
 			get { return self.fields[key] }
 			set { self.fields[key] = newValue }
 		}
@@ -29,10 +29,26 @@ extension Plug {
 			return "Boundary-\(NSUUID().UUIDString)"
 		}
 		
+		func labeledFieldsArray(dict: JSONDictionary, prefix: String? = nil) -> [(String, String)] {
+			var results: [(String, String)] = []
+			
+			for (key, value) in dict {
+				if let subDict = value as? JSONDictionary {
+					let extendedPrefix = prefix == nil ? key : "\(prefix!)[\(key)]"
+					results += self.labeledFieldsArray(subDict, prefix: extendedPrefix)
+				} else {
+					let label = prefix == nil ? "" : "\(prefix!)[\(key)]"
+					results.append((label, "\(value)"))
+				}
+			}
+			return results
+		}
+		
 		var dataValue: NSData {
 			let data = NSMutableData()
+			let fields = self.labeledFieldsArray(self.fields)
 			
-			for (key, value) in self.fields {
+			for (key, value) in fields {
 				for line in ["--\(self.boundary)\r\n",
 							 "Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n",
 							 "\(value)\r\n"
@@ -69,17 +85,18 @@ extension Plug {
 			return self.fields.keys.reduce("") { if let v = self.fields[$1] { return $0 + "\($1)=\(v)&" }; return $0 }
 		}
 		
-		public init(fields dictionary: [String: String]) {
+		public init(fields dictionary: JSONDictionary) {
 			fields = dictionary
 		}
 		
 		public var description: String {
 			var string = ""
+			let fields = self.labeledFieldsArray(self.fields)
 			
-			for (key, value) in self.fields {
-				for line in ["--\(self.boundary)\n",
-					"Content-Disposition: form-data; name=\"\(key)\"\n\n",
-					"\(value)\n"
+			for (key, value) in fields {
+				for line in ["--\(self.boundary)\r\n",
+					"Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n",
+					"\(value)\r\n"
 					] {
 						string += line
 				}
