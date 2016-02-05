@@ -174,7 +174,7 @@ extension Array: JSONObject {
 			guard let array = self[index] as? JSONArray else { return nil }
 			return array[components: components]
 		} else {
-			guard let dict = self[index] as? JSONDictionary else { return nil }
+			guard index < self.count, let dict = self[index] as? JSONDictionary else { return nil }
 			return dict[components: components]
 		}
 	}
