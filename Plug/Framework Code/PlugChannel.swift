@@ -89,11 +89,21 @@ extension Plug {
 		
 		func dequeue(connection: Plug.Connection) {
 			self.serialize {
-				self.unfinishedConnections.remove(connection)
-				if let index = self.waitingConnections.indexOf(connection) {
-					self.waitingConnections.removeAtIndex(index)
-				}
+				self.removeWaitingConnection(connection)
 				self.updateQueue()
+			}
+		}
+		
+		func removeWaitingConnection(connection: Plug.Connection) {
+			self.unfinishedConnections.remove(connection)
+			if let index = self.waitingConnections.indexOf(connection) {
+				self.waitingConnections.removeAtIndex(index)
+			}
+		}
+		
+		func removeActiveConnection(connection: Plug.Connection) {
+			if let index = self.activeConnections.indexOf(connection) {
+				self.activeConnections.removeAtIndex(index)
 			}
 		}
 		
@@ -106,11 +116,10 @@ extension Plug {
 			}
 		}
 		
-		func connectionStopped(connection: Plug.Connection) {
+		func connectionStopped(connection: Plug.Connection, totallyRemove: Bool = false) {
 			self.serialize {
-				if let index = self.activeConnections.indexOf(connection) {
-					self.activeConnections.removeAtIndex(index)
-				}
+				if totallyRemove { self.unfinishedConnections.remove(connection) }
+				self.removeActiveConnection(connection)
 				self.updateQueue()
 			}
 		}
@@ -167,7 +176,13 @@ extension Plug {
 
 		subscript(task: NSURLSessionTask) -> Plug.Connection? {
 			get { var connection: Plug.Connection?; self.queue.addOperations( [ NSBlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true); return connection  }
-			set { self.serialize { self.connections[task.taskIdentifier] = newValue } }
+			set { self.serialize {
+				if newValue == nil, let existing = self.connections[task.taskIdentifier] {
+					self.removeWaitingConnection(existing)
+					self.removeActiveConnection(existing)
+				}
+				self.connections[task.taskIdentifier] = newValue
+			} }
 		}
 		
 		func existingConnectionWithMethod(method: Method, URL: NSURLLike, parameters: Plug.Parameters?) -> Connection? {

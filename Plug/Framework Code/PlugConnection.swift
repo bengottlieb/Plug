@@ -336,7 +336,7 @@ extension Plug.Connection {		//actions
 	}
 	
 	public func cancel() {
-		self.channel.connectionStopped(self)
+		self.channel.connectionStopped(self, totallyRemove: true)
 		self.state = .Canceled
 		self.task?.cancel()
 		NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionCancelled, object: self)
