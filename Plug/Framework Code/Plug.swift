@@ -70,7 +70,7 @@ public class Plug: NSObject, NSURLSessionDelegate {
 	
 	public var areConnectionsInFlight: Bool {
 		for (_, channel) in Plug.Channel.allChannels {
-			if channel.unfinishedConnections.count > 0 {
+			if channel.activeConnections.count > 0 {
 				return true
 			}
 		}
