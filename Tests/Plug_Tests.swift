@@ -95,7 +95,8 @@ class Plug_Tests: XCTestCase {
     }
 	
 	func testPersistent2() {
-		persistentDelegate.expectations.append(expectationWithDescription("GET"))
+		let expectation = expectationWithDescription("GET_Persistent")
+//		persistentDelegate.expectations.append()
 		let url = "http://httpbin.org/get"
 		let params: Plug.Parameters = .None
 		let headers = Plug.Headers([.Accept(["*/*"])])
@@ -105,12 +106,15 @@ class Plug_Tests: XCTestCase {
 		let dict = connection.JSONRepresentation
 		
 		let json = dict.JSONString
+		connection.cancel()
 		
 		do {
 			if let dict = try NSJSONSerialization.JSONObjectWithData(json!.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, options: []) as? NSDictionary {
 				let replacement = Plug.Connection(JSONRepresentation: dict)
 				
-				replacement?.start()
+				replacement?.completion { req, data in
+					expectation.fulfill()
+				}.start()
 			}
 		} catch let error as NSError {
 			print("Error while decoding JSON: \(error)")
@@ -130,9 +134,9 @@ class Plug_Tests: XCTestCase {
 	
 	func testTimeout() {
 		let expectation = expectationWithDescription("GET")
-		let url = "https://192.168.1.62"
+		let url = "http://128.0.0.1/"
 		
-		Plug.instance.timeout = 2
+		Plug.instance.timeout = 5
 		let request = Plug.request(.GET, URL: url)
 		
 		request.error { req, error in
@@ -147,9 +151,11 @@ class Plug_Tests: XCTestCase {
 		}
 	}
 	
+	let largeURL = "http://mirror.internode.on.net/pub/test/50meg.test"
+	var lastPercent = 0.0
 	func testTimeoutLargeDownload() {
 		let expectation = expectationWithDescription("GET")
-		let url = "https://dl.dropboxusercontent.com/u/85235/Freddie.pdf"
+		let url = largeURL
 		
 		Plug.instance.timeout = 10
 		let request = Plug.request(.GET, URL: url)
@@ -157,6 +163,13 @@ class Plug_Tests: XCTestCase {
 		request.error { req, error in
 			XCTAssert(!error.isTimeout, "Should not have timed out")
 			expectation.fulfill()
+		}
+		
+		request.progress { req, percent in
+			if percent > (self.lastPercent + 0.01) {
+				print("Got \(percent * 100.0) %")
+				self.lastPercent = percent
+			}
 		}
 		
 		request.completion { req, data in
