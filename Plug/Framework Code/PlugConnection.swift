@@ -66,6 +66,7 @@ extension Plug {
 		public var completionQueue: NSOperationQueue?
 		public var completionBlocks: [(Plug.Connection, NSData) -> Void] = []
 		public var errorBlocks: [(Plug.Connection, NSError) -> Void] = []
+		public var progressBlocks: [(Plug.Connection, Double) -> Void] = []
 		
 		public let method: Method
 		public var URL: NSURL { get { return self.URLLike.URL ?? NSURL() } }
@@ -92,6 +93,15 @@ extension Plug {
 		public func addHeader(header: Plug.Header) {
 			if self.headers == nil { self.headers = Plug.instance.defaultHeaders }
 			self.headers?.append(header)
+		}
+		public var percentComplete: Double = 0.0 {
+			didSet {
+				if self.percentComplete != oldValue {
+					for closure in self.progressBlocks {
+						closure(self, self.percentComplete)
+					}
+				}
+			}
 		}
 		
 		
@@ -146,6 +156,10 @@ extension Plug {
 		func receivedData(data: NSData) {
 			if self.resultsData == nil { self.resultsData = NSMutableData() }
 			self.resultsData?.appendData(data)
+			
+			if let total = self.expectedContentLength, dataLength = self.resultsData?.length {
+				self.percentComplete = Double(dataLength) / Double(total)
+			}
 		}
 		
 		func failedWithError(error: NSError?) {
@@ -201,6 +215,11 @@ extension Plug.Connection {
 
 	public func error(completion: (Plug.Connection, NSError) -> Void) -> Self {
 		self.requestQueue.addOperationWithBlock { self.errorBlocks.append(completion) }
+		return self
+	}
+	
+	public func progress(closure: (Plug.Connection, Double) -> Void) -> Self {
+		self.requestQueue.addOperationWithBlock { self.progressBlocks.append(closure) }
 		return self
 	}
 }

@@ -23,6 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			print("Completed")
 		}.error { request, error in
 			print("Failed with error: \(error)")
+		}.progress {conn, percent in
+			print("Completed \(percent * 100.0)%")
 		}
 		
 		connection.start()
