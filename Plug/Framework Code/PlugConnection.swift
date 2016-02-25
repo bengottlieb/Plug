@@ -50,11 +50,17 @@ extension Plug {
 			}
 		}
 		
+		public var expectedContentLength: Int64?
 		public var cachingPolicy: NSURLRequestCachePolicy = .ReloadIgnoringLocalCacheData
 		public var response: NSURLResponse? { didSet {
 			if let resp = response as? NSHTTPURLResponse {
 				self.responseHeaders = Headers(dictionary: resp.allHeaderFields)
+				self.statusCode = resp.statusCode
 			}
+			if self.response?.expectedContentLength != -1 {
+				self.expectedContentLength = self.response?.expectedContentLength
+			}
+			self.resultsError = self.response?.error
 		}}
 		public var statusCode: Int?
 		public var completionQueue: NSOperationQueue?
