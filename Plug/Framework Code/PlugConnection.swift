@@ -124,27 +124,29 @@ extension Plug {
 		
 		var task: NSURLSessionTask?
 		func generateTask() -> NSURLSessionTask? {
+			if self.task != nil { return self.task }
 			if self.downloadToFile {
-				return Plug.instance.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { url, response, error in })
+				self.task = Plug.instance.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { url, response, error in })
 			} else {
-				return Plug.instance.session.dataTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { data, response, error in
-					if let httpResponse = response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
-					self.response = response
-					self.resultsError = error ?? response?.error
-					if error != nil && error!.code == -1005 {
-						print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
-					}
-					if error == nil || (data != nil && data!.length > 0) {
-						self.resultsData = data
-					}
+				self.task = Plug.instance.session.dataTaskWithRequest(self.request ?? self.defaultRequest)/*, completionHandler: { data, response, error in
 					self.complete((error == nil) ? .Completed : .CompletedWithError)
-				})
+				})*/
 			}
+			
+			if let identifier = self.task?.taskIdentifier {
+				Plug.instance.channels[identifier] = self.channel
+			}
+			return self.task
 		}
-		
+				
 		var resultsError: NSError?
-		var resultsURL: NSURL? { didSet { if let url = self.resultsURL { self.resultsData = NSData(contentsOfURL: url) } } }
-		var resultsData: NSData?
+		var resultsURL: NSURL? { didSet { if let url = self.resultsURL { self.resultsData = NSMutableData(contentsOfURL: url) } } }
+		var resultsData: NSMutableData?
+		
+		func receivedData(data: NSData) {
+			if self.resultsData == nil { self.resultsData = NSMutableData() }
+			self.resultsData?.appendData(data)
+		}
 		
 		func failedWithError(error: NSError?) {
 			if error != nil && error!.code == -1005 {

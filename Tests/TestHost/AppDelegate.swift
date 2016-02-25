@@ -14,6 +14,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	var window: UIWindow?
 
+	func testLargeDownloads() {
+		let largeURL = NSURL(string: "https://dl.dropboxusercontent.com/u/85235/Stereotypies%20Therapy.mp4")!
+		Plug.instance.timeout = 5.0
+		
+		
+		let connection = Plug.request(.GET, URL: largeURL).completion { request, data in
+			print("Completed")
+		}.error { request, error in
+			print("Failed with error: \(error)")
+		}
+		
+		connection.start()
+	}
+	
+	func testSmallDownloads() {
+		let smallURL = NSURL(string: "http://stackoverflow.com/questions/34182482/nsurlsessiondatadelegate-not-called")!
+		
+		
+		let connection = Plug.request(.GET, URL: smallURL).completion { request, data in
+			print("Completed, got \(data.length) bytes")
+		}.error { request, error in
+			print("Failed with error: \(error)")
+		}
+		
+		connection.start()
+	}
+	
 	func testMimeUpload() {
 		let fileURL = NSBundle.mainBundle().URLForResource("sample_image", withExtension: "png")
 		let url = "http://posttestserver.com/post.php"
@@ -36,8 +63,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 		Plug.instance.setup()
 		
-//		self.timeoutTests()
-		self.testMimeUpload()
+		self.testLargeDownloads()
+//		self.testLargeDownloads()
 		
 		return true
 	}
@@ -46,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func timeoutTests() {
-		Plug.instance.timeout = 5.0
+		Plug.instance.timeout = 35.0
 		
 		//let largeURL = NSURL(string: "https://developer.apple.com/services-account/download?path=/iOS/iAd_Producer_5.1/iAd_Producer_5.1.dmg")!
 		

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class Plug: NSObject {
+public class Plug: NSObject, NSURLSessionDelegate {
 	public enum ConnectionType: Int { case Offline, Wifi, WAN }
 	public enum Method: String, CustomStringConvertible { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH"
 		public var description: String { return self.rawValue } 
@@ -136,13 +136,20 @@ public extension Plug {
 	}
 }
 
-extension Plug: NSURLSessionDataDelegate {
-	
-}
+extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate, NSURLSessionDataDelegate {
+//	public func URLSession(session: NSURLSession, dataTask task: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
+//		self[task]?.response = response
+//	}
 
-extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate {
+	public func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
+		guard let task = self[dataTask] else { return }
+		
+		if task.response == nil { task.response = dataTask.response }
+		
+		task.receivedData(data)
+	}
 	
-	subscript(task: NSURLSessionTask) -> Plug.Channel? {
+	subscript(toChannel task: NSURLSessionTask) -> Plug.Channel? {
 		get {
 			var channel: Plug.Channel?
 			self.serialQueue.addOperations( [ NSBlockOperation(block: {
@@ -152,13 +159,25 @@ extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate {
 		
 		set { self.serialQueue.addOperationWithBlock { [unowned self] in self.channels[task.taskIdentifier] = newValue } }
 	}
-	
+
+	subscript(task: NSURLSessionTask) -> Plug.Connection? {
+		get {
+			var channel: Plug.Channel?
+			self.serialQueue.addOperations( [ NSBlockOperation(block: {
+				channel = Plug.instance.channels[task.taskIdentifier]
+			} )], waitUntilFinished: true)
+			return channel?[task]  }
+		}
+
 	public func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
-		self[downloadTask]?[downloadTask]?.completedDownloadingToURL(location)
+		
 	}
 
 	public func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
-		self[task]?[task]?.failedWithError(error)
+		if let err = error where err.code == -1005 {
+			print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
+		}
+		self[task]?.failedWithError(error)
 	}
 	
 	public func URLSession(session: NSURLSession, task: NSURLSessionTask, willPerformHTTPRedirection response: NSHTTPURLResponse, newRequest request: NSURLRequest, completionHandler: (NSURLRequest?) -> Void) {
