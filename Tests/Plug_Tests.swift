@@ -58,7 +58,24 @@ class Plug_Tests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
-    
+	
+	func testDownloadToFile() {
+		let url = "https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2@2x.png"
+		let expectation = expectationWithDescription("GET download to file")
+		let connection = Plug.request(.GET, URL: url)
+		connection.destinationFileURL = Plug.instance.generateTemporaryFileURL()
+		connection.completion { connection, data in
+			print("got \(data.length) bytes")
+			XCTAssert(data.length == 34245, "Failed to download correct file bytes: (expected 34245, got \(data.length)")
+			
+			expectation.fulfill()
+		}
+		waitForExpectationsWithTimeout(20) { (error) in
+			XCTAssert(error == nil, "Failed to download to file")
+		}
+		
+	}
+	
     func testGET2() {
 		let expectation = expectationWithDescription("GET")
 		let url = "http://httpbin.org/get"
@@ -70,7 +87,7 @@ class Plug_Tests: XCTestCase {
 		XCTAssert(connection == connection2, "Identical connections should be identical")
 
 		connection.completion({ (conn, data) in
-			let str = NSString(data: data, encoding: NSUTF8StringEncoding)
+			let str = NSString(data: data.data, encoding: NSUTF8StringEncoding)
 			print("Data: \(connection): \(str)")
 			expectation.fulfill()
 

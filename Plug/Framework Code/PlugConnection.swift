@@ -146,16 +146,30 @@ extension Plug {
 		}
 				
 		var resultsError: NSError?
-		var resultsURL: NSURL? { didSet { if let url = self.resultsURL { self.resultsData = NSMutableData(contentsOfURL: url) } } }
 		var resultsData: NSMutableData?
 		var bytesReceived: UInt64 = 0
 		var fileHandle: NSFileHandle!
 		
 		func receivedData(data: NSData) {
 			self.bytesReceived += UInt64(data.length)
-			if let destURL = self.destinationFileURL {
+			if let destURL = self.destinationFileURL, path = destURL.path {
 				if self.fileHandle == nil {
-					self.fileHandle = NSFileHandle(forWritingAtPath: destURL.path!)
+					do {
+						try NSFileManager.defaultManager().createDirectoryAtURL(destURL.URLByDeletingLastPathComponent!, withIntermediateDirectories: true, attributes: nil)
+					} catch let error {
+						print("Error while creating directory for file: \(error)")
+					}
+					
+					if !NSFileManager.defaultManager().fileExistsAtPath(path) {
+						if !NSFileManager.defaultManager().createFileAtPath(path, contents: nil, attributes: nil) {
+							print("Unable to create a file at: \(path)")
+						}
+					}
+					do {
+						self.fileHandle = try NSFileHandle(forWritingToURL: destURL)
+					} catch let error {
+						print("Error while opening file: \(error)")
+					}
 				}
 				self.fileHandle.writeData(data)
 			} else {
@@ -339,9 +353,10 @@ extension Plug.Connection {		//actions
 		Plug.instance.unregisterConnection(self)
 		self.channel.connectionStopped(self)
 		self.channel.dequeue(self)
-		 
+		self.fileHandle?.closeFile()
+		
 		self.requestQueue.addOperationWithBlock {
-			let data = Plug.ConnectionData(data: self.resultsData, size: self.bytesReceived) ?? Plug.ConnectionData(URL: self.resultsURL, size: self.bytesReceived)
+			let data = Plug.ConnectionData(data: self.resultsData, size: self.bytesReceived) ?? Plug.ConnectionData(URL: self.destinationFileURL, size: self.bytesReceived)
 			
 			if let data = data {
 				let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
