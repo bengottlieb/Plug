@@ -38,7 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			print("Completed, got \(data.length) bytes")
 		}.error { request, error in
 			print("Failed with error: \(error)")
-		}
+		} 
 		
 		connection.start()
 	}
@@ -98,7 +98,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let args = ["device": ["udid": UIDevice.currentDevice().identifierForVendor!.UUIDString]]
 	
 		Plug.request(.DELETE, URL: url, parameters: Plug.Parameters.JSON(args)).completion { conn, data in
-			print("got it \(NSString(data: data, encoding: NSUTF8StringEncoding))")
+			print("got it \(NSString(data: data.data, encoding: NSUTF8StringEncoding))")
 		}.start()
 	}
 

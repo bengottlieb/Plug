@@ -39,6 +39,10 @@ public class Plug: NSObject, NSURLSessionDelegate {
 	}}
 	public var autostartConnections = true
 	public var temporaryDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory())
+	public func generateTemporaryFileURL() -> NSURL {
+		let filename = NSUUID().UUIDString + ".temp"
+		return self.temporaryDirectoryURL.URLByAppendingPathComponent(filename)
+	}
 	public var sessionQueue: NSOperationQueue = NSOperationQueue()
 	var configuration: NSURLSessionConfiguration {
 		let config = NSURLSessionConfiguration.defaultSessionConfiguration()

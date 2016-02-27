@@ -12,6 +12,8 @@ import Foundation
 	import Gulliver
 #endif
 
+public typealias PlugCompletionClosure = (Plug.Connection, Plug.ConnectionData) -> Void
+
 extension Plug {
 	public class Connection: NSObject {
 		public enum Persistence { case Transient, PersistRequest, Persistent(PersistenceInfo)
@@ -64,13 +66,13 @@ extension Plug {
 		}}
 		public var statusCode: Int?
 		public var completionQueue: NSOperationQueue?
-		public var completionBlocks: [(Plug.Connection, NSData) -> Void] = []
+		public var completionBlocks: [PlugCompletionClosure] = []
 		public var errorBlocks: [(Plug.Connection, NSError) -> Void] = []
 		public var progressBlocks: [(Plug.Connection, Double) -> Void] = []
 		
 		public let method: Method
 		public var URL: NSURL { get { return self.URLLike.URL ?? NSURL() } }
-		public var downloadToFile = false
+		public var destinationFileURL: NSURL?
 		public var request: NSURLRequest?
 		public let requestQueue: NSOperationQueue
 		public let parameters: Plug.Parameters
@@ -135,13 +137,7 @@ extension Plug {
 		var task: NSURLSessionTask?
 		func generateTask() -> NSURLSessionTask? {
 			if self.task != nil { return self.task }
-			if self.downloadToFile {
-				self.task = Plug.instance.session.downloadTaskWithRequest(self.request ?? self.defaultRequest, completionHandler: { url, response, error in })
-			} else {
-				self.task = Plug.instance.session.dataTaskWithRequest(self.request ?? self.defaultRequest)/*, completionHandler: { data, response, error in
-					self.complete((error == nil) ? .Completed : .CompletedWithError)
-				})*/
-			}
+			self.task = Plug.instance.session.dataTaskWithRequest(self.request ?? self.defaultRequest)
 			
 			if let identifier = self.task?.taskIdentifier {
 				Plug.instance.channels[identifier] = self.channel
@@ -152,13 +148,23 @@ extension Plug {
 		var resultsError: NSError?
 		var resultsURL: NSURL? { didSet { if let url = self.resultsURL { self.resultsData = NSMutableData(contentsOfURL: url) } } }
 		var resultsData: NSMutableData?
+		var bytesReceived: UInt64 = 0
+		var fileHandle: NSFileHandle!
 		
 		func receivedData(data: NSData) {
-			if self.resultsData == nil { self.resultsData = NSMutableData() }
-			self.resultsData?.appendData(data)
+			self.bytesReceived += UInt64(data.length)
+			if let destURL = self.destinationFileURL {
+				if self.fileHandle == nil {
+					self.fileHandle = NSFileHandle(forWritingAtPath: destURL.path!)
+				}
+				self.fileHandle.writeData(data)
+			} else {
+				if self.resultsData == nil { self.resultsData = NSMutableData() }
+				self.resultsData?.appendData(data)
+			}
 			
-			if let total = self.expectedContentLength, dataLength = self.resultsData?.length {
-				self.percentComplete = Double(dataLength) / Double(total)
+			if let total = self.expectedContentLength {
+				self.percentComplete = Double(self.bytesReceived) / Double(total)
 			}
 		}
 		
@@ -172,21 +178,6 @@ extension Plug {
 			self.complete(.CompletedWithError)
 		}
 
-		func completedDownloadingToURL(location: NSURL) {
-			let filename = "Plug-temp-\(location.lastPathComponent!.hash).tmp"
-			
-			self.response = self.task?.response
-			if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
-			self.resultsURL = Plug.instance.temporaryDirectoryURL.URLByAppendingPathComponent(filename)
-			do {
-				try NSFileManager.defaultManager().moveItemAtURL(location, toURL: self.resultsURL!)
-			} catch let error as NSError {
-				print("error while saving a moving a downloaded URL: \(error)")
-			}
-			
-			self.complete(.Completed)
-		}
-		
 		var defaultRequest: NSURLRequest {
 			let urlString = self.URL.absoluteString + self.parameters.URLString
 			let request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
@@ -208,7 +199,7 @@ extension Plug {
 }
 
 extension Plug.Connection {
-	public func completion(completion: (Plug.Connection, NSData) -> Void) -> Self {
+	public func completion(completion: PlugCompletionClosure) -> Self {
 		self.requestQueue.addOperationWithBlock { self.completionBlocks.append(completion) }
 		return self
 	}
@@ -348,9 +339,11 @@ extension Plug.Connection {		//actions
 		Plug.instance.unregisterConnection(self)
 		self.channel.connectionStopped(self)
 		self.channel.dequeue(self)
-		
+		 
 		self.requestQueue.addOperationWithBlock {
-			if let data = self.resultsData {
+			let data = Plug.ConnectionData(data: self.resultsData, size: self.bytesReceived) ?? Plug.ConnectionData(URL: self.resultsURL, size: self.bytesReceived)
+			
+			if let data = data {
 				let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
 				for block in self.completionBlocks {
 					let op = NSBlockOperation(block: { block(self, data) })
@@ -373,6 +366,37 @@ extension Plug.Connection {		//actions
 		}
 	}
 }
+
+public extension Plug {
+	public class ConnectionData {
+		public var data: NSData {
+			if let data = self.rawData { return data }
+			
+			if let url = self.URL {
+				self.rawData = NSData(contentsOfURL: url)
+			}
+			
+			return self.rawData ?? NSData()
+		}
+		public var URL: NSURL?
+		private var rawData: NSData?
+		
+		init?(data: NSData?, size: UInt64) {
+			length = size
+			if data == nil { return nil }
+			self.rawData = data
+		}
+		
+		init?(URL: NSURL?, size: UInt64) {
+			length = size
+			if URL == nil { return nil }
+			self.URL = URL
+		}
+
+		public var length: UInt64
+	}
+}
+
 
 extension NSURLRequest {
 	public override var description: String {
