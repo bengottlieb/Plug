@@ -64,6 +64,7 @@ class Plug_Tests: XCTestCase {
 		let expectation = expectationWithDescription("GET download to file")
 		let connection = Plug.request(.GET, URL: url)
 		connection.destinationFileURL = Plug.instance.generateTemporaryFileURL()
+		print("Downloading to \(connection.destinationFileURL!)")
 		connection.completion { connection, data in
 			print("got \(data.length) bytes")
 			XCTAssert(data.length == 34245, "Failed to download correct file bytes: (expected 34245, got \(data.length)")
