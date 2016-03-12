@@ -80,7 +80,7 @@ public extension Plug {
 			self.saveTimer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: "savePersistentConnections", userInfo: nil, repeats: false)
 		}
 		
-		func savePersistentConnections() {
+		@objc func savePersistentConnections() {
 			self.saveTimer = nil
 			if self.persistentCacheURL == nil { return }
 			let dictionaries: [NSDictionary] = self.persistentConnections.map { return $0.JSONRepresentation }
