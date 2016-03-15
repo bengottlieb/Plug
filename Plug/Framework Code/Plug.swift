@@ -181,7 +181,11 @@ extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate, NSURLSes
 		if let err = error where err.code == -1005 {
 			print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 		}
-		self[task]?.failedWithError(error)
+		if let error = error {
+			self[task]?.failedWithError(error)
+		} else {
+			self[task]?.complete(.Completed)
+		}
 	}
 	
 	public func URLSession(session: NSURLSession, task: NSURLSessionTask, willPerformHTTPRedirection response: NSHTTPURLResponse, newRequest request: NSURLRequest, completionHandler: (NSURLRequest?) -> Void) {
