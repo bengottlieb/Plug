@@ -182,6 +182,13 @@ extension Plug {
 			}
 		}
 		
+		func succeeded() {
+			self.response = self.task?.response
+			if let httpResponse = self.response as? NSHTTPURLResponse { self.statusCode = httpResponse.statusCode }
+			self.resultsError = self.task?.response?.error
+			self.complete(.Completed)
+		}
+		
 		func failedWithError(error: NSError?) {
 			if error != nil && error!.code == -1005 {
 				print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
@@ -357,15 +364,14 @@ extension Plug.Connection {		//actions
 		
 		self.requestQueue.addOperationWithBlock {
 			let data = Plug.ConnectionData(data: self.resultsData, size: self.bytesReceived) ?? Plug.ConnectionData(URL: self.destinationFileURL, size: self.bytesReceived)
+			let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
 			
-			if let data = data {
-				let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
+			if data != nil || self.resultsError == nil {
 				for block in self.completionBlocks {
-					let op = NSBlockOperation(block: { block(self, data) })
+					let op = NSBlockOperation(block: { block(self, data ?? Plug.ConnectionData()) })
 					queue.addOperations([op], waitUntilFinished: true)
 				}
 			} else if let error = self.resultsError {
-				let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
 				for block in self.errorBlocks {
 					let op = NSBlockOperation(block: { block(self, error) })
 					queue.addOperations([op], waitUntilFinished: true)
@@ -409,6 +415,11 @@ public extension Plug {
 		}
 
 		public var length: UInt64
+		
+		init() {
+			length = 0
+			self.rawData = nil
+		}
 	}
 }
 

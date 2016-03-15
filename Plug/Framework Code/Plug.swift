@@ -184,7 +184,7 @@ extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate, NSURLSes
 		if let error = error {
 			self[task]?.failedWithError(error)
 		} else {
-			self[task]?.complete(.Completed)
+			self[task]?.succeeded()
 		}
 	}
 	
