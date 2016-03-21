@@ -16,6 +16,14 @@ public protocol JSONObject {
 	var JSONString: String? { get }
 }
 
+public protocol JSONInitable {
+	init?(json: JSONDictionary)
+}
+
+public protocol JSONConvertible {
+	var json: JSONDictionary? { get }
+}
+
 extension NSString: JSONObject {
 	public var JSONString: String? { return (self as String) }
 }
