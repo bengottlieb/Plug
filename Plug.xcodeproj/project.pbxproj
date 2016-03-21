@@ -56,6 +56,7 @@
 		B58D64931A899094005A0002 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B58D648D1A899094005A0002 /* Images.xcassets */; };
 		B58D64951A899094005A0002 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D648F1A899094005A0002 /* ViewController.swift */; };
 		B58D64961A899285005A0002 /* Plug.h in Headers */ = {isa = PBXBuildFile; fileRef = B58D646B1A898F81005A0002 /* Plug.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B5B178EE1C9F8507007BFF63 /* DuplicateConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */; };
 		B5E0C14F1C4EE14F009D501E /* Gulliver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; };
 		B5E0C1511C4EE14F009D501E /* GulliverEXT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */; };
 		B5E0C1531C4EE187009D501E /* Gulliver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -141,6 +142,7 @@
 		B58D648D1A899094005A0002 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		B58D648E1A899094005A0002 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B58D648F1A899094005A0002 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuplicateConnections.swift; sourceTree = "<group>"; };
 		B5E0C14D1C4EE14F009D501E /* Gulliver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Gulliver.framework; sourceTree = "<group>"; };
 		B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GulliverEXT.framework; sourceTree = "<group>"; };
 		B5F5EF871C497E1500284AF8 /* json_sample_1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = json_sample_1.json; path = TestHost/json_sample_1.json; sourceTree = "<group>"; };
@@ -213,6 +215,7 @@
 			children = (
 				B58D64871A899094005A0002 /* TestHost */,
 				B504E69C1A896E82001B414B /* Plug_Tests.swift */,
+				B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */,
 				B5F5EF871C497E1500284AF8 /* json_sample_1.json */,
 				B504E69A1A896E82001B414B /* Supporting Files */,
 			);
@@ -531,6 +534,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B504E69D1A896E82001B414B /* Plug_Tests.swift in Sources */,
+				B5B178EE1C9F8507007BFF63 /* DuplicateConnections.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

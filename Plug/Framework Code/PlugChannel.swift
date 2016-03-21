@@ -16,6 +16,7 @@ extension Plug {
 		public var maximumActiveConnections = 0
 		public var queueState: QueueState = .PausedDueToOffline
 		public let name: String
+		public var count: Int { return self.waitingConnections.count + self.activeConnections.count }
 		public var maxSimultaneousConnections = 1// { didSet { self.queue.maxConcurrentOperationCount = self.maxSimultaneousConnections }}
 		
 		public enum QueueState: Int { case Paused, PausedDueToOffline, Running }
@@ -75,6 +76,8 @@ extension Plug {
 		
 		func enqueue(connection: Plug.Connection) {
 			self.serialize {
+				if connection.state == .Queued { return }
+				connection.state = .Queued
 				self.waitingConnections.append(connection)
 				self.updateQueue()
 				NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionQueued, object: connection)
