@@ -66,6 +66,7 @@
 		B5E0C1581C4EF161009D501E /* Gulliver.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B5E0C1591C4EF164009D501E /* GulliverEXT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B5F5EF881C497E1500284AF8 /* json_sample_1.json in Resources */ = {isa = PBXBuildFile; fileRef = B5F5EF871C497E1500284AF8 /* json_sample_1.json */; };
+		B5F7A9F01CA1524C00A53C48 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5F7A9EE1CA1524C00A53C48 /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -146,6 +147,7 @@
 		B5E0C14D1C4EE14F009D501E /* Gulliver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Gulliver.framework; sourceTree = "<group>"; };
 		B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GulliverEXT.framework; sourceTree = "<group>"; };
 		B5F5EF871C497E1500284AF8 /* json_sample_1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = json_sample_1.json; path = TestHost/json_sample_1.json; sourceTree = "<group>"; };
+		B5F7A9EF1CA1524C00A53C48 /* Base */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Base; path = "Base.lproj/Default-568h@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -285,6 +287,7 @@
 				B57AEF431C59C1AE007611F0 /* sample_image.png */,
 				B58D64891A899094005A0002 /* LaunchScreen.xib */,
 				B58D648B1A899094005A0002 /* Main.storyboard */,
+				B5F7A9EE1CA1524C00A53C48 /* Default-568h@2x.png */,
 				B58D648D1A899094005A0002 /* Images.xcassets */,
 				B58D648E1A899094005A0002 /* Info.plist */,
 				B58D648F1A899094005A0002 /* ViewController.swift */,
@@ -459,6 +462,7 @@
 				B58D64911A899094005A0002 /* LaunchScreen.xib in Resources */,
 				B57AEF441C59C1AE007611F0 /* sample_image.png in Resources */,
 				B58D64921A899094005A0002 /* Main.storyboard in Resources */,
+				B5F7A9F01CA1524C00A53C48 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -585,6 +589,14 @@
 				B58D648C1A899094005A0002 /* Base */,
 			);
 			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		B5F7A9EE1CA1524C00A53C48 /* Default-568h@2x.png */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B5F7A9EF1CA1524C00A53C48 /* Base */,
+			);
+			name = "Default-568h@2x.png";
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

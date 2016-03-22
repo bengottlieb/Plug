@@ -83,8 +83,8 @@ class Plug_Tests: XCTestCase {
 		let params: Plug.Parameters = .None
 		var completionCount = 0
 		
-		let connection = Plug.request(.GET, URL: url, parameters: params).completion { c, d in completionCount++ }
-		let connection2 = Plug.request(.GET, URL: url, parameters: params).completion { c, d in completionCount++ }
+		let connection = Plug.request(.GET, URL: url, parameters: params).completion { c, d in completionCount += 1 }
+		let connection2 = Plug.request(.GET, URL: url, parameters: params).completion { c, d in completionCount += 1 }
 		XCTAssert(connection == connection2, "Identical connections should be identical")
 
 		connection.completion({ (conn, data) in

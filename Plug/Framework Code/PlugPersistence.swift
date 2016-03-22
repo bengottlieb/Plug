@@ -77,7 +77,7 @@ public extension Plug {
 		func queuePersistentConnectionSave() {
 			self.saveTimer?.invalidate()
 			
-			self.saveTimer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: "savePersistentConnections", userInfo: nil, repeats: false)
+			self.saveTimer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: #selector(savePersistentConnections), userInfo: nil, repeats: false)
 		}
 		
 		@objc func savePersistentConnections() {
