@@ -61,12 +61,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				
 		}.start()
 	}
+	
+	func testJSONDownload() {
+		let url = NSURL(string: "http://jsonview.com/example.json")!
+		Plug.request(URL: url).completion { request, data in
+			print("Request: \(request)")
+		}
+	}
 
 	func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 		Plug.instance.setup()
 		
-		self.testLargeDownloads()
 //		self.testLargeDownloads()
+//		self.testLargeDownloads()
+		self.testJSONDownload()
 		
 		return true
 	}
