@@ -8,12 +8,18 @@
 
 import Foundation
 
+extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
+	
+}
+
+public protocol JSONContainer {}			//either a JSONArray or JSONDictionary
 
 public typealias JSONArray = [AnyObject]
 public typealias JSONDictionary = [String : AnyObject]
 
 public protocol JSONObject {
 	var JSONString: String? { get }
+	var JSONData: NSData? { get }
 }
 
 public protocol JSONInitable {
@@ -26,18 +32,22 @@ public protocol JSONConvertible {
 
 extension NSString: JSONObject {
 	public var JSONString: String? { return (self as String) }
+	public var JSONData: NSData? { return self.dataUsingEncoding(NSUTF8StringEncoding) }
 }
 
 extension NSData: JSONObject {
 	public var JSONString: String? { return self.base64EncodedStringWithOptions([]) }
+	public var JSONData: NSData? { return self.base64EncodedStringWithOptions([]).dataUsingEncoding(NSUTF8StringEncoding) }
 }
 
 extension NSNumber: JSONObject {
 	public var JSONString: String? { return self.description }
+	public var JSONData: NSData? { return self.description.dataUsingEncoding(NSUTF8StringEncoding) }
 }
 
 extension Bool: JSONObject {
 	public var JSONString: String? { return self ? "true" : "false" }
+	public var JSONData: NSData? { return self.JSONString?.dataUsingEncoding(NSUTF8StringEncoding) }
 }
 
 extension JSONObject {
@@ -48,30 +58,35 @@ extension JSONObject {
 			print("\(self)")
 		}
 	}
-}
-
-extension NSDictionary: JSONObject {
+	
 	public var JSONString: String? {
-		do {
-			let data = try NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
-			return (NSString(data: data, encoding: NSUTF8StringEncoding) as? String) ?? ""
-		} catch let error as NSError {
-			print("error while deserializing a JSON object: \(error)")
-		}
-		return nil
+		return String(data: self.JSONData ?? NSData(), encoding: NSUTF8StringEncoding) ?? ""
 	}
 }
 
-extension NSArray: JSONObject {
-	public var JSONString: String? {
-		do {
-			let data = try NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
-			return (NSString(data: data, encoding: NSUTF8StringEncoding) as? String) ?? ""
-		} catch let error as NSError {
-			print("error while deserializing a JSON object: \(error)")
-		}
+extension Dictionary: JSONContainer {}
+extension Array: JSONContainer {}
 
-		return nil
+extension NSDictionary: JSONObject {
+	public var JSONData: NSData? {
+		do {
+			return try NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
+		} catch let error {
+			print("Unable to convert \(self) to JSON: \(error)")
+			return nil
+		}
+	}
+	
+}
+
+extension NSArray: JSONObject {
+	public var JSONData: NSData? {
+		do {
+			return try NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
+		} catch let error {
+			print("Unable to convert \(self) to JSON: \(error)")
+			return nil
+		}
 	}
 }
 
@@ -120,7 +135,7 @@ extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
 		guard components.count > 0 else { return nil }
 		
 		let key = components[0]
-		if Int(key) != nil { return nil }
+
 		components.removeAtIndex(0)
 		guard components.count > 0 else { return dict[key] }
 		
@@ -152,6 +167,7 @@ extension Dictionary: JSONObject {
 		}
 		return nil
 	}
+	public var JSONData: NSData? { return self.JSONString?.dataUsingEncoding(NSUTF8StringEncoding) }
 }
 
 extension Array: JSONObject {
@@ -198,5 +214,6 @@ extension Array: JSONObject {
 		return nil
 	}
 	
+	public var JSONData: NSData? { return self.JSONString?.dataUsingEncoding(NSUTF8StringEncoding) }
 	var description: String { return self.JSONString ?? "" }
 }
