@@ -6,7 +6,7 @@
 	<dict>
 		<key>Headers/Gulliver-Swift.h</key>
 		<data>
-		8Xc2eDFJdjLVQQZr4ElKD+JXYKM=
+		WHQ/EB/53rj3x5cckgb5TFDGdSU=
 		</data>
 		<key>Headers/Gulliver.h</key>
 		<data>
@@ -14,23 +14,23 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		gAH/ysxv7r1L5cEvCTWYP8awoOI=
+		y065M4Oz8l8bGHQvrEZEIZraxq4=
 		</data>
 		<key>Modules/Gulliver.swiftmodule/arm.swiftdoc</key>
 		<data>
-		ddSu8w5sV2hS/Pj5/5QRPOpHbHk=
+		nYKTWP7XNJWx5qfDLpMZRmXxT9s=
 		</data>
 		<key>Modules/Gulliver.swiftmodule/arm.swiftmodule</key>
 		<data>
-		fdhcdj4wkpZwfRfgOyb9aruaTSE=
+		EL0l2w3IV7D2lfhuM8PlgiiyvsY=
 		</data>
 		<key>Modules/Gulliver.swiftmodule/arm64.swiftdoc</key>
 		<data>
-		LYz0XrXdhytuvStIqzCsMjixIy8=
+		2NfM8sGquYkl0EHcz/79QF/R9EA=
 		</data>
 		<key>Modules/Gulliver.swiftmodule/arm64.swiftmodule</key>
 		<data>
-		yw/GoJsvOMcsTMakfreHR1vFAIU=
+		/7dVmFxpY2vaYH8C+wFUGz0LpHQ=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -40,33 +40,82 @@
 	<key>files2</key>
 	<dict>
 		<key>Headers/Gulliver-Swift.h</key>
-		<data>
-		8Xc2eDFJdjLVQQZr4ElKD+JXYKM=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			WHQ/EB/53rj3x5cckgb5TFDGdSU=
+			</data>
+			<key>hash2</key>
+			<data>
+			sAZE8bQLtw+3mwUye/QaoMOTtRsc7S2AvcSG+xVtoe4=
+			</data>
+		</dict>
 		<key>Headers/Gulliver.h</key>
-		<data>
-		mpefZ34z0kZxxDWE8gt51QGxO70=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			mpefZ34z0kZxxDWE8gt51QGxO70=
+			</data>
+			<key>hash2</key>
+			<data>
+			pg7bx/7Lsgc5YNzSP9/QvUK1VkbKq8iIH41FnjIyUFo=
+			</data>
+		</dict>
 		<key>Modules/Gulliver.swiftmodule/arm.swiftdoc</key>
-		<data>
-		ddSu8w5sV2hS/Pj5/5QRPOpHbHk=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			nYKTWP7XNJWx5qfDLpMZRmXxT9s=
+			</data>
+			<key>hash2</key>
+			<data>
+			dQll5e9thBCd15CdhE4O+W7RfNYLX/OtdiItcsZ/ehg=
+			</data>
+		</dict>
 		<key>Modules/Gulliver.swiftmodule/arm.swiftmodule</key>
-		<data>
-		fdhcdj4wkpZwfRfgOyb9aruaTSE=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			EL0l2w3IV7D2lfhuM8PlgiiyvsY=
+			</data>
+			<key>hash2</key>
+			<data>
+			/xMFe/B41x/9ue2ZS+gRM3Ly79MontFwi5tSPdACqSk=
+			</data>
+		</dict>
 		<key>Modules/Gulliver.swiftmodule/arm64.swiftdoc</key>
-		<data>
-		LYz0XrXdhytuvStIqzCsMjixIy8=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			2NfM8sGquYkl0EHcz/79QF/R9EA=
+			</data>
+			<key>hash2</key>
+			<data>
+			3vWfoGBkyhdWf3AULcej63l2smf/U4jm1zwTrWx3ERk=
+			</data>
+		</dict>
 		<key>Modules/Gulliver.swiftmodule/arm64.swiftmodule</key>
-		<data>
-		yw/GoJsvOMcsTMakfreHR1vFAIU=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			/7dVmFxpY2vaYH8C+wFUGz0LpHQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			X+hsX8MoqWRXcT1TJi83D2rIwNmDB2Ur6TvHGHEpC90=
+			</data>
+		</dict>
 		<key>Modules/module.modulemap</key>
-		<data>
-		e+knOEoLhDRIUStlpK3w3ul2FTQ=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			e+knOEoLhDRIUStlpK3w3ul2FTQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			wyTQcyFuHFfavcS/DyS+0SjWUd63rtNpfk1Psk7PMJc=
+			</data>
+		</dict>
 	</dict>
 	<key>rules</key>
 	<dict>

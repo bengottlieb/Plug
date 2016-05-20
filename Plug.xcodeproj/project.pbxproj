@@ -57,14 +57,8 @@
 		B58D64951A899094005A0002 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D648F1A899094005A0002 /* ViewController.swift */; };
 		B58D64961A899285005A0002 /* Plug.h in Headers */ = {isa = PBXBuildFile; fileRef = B58D646B1A898F81005A0002 /* Plug.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B5B178EE1C9F8507007BFF63 /* DuplicateConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */; };
-		B5E0C14F1C4EE14F009D501E /* Gulliver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; };
-		B5E0C1511C4EE14F009D501E /* GulliverEXT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */; };
-		B5E0C1531C4EE187009D501E /* Gulliver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		B5E0C1541C4EE187009D501E /* GulliverEXT.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		B5E0C1551C4EF131009D501E /* Gulliver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; };
-		B5E0C1561C4EF134009D501E /* GulliverEXT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */; };
-		B5E0C1581C4EF161009D501E /* Gulliver.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B5E0C14D1C4EE14F009D501E /* Gulliver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		B5E0C1591C4EF164009D501E /* GulliverEXT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B5F220D51CE60C2700BBD5B7 /* Gulliver.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B5C112601CA15C5C00ADE638 /* Gulliver.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B5F220D61CE60C2800BBD5B7 /* GulliverEXT.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B5C112611CA15C5C00ADE638 /* GulliverEXT.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B5F5EF881C497E1500284AF8 /* json_sample_1.json in Resources */ = {isa = PBXBuildFile; fileRef = B5F5EF871C497E1500284AF8 /* json_sample_1.json */; };
 		B5F7A9F01CA1524C00A53C48 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5F7A9EE1CA1524C00A53C48 /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
@@ -94,8 +88,8 @@
 			dstSubfolderSpec = 10;
 			files = (
 				B504E6A41A897017001B414B /* Plug.framework in Embed Frameworks */,
-				B5E0C1531C4EE187009D501E /* Gulliver.framework in Embed Frameworks */,
-				B5E0C1541C4EE187009D501E /* GulliverEXT.framework in Embed Frameworks */,
+				B5F220D51CE60C2700BBD5B7 /* Gulliver.framework in Embed Frameworks */,
+				B5F220D61CE60C2800BBD5B7 /* GulliverEXT.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -106,8 +100,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B5E0C1581C4EF161009D501E /* Gulliver.framework in CopyFiles */,
-				B5E0C1591C4EF164009D501E /* GulliverEXT.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,8 +136,8 @@
 		B58D648E1A899094005A0002 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B58D648F1A899094005A0002 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuplicateConnections.swift; sourceTree = "<group>"; };
-		B5E0C14D1C4EE14F009D501E /* Gulliver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Gulliver.framework; sourceTree = "<group>"; };
-		B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GulliverEXT.framework; sourceTree = "<group>"; };
+		B5C112601CA15C5C00ADE638 /* Gulliver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Gulliver.framework; sourceTree = "<group>"; };
+		B5C112611CA15C5C00ADE638 /* GulliverEXT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GulliverEXT.framework; sourceTree = "<group>"; };
 		B5F5EF871C497E1500284AF8 /* json_sample_1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = json_sample_1.json; path = TestHost/json_sample_1.json; sourceTree = "<group>"; };
 		B5F7A9EF1CA1524C00A53C48 /* Base */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Base; path = "Base.lproj/Default-568h@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -155,9 +147,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5E0C14F1C4EE14F009D501E /* Gulliver.framework in Frameworks */,
 				B504E65D1A8968DC001B414B /* Plug.framework in Frameworks */,
-				B5E0C1511C4EE14F009D501E /* GulliverEXT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,8 +163,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				B504E6A51A897087001B414B /* Plug.framework in Frameworks */,
-				B5E0C1551C4EF131009D501E /* Gulliver.framework in Frameworks */,
-				B5E0C1561C4EF134009D501E /* GulliverEXT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,8 +286,8 @@
 		B5E0C14C1C4EE14F009D501E /* ExternalFrameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B5E0C14D1C4EE14F009D501E /* Gulliver.framework */,
-				B5E0C14E1C4EE14F009D501E /* GulliverEXT.framework */,
+				B5C112601CA15C5C00ADE638 /* Gulliver.framework */,
+				B5C112611CA15C5C00ADE638 /* GulliverEXT.framework */,
 			);
 			path = ExternalFrameworks;
 			sourceTree = "<group>";
