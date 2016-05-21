@@ -1,3 +1,0 @@
-framework module GulliverEXT {
-    header "GulliverEXT-Swift.h"
-}
