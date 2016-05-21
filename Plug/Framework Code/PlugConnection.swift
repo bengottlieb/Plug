@@ -14,10 +14,8 @@ public class Connection: Hashable, CustomStringConvertible {
 	public var state: State = .Waiting {
 		didSet {
 			if self.state == oldValue { return }
-			#if os(iOS)
-				if oldValue == .Running { Plug.decrementActivityIndicatorCount() }
-				if self.state.isRunning { Plug.incrementActivityIndicatorCount() }
-			#endif
+			if oldValue == .Running { Plug.decrementActivityIndicatorCount() }
+			if self.state.isRunning { Plug.incrementActivityIndicatorCount() }
 			self.subconnections.forEach { $0.state = self.state }
 		}
 	}

@@ -8,6 +8,11 @@
 
 import Foundation
 
+#if os(iOS)
+	import UIKit
+#endif
+
+
 protocol ActivityIndicatorProtocol {
 	func decrement()
 	func increment()
@@ -22,7 +27,9 @@ public class Plug: NSObject, NSURLSessionDelegate {
 	static var activityUsageCount = 0
 	public static var incrementActivityIndicatorCount: () -> Void = {
 		dispatch_async(dispatch_get_main_queue()) {
-			if Plug.activityUsageCount == 0 { UIApplication.sharedApplication().networkActivityIndicatorVisible = true }
+			#if os(iOS)
+				if Plug.activityUsageCount == 0 { UIApplication.sharedApplication().networkActivityIndicatorVisible = true }
+			#endif
 			activityUsageCount += 1
 		}
 	}
@@ -30,7 +37,9 @@ public class Plug: NSObject, NSURLSessionDelegate {
 	public static var decrementActivityIndicatorCount: () -> Void = {
 		dispatch_async(dispatch_get_main_queue()) {
 			activityUsageCount -= 1
-			if Plug.activityUsageCount == 0 { UIApplication.sharedApplication().networkActivityIndicatorVisible = false }
+			#if os(iOS)
+				if Plug.activityUsageCount == 0 { UIApplication.sharedApplication().networkActivityIndicatorVisible = false }
+			#endif
 		}
 	}
 
