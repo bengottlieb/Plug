@@ -44,10 +44,10 @@ public class Connection: Hashable, CustomStringConvertible {
 	// pertaining to completion, cascaded down to subconnections
 	private(set) var startedAt: NSDate? { didSet { self.subconnections.forEach { $0.startedAt = self.startedAt } } }
 	private(set) var expectedContentLength: Int64? { didSet { self.subconnections.forEach { $0.expectedContentLength = self.expectedContentLength } } }
-	private(set) var statusCode: Int? { didSet { self.subconnections.forEach { $0.statusCode = self.statusCode } } }
-	private(set) var completedAt: NSDate? { didSet { self.subconnections.forEach { $0.completedAt = self.completedAt } } }
+	public private(set) var statusCode: Int? { didSet { self.subconnections.forEach { $0.statusCode = self.statusCode } } }
+	public private(set) var completedAt: NSDate? { didSet { self.subconnections.forEach { $0.completedAt = self.completedAt } } }
 	var task: NSURLSessionTask? { didSet { self.subconnections.forEach { $0.task = self.task } } }
-	private(set) var resultsError: NSError?  { didSet { self.subconnections.forEach { $0.resultsError = self.resultsError } } }
+	public private(set) var resultsError: NSError?  { didSet { self.subconnections.forEach { $0.resultsError = self.resultsError } } }
 	var resultsData: NSMutableData? { didSet { self.subconnections.forEach { $0.resultsData = self.resultsData } } }
 	var bytesReceived: UInt64 = 0 { didSet { self.subconnections.forEach { $0.bytesReceived = self.bytesReceived } } }
 	var fileHandle: NSFileHandle! { didSet { self.subconnections.forEach { $0.fileHandle = self.fileHandle } } }
