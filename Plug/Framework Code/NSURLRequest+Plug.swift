@@ -27,3 +27,19 @@ extension NSURLRequest {
 		return str
 	}
 }
+
+extension NSURLComponents {
+	public var queryDictionary: [String: String] {
+		var results: [String: String] = [:]
+		
+		for pair in self.query?.componentsSeparatedByString("&") ?? [] {
+			let values = pair.componentsSeparatedByString("=")
+			
+			if values.count == 2 {
+				results[values[0]] = values[1]
+			}
+		}
+		return results
+	}
+}
+
