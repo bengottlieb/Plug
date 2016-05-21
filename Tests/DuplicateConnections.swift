@@ -8,7 +8,6 @@
 
 import XCTest
 import Plug
-import Gulliver
 
 class DuplicateConnections: XCTestCase {
 

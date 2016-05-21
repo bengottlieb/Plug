@@ -8,12 +8,32 @@
 
 import Foundation
 
+protocol ActivityIndicatorProtocol {
+	func decrement()
+	func increment()
+}
+
 public class Plug: NSObject, NSURLSessionDelegate {
 	public enum ConnectionType: Int { case Offline, Wifi, WAN }
 	public enum Method: String, CustomStringConvertible { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH"
 		public var description: String { return self.rawValue } 
 	}
 	
+	static var activityUsageCount = 0
+	public static var incrementActivityIndicatorCount: () -> Void = {
+		dispatch_async(dispatch_get_main_queue()) {
+			if Plug.activityUsageCount == 0 { UIApplication.sharedApplication().networkActivityIndicatorVisible = true }
+			activityUsageCount += 1
+		}
+	}
+
+	public static var decrementActivityIndicatorCount: () -> Void = {
+		dispatch_async(dispatch_get_main_queue()) {
+			activityUsageCount -= 1
+			if Plug.activityUsageCount == 0 { UIApplication.sharedApplication().networkActivityIndicatorVisible = false }
+		}
+	}
+
 	public enum Persistence { case Transient, PersistRequest, Persistent(Plug.PersistenceInfo)
 		public var isPersistent: Bool {
 			switch (self) {

@@ -8,10 +8,6 @@
 
 import Foundation
 
-#if os(iOS)
-	import Gulliver
-#endif
-
 public typealias PlugCompletionClosure = (Connection, Plug.ConnectionData) -> Void
 
 public class Connection: Hashable, CustomStringConvertible {
@@ -19,8 +15,8 @@ public class Connection: Hashable, CustomStringConvertible {
 		didSet {
 			if self.state == oldValue { return }
 			#if os(iOS)
-				if oldValue == .Running { NetworkActivityIndicator.decrement() }
-				if self.state.isRunning { NetworkActivityIndicator.increment() }
+				if oldValue == .Running { Plug.decrementActivityIndicatorCount() }
+				if self.state.isRunning { Plug.incrementActivityIndicatorCount() }
 			#endif
 			self.subconnections.forEach { $0.state = self.state }
 		}
