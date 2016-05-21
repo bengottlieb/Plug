@@ -35,11 +35,11 @@ extension Plug {
 			Channel.allChannels[chName] = self
 		}
 
-		internal var unfinishedConnections: Set<Plug.Connection> = []
-		internal var connections: [Int: Plug.Connection] = [:]
+		internal var unfinishedConnections: Set<Connection> = []
+		internal var connections: [Int: Connection] = [:]
 		private let queue: NSOperationQueue
-		internal var waitingConnections: [Plug.Connection] = []
-		internal var activeConnections: [Plug.Connection] = []
+		internal var waitingConnections: [Connection] = []
+		internal var activeConnections: [Connection] = []
 		
 		var JSONRepresentation: NSDictionary {
 			return ["name": self.name, "max": self.maximumActiveConnections ]
@@ -62,7 +62,7 @@ extension Plug {
 			self.queueState = .Paused
 		}
 		
-		var allConnections: [Plug.Connection] {
+		var allConnections: [Connection] {
 			return self.activeConnections + self.waitingConnections
 		}
 		
@@ -74,7 +74,7 @@ extension Plug {
 			}
 		}
 		
-		func enqueue(connection: Plug.Connection) {
+		func enqueue(connection: Connection) {
 			self.serialize {
 				if connection.state == .Queued { return }
 				
@@ -89,33 +89,33 @@ extension Plug {
 			}
 		}
 		
-		func addConnectionToChannel(connection: Plug.Connection) {
+		func addConnectionToChannel(connection: Connection) {
 			self.serialize {
 				self.unfinishedConnections.insert(connection)
 			}
 		}
 		
-		func dequeue(connection: Plug.Connection) {
+		func dequeue(connection: Connection) {
 			self.serialize {
 				self.removeWaitingConnection(connection)
 				self.updateQueue()
 			}
 		}
 		
-		func removeWaitingConnection(connection: Plug.Connection) {
+		func removeWaitingConnection(connection: Connection) {
 			self.unfinishedConnections.remove(connection)
 			if let index = self.waitingConnections.indexOf(connection) {
 				self.waitingConnections.removeAtIndex(index)
 			}
 		}
 		
-		func removeActiveConnection(connection: Plug.Connection) {
+		func removeActiveConnection(connection: Connection) {
 			if let index = self.activeConnections.indexOf(connection) {
 				self.activeConnections.removeAtIndex(index)
 			}
 		}
 		
-		func connectionStarted(connection: Plug.Connection) {
+		func connectionStarted(connection: Connection) {
 			self.startBackgroundTask()
 			self.serialize {
 				if let index = self.waitingConnections.indexOf(connection) { self.waitingConnections.removeAtIndex(index) }
@@ -124,7 +124,7 @@ extension Plug {
 			}
 		}
 		
-		func connectionStopped(connection: Plug.Connection, totallyRemove: Bool = false) {
+		func connectionStopped(connection: Connection, totallyRemove: Bool = false) {
 			self.serialize {
 				if totallyRemove { self.unfinishedConnections.remove(connection) }
 				self.removeActiveConnection(connection)
@@ -182,8 +182,8 @@ extension Plug {
 		}
 
 
-		subscript(task: NSURLSessionTask) -> Plug.Connection? {
-			get { var connection: Plug.Connection?; self.queue.addOperations( [ NSBlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true); return connection  }
+		subscript(task: NSURLSessionTask) -> Connection? {
+			get { var connection: Connection?; self.queue.addOperations( [ NSBlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true); return connection  }
 			set { self.serialize {
 				if newValue == nil, let existing = self.connections[task.taskIdentifier] {
 					self.removeWaitingConnection(existing)

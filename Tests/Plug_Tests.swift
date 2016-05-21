@@ -17,7 +17,7 @@ class Plug_TestPersistentDelegate: PlugPersistentDelegate {
 	var persistenceInfo = Plug.PersistenceInfo(objectKey: "test")
 	var expectations: [XCTestExpectation] = []
 	
-	func connectionCompleted(connection: Plug.Connection, info: Plug.PersistenceInfo?) {
+	func connectionCompleted(connection: Connection, info: Plug.PersistenceInfo?) {
 		if info == nil { return }
 		if self.expectations.count > 0 {
 			let expectation = self.expectations[0]
@@ -128,7 +128,7 @@ class Plug_Tests: XCTestCase {
 		
 		do {
 			if let dict = try NSJSONSerialization.JSONObjectWithData(json!.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, options: []) as? NSDictionary {
-				let replacement = Plug.Connection(JSONRepresentation: dict)
+				let replacement = Connection(JSONRepresentation: dict)
 				
 				replacement?.completion { req, data in
 					expectation.fulfill()

@@ -8,4 +8,5 @@
 
 import Foundation
 
-public typealias PlugJSONCompletionClosure = (Plug.Connection, JSONDictionary) -> Void
+public typealias PlugJSONCompletionClosure = (Connection, JSONDictionary) -> Void
+

@@ -14,6 +14,26 @@ public class Plug: NSObject, NSURLSessionDelegate {
 		public var description: String { return self.rawValue } 
 	}
 	
+	public enum Persistence { case Transient, PersistRequest, Persistent(Plug.PersistenceInfo)
+		public var isPersistent: Bool {
+			switch (self) {
+			case .Transient: return false
+			default: return true
+			}
+		}
+		public var persistentDelegate: PlugPersistentDelegate? { return Plug.PersistenceManager.defaultManager.delegateForPersistenceInfo(self.persistentInfo) }
+		
+		public var persistentInfo: Plug.PersistenceInfo? {
+			switch (self) {
+			case .Persistent(let info): return info
+			default: return nil
+			}
+		}
+		
+		public var JSONValue: AnyObject { return self.persistentInfo?.JSONValue ?? [] }
+		
+	}
+	
 	public static let instance = Plug()
 	public static var connectionType = ConnectionType.Offline
 	public static var online: Bool { return self.connectionType != .Offline }
@@ -127,8 +147,8 @@ public class Plug: NSObject, NSURLSessionDelegate {
 }
 
 public extension Plug {
-	public class func request(method: Method = .GET, URL: NSURLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Connection.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Plug.Connection {
-		return Plug.Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel) ?? self.noopConnection
+	public class func request(method: Method = .GET, URL: NSURLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Connection {
+		return Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel) ?? Connection.noopConnection
 	}
 }
 
@@ -156,7 +176,7 @@ extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate, NSURLSes
 		set { self.serialQueue.addOperationWithBlock { [unowned self] in self.channels[task.taskIdentifier] = newValue } }
 	}
 
-	subscript(task: NSURLSessionTask) -> Plug.Connection? {
+	subscript(task: NSURLSessionTask) -> Connection? {
 		get {
 			var channel: Plug.Channel?
 			self.serialQueue.addOperations( [ NSBlockOperation(block: {
@@ -189,14 +209,14 @@ extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate, NSURLSes
 }
 
 extension Plug {
-	func registerConnection(connection: Plug.Connection) {
+	func registerConnection(connection: Connection) {
 		if let task = connection.task {
 			connection.channel.connections[task.taskIdentifier] = connection
 			if connection.persistence.isPersistent { PersistenceManager.defaultManager.registerPersisitentConnection(connection) }
 		}
 	}
 	
-	func unregisterConnection(connection: Plug.Connection) {
+	func unregisterConnection(connection: Connection) {
 		if let task = connection.task {
 			connection.channel.connections.removeValueForKey(task.taskIdentifier)
 			if connection.persistence.isPersistent { PersistenceManager.defaultManager.unregisterPersisitentConnection(connection) }

@@ -22,10 +22,10 @@ public extension Plug {
 		}
 		
 		var persistentDelegates: [PersistenceInfo: PlugPersistentDelegate] = [:]
-		var persistentConnections: [Plug.Connection] = []
+		var persistentConnections: [Connection] = []
 		var queue: NSOperationQueue = { var q = NSOperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
 		
-		func registerPersisitentConnection(connection: Plug.Connection) {
+		func registerPersisitentConnection(connection: Connection) {
 			self.queue.addOperationWithBlock {
 				if self.persistentConnections.indexOf(connection) == nil {
 					self.persistentConnections.append(connection)
@@ -34,7 +34,7 @@ public extension Plug {
 			}
 		}
 		
-		func unregisterPersisitentConnection(connection: Plug.Connection) {
+		func unregisterPersisitentConnection(connection: Connection) {
 			self.queue.addOperationWithBlock {
 				if let index = self.persistentConnections.indexOf(connection) {
 					self.persistentConnections.removeAtIndex(index)
@@ -50,7 +50,7 @@ public extension Plug {
 				do {
 					if let json = try NSJSONSerialization.JSONObjectWithData(data, options: []) as? [NSDictionary] {
 						for dict in json {
-							if let connection = Plug.Connection(JSONRepresentation: dict) {
+							if let connection = Connection(JSONRepresentation: dict) {
 								connection.channel.enqueue(connection)
 							}
 						}
@@ -95,7 +95,7 @@ public extension Plug {
 }
 
 
-extension Plug.Connection {
+extension Connection {
 	public var JSONRepresentation: NSDictionary {
 		var json = [
 			"url": self.URL.absoluteString ?? "",
@@ -152,7 +152,7 @@ public extension Plug {
 public protocol PlugPersistentDelegate {
 	var persistenceInfo: Plug.PersistenceInfo { get }
 	
-	func connectionCompleted(connection: Plug.Connection, info: Plug.PersistenceInfo?)
+	func connectionCompleted(connection: Connection, info: Plug.PersistenceInfo?)
 }
 
 public func ==(lhs: Plug.PersistenceInfo, rhs: Plug.PersistenceInfo) -> Bool {
