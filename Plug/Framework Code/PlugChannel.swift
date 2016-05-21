@@ -194,10 +194,16 @@ extension Plug {
 		}
 		
 		func existingConnectionMatching(connection: Connection) -> Connection? {
-			for existing in self.unfinishedConnections {
+			for existing in self.activeConnections {
 				if existing === connection { continue }
-				if existing.URLLike == connection.URL && connection.method == existing.method { return existing }
+				if existing == connection { return existing }
 			}
+
+			for existing in self.waitingConnections {
+				if existing === connection { continue }
+				if existing == connection { return existing }
+			}
+
 			return nil
 		}
 	}
