@@ -77,9 +77,14 @@ extension Plug {
 		func enqueue(connection: Plug.Connection) {
 			self.serialize {
 				if connection.state == .Queued { return }
-				connection.state = .Queued
-				self.waitingConnections.append(connection)
-				self.updateQueue()
+				
+				if let existing = self.existingConnectionMatching(connection) {
+					existing.addSubconnection(connection)
+				} else {
+					connection.state = .Queued
+					self.waitingConnections.append(connection)
+					self.updateQueue()
+				}
 				NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionQueued, object: connection)
 			}
 		}
@@ -188,9 +193,10 @@ extension Plug {
 			} }
 		}
 		
-		func existingConnectionWithMethod(method: Method, URL: NSURLLike, parameters: Plug.Parameters?) -> Connection? {
-			for connection in self.unfinishedConnections {
-				if connection.URLLike == URL && connection.method == method { return connection }
+		func existingConnectionMatching(connection: Connection) -> Connection? {
+			for existing in self.unfinishedConnections {
+				if existing === connection { continue }
+				if existing.URLLike == connection.URL && connection.method == existing.method { return existing }
 			}
 			return nil
 		}

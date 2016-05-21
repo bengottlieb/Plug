@@ -61,6 +61,12 @@
 		B5F220D61CE60C2800BBD5B7 /* GulliverEXT.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B5C112611CA15C5C00ADE638 /* GulliverEXT.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B5F5EF881C497E1500284AF8 /* json_sample_1.json in Resources */ = {isa = PBXBuildFile; fileRef = B5F5EF871C497E1500284AF8 /* json_sample_1.json */; };
 		B5F7A9F01CA1524C00A53C48 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5F7A9EE1CA1524C00A53C48 /* Default-568h@2x.png */; };
+		B5FDD9B51CEFC5280001FABA /* PlugJSONConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FDD9B41CEFC5280001FABA /* PlugJSONConnection.swift */; };
+		B5FDD9B61CEFC5280001FABA /* PlugJSONConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FDD9B41CEFC5280001FABA /* PlugJSONConnection.swift */; };
+		B5FDD9B81CEFE3380001FABA /* NSURLRequest+Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FDD9B71CEFE3380001FABA /* NSURLRequest+Plug.swift */; };
+		B5FDD9B91CEFE3380001FABA /* NSURLRequest+Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FDD9B71CEFE3380001FABA /* NSURLRequest+Plug.swift */; };
+		B5FDD9BB1CEFE3500001FABA /* Plug.ConnectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FDD9BA1CEFE3500001FABA /* Plug.ConnectionData.swift */; };
+		B5FDD9BC1CEFE3500001FABA /* Plug.ConnectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FDD9BA1CEFE3500001FABA /* Plug.ConnectionData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -140,6 +146,9 @@
 		B5C112611CA15C5C00ADE638 /* GulliverEXT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GulliverEXT.framework; sourceTree = "<group>"; };
 		B5F5EF871C497E1500284AF8 /* json_sample_1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = json_sample_1.json; path = TestHost/json_sample_1.json; sourceTree = "<group>"; };
 		B5F7A9EF1CA1524C00A53C48 /* Base */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Base; path = "Base.lproj/Default-568h@2x.png"; sourceTree = "<group>"; };
+		B5FDD9B41CEFC5280001FABA /* PlugJSONConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugJSONConnection.swift; sourceTree = "<group>"; };
+		B5FDD9B71CEFE3380001FABA /* NSURLRequest+Plug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSURLRequest+Plug.swift"; sourceTree = "<group>"; };
+		B5FDD9BA1CEFE3500001FABA /* Plug.ConnectionData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plug.ConnectionData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -257,6 +266,9 @@
 				B58D64751A898F81005A0002 /* Plug.swift */,
 				B5264A851AE68AA30062537C /* PlugChannel.swift */,
 				B58D64761A898F81005A0002 /* PlugConnection.swift */,
+				B5FDD9B71CEFE3380001FABA /* NSURLRequest+Plug.swift */,
+				B5FDD9BA1CEFE3500001FABA /* Plug.ConnectionData.swift */,
+				B5FDD9B41CEFC5280001FABA /* PlugJSONConnection.swift */,
 				B580E0281A99867C0067F89D /* PlugPersistence.swift */,
 				B58D64771A898F81005A0002 /* PlugParameters.swift */,
 				B572EB721A8CC96E00670D8E /* Plug.Headers.swift */,
@@ -514,10 +526,13 @@
 				B58D64801A898FBD005A0002 /* PlugConnection.swift in Sources */,
 				B58D64811A898FBD005A0002 /* PlugParameters.swift in Sources */,
 				B560B52C1AA4A15000F3161F /* PlugReachability.m in Sources */,
+				B5FDD9B81CEFE3380001FABA /* NSURLRequest+Plug.swift in Sources */,
 				B580E0291A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B58D64821A898FBD005A0002 /* PlugProtocols.swift in Sources */,
+				B5FDD9BB1CEFE3500001FABA /* Plug.ConnectionData.swift in Sources */,
 				B5264A871AE68AED0062537C /* PlugChannel.swift in Sources */,
 				B507A3C91A8E85BC008E3DB1 /* PlugErrors.swift in Sources */,
+				B5FDD9B51CEFC5280001FABA /* PlugJSONConnection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -540,10 +555,13 @@
 				B5264A881AE68AEE0062537C /* PlugChannel.swift in Sources */,
 				B58D64851A898FBE005A0002 /* PlugParameters.swift in Sources */,
 				B507A3CA1A8E85BC008E3DB1 /* PlugErrors.swift in Sources */,
+				B5FDD9B91CEFE3380001FABA /* NSURLRequest+Plug.swift in Sources */,
 				B58D64861A898FBE005A0002 /* PlugProtocols.swift in Sources */,
 				B580E02A1A99867C0067F89D /* PlugPersistence.swift in Sources */,
+				B5FDD9BC1CEFE3500001FABA /* Plug.ConnectionData.swift in Sources */,
 				B55097A11A9A4FE7003E5155 /* PlugJSON.swift in Sources */,
 				B560B52D1AA4A15000F3161F /* PlugReachability.m in Sources */,
+				B5FDD9B61CEFC5280001FABA /* PlugJSONConnection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

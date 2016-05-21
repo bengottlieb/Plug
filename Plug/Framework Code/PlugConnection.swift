@@ -16,32 +16,6 @@ public typealias PlugCompletionClosure = (Plug.Connection, Plug.ConnectionData) 
 
 extension Plug {
 	public class Connection: NSObject {
-		public enum Persistence { case Transient, PersistRequest, Persistent(PersistenceInfo)
-			public var isPersistent: Bool {
-				switch (self) {
-				case .Transient: return false
-				default: return true
-				}
-			}
-			public var persistentDelegate: PlugPersistentDelegate? { return PersistenceManager.defaultManager.delegateForPersistenceInfo(self.persistentInfo) }
-			
-			public var persistentInfo: PersistenceInfo? {
-				switch (self) {
-				case .Persistent(let info): return info
-				default: return nil
-				}
-			}
-			
-			public var JSONValue: AnyObject { return self.persistentInfo?.JSONValue ?? [] }
-				
-		}
-		public let persistence: Persistence
-		
-		public enum State: String, CustomStringConvertible { case Waiting = "Waiting", Queued = "Queued", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Completed with Error"
-			public var description: String { return self.rawValue }
-			public var isRunning: Bool { return self == .Running }
-			public var hasStarted: Bool { return self != .Waiting && self != .Queued }
-		}
 		public var state: State = .Waiting {
 			didSet {
 				if self.state == oldValue { return }
@@ -49,12 +23,36 @@ extension Plug {
 					if oldValue == .Running { NetworkActivityIndicator.decrement() }
 					if self.state.isRunning { NetworkActivityIndicator.increment() }
 				#endif
+				self.subconnections.forEach { $0.state = self.state }
 			}
 		}
 		
-		public var expectedContentLength: Int64?
+		// set at or immediately after instantiation
+		public let method: Method
+		public var URL: NSURL { get { return self.URLLike.URL ?? NSURL() } }
+		public var destinationFileURL: NSURL?
+		public let requestQueue: NSOperationQueue
+		public let parameters: Plug.Parameters
+		public var headers: Plug.Headers?
+		public let persistence: Persistence
+		public var completionQueue: NSOperationQueue?
+		public var completionBlocks: [PlugCompletionClosure] = []
+		public var errorBlocks: [(Plug.Connection, NSError) -> Void] = []
+		public var progressBlocks: [(Plug.Connection, Double) -> Void] = []
 		public var cachingPolicy: NSURLRequestCachePolicy = .ReloadIgnoringLocalCacheData
-		public var response: NSURLResponse? { didSet {
+
+		// pertaining to completion, cascaded down to subconnections
+		private(set) var startedAt: NSDate? { didSet { self.subconnections.forEach { $0.startedAt = self.startedAt } } }
+		private(set) var expectedContentLength: Int64? { didSet { self.subconnections.forEach { $0.expectedContentLength = self.expectedContentLength } } }
+		private(set) var statusCode: Int? { didSet { self.subconnections.forEach { $0.statusCode = self.statusCode } } }
+		private(set) var completedAt: NSDate? { didSet { self.subconnections.forEach { $0.completedAt = self.completedAt } } }
+		var task: NSURLSessionTask? { didSet { self.subconnections.forEach { $0.task = self.task } } }
+		private(set) var resultsError: NSError?  { didSet { self.subconnections.forEach { $0.resultsError = self.resultsError } } }
+		var resultsData: NSMutableData? { didSet { self.subconnections.forEach { $0.resultsData = self.resultsData } } }
+		var bytesReceived: UInt64 = 0 { didSet { self.subconnections.forEach { $0.bytesReceived = self.bytesReceived } } }
+		var fileHandle: NSFileHandle! { didSet { self.subconnections.forEach { $0.fileHandle = self.fileHandle } } }
+		
+		internal(set) var response: NSURLResponse? { didSet {
 			if let resp = response as? NSHTTPURLResponse {
 				self.responseHeaders = Headers(dictionary: resp.allHeaderFields)
 				self.statusCode = resp.statusCode
@@ -63,23 +61,11 @@ extension Plug {
 				self.expectedContentLength = self.response?.expectedContentLength
 			}
 			self.resultsError = self.response?.error
+			self.subconnections.forEach { $0.response = self.response }
 		}}
-		public var statusCode: Int?
-		public var completionQueue: NSOperationQueue?
-		public var completionBlocks: [PlugCompletionClosure] = []
-		public var errorBlocks: [(Plug.Connection, NSError) -> Void] = []
-		public var progressBlocks: [(Plug.Connection, Double) -> Void] = []
-		
-		public let method: Method
-		public var URL: NSURL { get { return self.URLLike.URL ?? NSURL() } }
-		public var destinationFileURL: NSURL?
+
 		public var request: NSURLRequest?
-		public let requestQueue: NSOperationQueue
-		public let parameters: Plug.Parameters
-		public var headers: Plug.Headers?
 		public var responseHeaders: Plug.Headers?
-		public var startedAt: NSDate?
-		public var completedAt: NSDate?
 		public let channel: Plug.Channel
 		internal let URLLike: NSURLLike
 		public var elapsedTime: NSTimeInterval {
@@ -96,16 +82,20 @@ extension Plug {
 			if self.headers == nil { self.headers = Plug.instance.defaultHeaders }
 			self.headers?.append(header)
 		}
+		
 		public var percentComplete: Double = 0.0 {
 			didSet {
 				if self.percentComplete != oldValue {
 					for closure in self.progressBlocks {
 						closure(self, self.percentComplete)
 					}
+					self.subconnections.forEach { $0.percentComplete = self.percentComplete }
 				}
 			}
 		}
 		
+		var subconnections: [Connection] = []
+		var superconnection: Connection?
 		
 		public init?(method meth: Method = .GET, URL url: NSURLLike, parameters params: Plug.Parameters? = nil, persistence persist: Persistence = .Transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
 			requestQueue = NSOperationQueue()
@@ -134,7 +124,6 @@ extension Plug {
 			}
 		}
 		
-		var task: NSURLSessionTask?
 		func generateTask() -> NSURLSessionTask? {
 			if self.task != nil { return self.task }
 			self.task = Plug.instance.session.dataTaskWithRequest(self.request ?? self.defaultRequest)
@@ -145,11 +134,6 @@ extension Plug {
 			return self.task
 		}
 				
-		var resultsError: NSError?
-		var resultsData: NSMutableData?
-		var bytesReceived: UInt64 = 0
-		var fileHandle: NSFileHandle!
-		
 		func receivedData(data: NSData) {
 			self.bytesReceived += UInt64(data.length)
 			if let destURL = self.destinationFileURL, path = destURL.path {
@@ -190,7 +174,7 @@ extension Plug {
 		}
 		
 		func failedWithError(error: NSError?) {
-			if error != nil && error!.code == -1005 {
+			if error != nil && error!.code == -1005 && self.superconnection == nil {
 				print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 			}
 			self.response = self.task?.response
@@ -217,6 +201,34 @@ extension Plug {
 	}
 
 	static var noopConnection: Plug.Connection { return Plug.Connection(URL: "about:blank")! }
+}
+
+extension Plug.Connection {
+	public enum Persistence { case Transient, PersistRequest, Persistent(Plug.PersistenceInfo)
+		public var isPersistent: Bool {
+			switch (self) {
+			case .Transient: return false
+			default: return true
+			}
+		}
+		public var persistentDelegate: PlugPersistentDelegate? { return Plug.PersistenceManager.defaultManager.delegateForPersistenceInfo(self.persistentInfo) }
+		
+		public var persistentInfo: Plug.PersistenceInfo? {
+			switch (self) {
+			case .Persistent(let info): return info
+			default: return nil
+			}
+		}
+		
+		public var JSONValue: AnyObject { return self.persistentInfo?.JSONValue ?? [] }
+		
+	}
+	
+	public enum State: String, CustomStringConvertible { case Waiting = "Waiting", Queued = "Queued", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Completed with Error"
+		public var description: String { return self.rawValue }
+		public var isRunning: Bool { return self == .Running }
+		public var hasStarted: Bool { return self != .Waiting && self != .Queued }
+	}
 }
 
 extension Plug.Connection {
@@ -337,26 +349,37 @@ extension Plug.Connection {		//actions
 		if self.state != .Running { return }
 		self.channel.connectionStopped(self)
 		self.state = .Suspended
-		self.task?.suspend()
+		if self.superconnection == nil { self.task?.suspend() }
 	}
 	
 	public func resume() {
 		if self.state != .Suspended { return }
 		self.channel.connectionStarted(self)
 		self.state = .Running
-		self.task?.resume()
+		if self.superconnection == nil { self.task?.resume() }
 	}
 	
 	public func cancel() {
 		self.channel.connectionStopped(self, totallyRemove: true)
 		self.state = .Canceled
-		self.task?.cancel()
+		if self.superconnection == nil { self.task?.cancel() }
 		NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionCancelled, object: self)
 	}
 	
-	func complete(state: State) {
+	func complete(state: State, parent: Plug.Connection? = nil) {
 		self.state = state
-		self.completedAt = NSDate()
+
+		if let parent = parent {
+			self.completedAt = parent.completedAt
+			self.fileHandle = parent.fileHandle
+			self.resultsError = parent.resultsError
+			self.resultsData = parent.resultsData
+			self.bytesReceived = parent.bytesReceived
+			self.task = parent.task
+			self.fileHandle = parent.fileHandle
+		} else {
+			self.completedAt = NSDate()
+		}
 		Plug.instance.unregisterConnection(self)
 		self.channel.connectionStopped(self)
 		self.channel.dequeue(self)
@@ -378,6 +401,8 @@ extension Plug.Connection {		//actions
 				}
 			}
 		}
+		
+		self.subconnections.forEach { $0.complete(state, parent: self) }
 		self.requestQueue.addOperationWithBlock({ self.notifyPersistentDelegateOfCompletion() })
 
 		if self.state == .Completed {
@@ -388,58 +413,22 @@ extension Plug.Connection {		//actions
 	}
 }
 
-public extension Plug {
-	public class ConnectionData {
-		public var data: NSData {
-			if let data = self.rawData { return data }
-			
-			if let url = self.URL {
-				self.rawData = NSData(contentsOfURL: url)
-			}
-			
-			return self.rawData ?? NSData()
-		}
-		public var URL: NSURL?
-		private var rawData: NSData?
-		
-		init?(data: NSData?, size: UInt64) {
-			length = size
-			if data == nil { return nil }
-			self.rawData = data
-		}
-		
-		init?(URL: NSURL?, size: UInt64) {
-			length = size
-			if URL == nil { return nil }
-			self.URL = URL
-		}
-
-		public var length: UInt64
-		
-		init() {
-			length = 0
-			self.rawData = nil
-		}
+extension Plug.Connection {
+	func addSubconnection(connection: Plug.Connection) {
+		self.propagate(connection)
+		connection.superconnection = self
+		self.subconnections.append(connection)
 	}
-}
-
-
-extension NSURLRequest {
-	public override var description: String {
-		var str = (self.HTTPMethod ?? "[no method]") + " " + "\(self.URL)"
-		
-		if let fields = self.allHTTPHeaderFields {
-			for (label, value) in fields {
-				str += "\n\t" + label + ": " + value
-			}
-		}
-		
-		if let data = self.HTTPBody {
-			let body = NSString(data: data, encoding: NSUTF8StringEncoding)
-			str += "\n" + (body?.description ?? "[unconvertible body: \(data.length) bytes]")
-		}
-		
-		return str
+	
+	func propagate(connection: Plug.Connection) {
+		connection.startedAt = self.startedAt
+		connection.expectedContentLength = self.expectedContentLength
+		connection.statusCode = self.statusCode
+		connection.completedAt = self.completedAt
+		connection.resultsError = self.resultsError
+		connection.bytesReceived = self.bytesReceived
+		connection.fileHandle = self.fileHandle
+		connection.task = self.task
 	}
 }
 

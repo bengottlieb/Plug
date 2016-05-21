@@ -128,15 +128,7 @@ public class Plug: NSObject, NSURLSessionDelegate {
 
 public extension Plug {
 	public class func request(method: Method = .GET, URL: NSURLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Connection.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Plug.Connection {
-		if let connection = channel.existingConnectionWithMethod(method, URL: URL, parameters: parameters) {
-			return connection
-		}
-		
-		if let connection = Plug.Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel) {
-			return connection
-		}
-		
-		return self.noopConnection
+		return Plug.Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel) ?? self.noopConnection
 	}
 }
 
