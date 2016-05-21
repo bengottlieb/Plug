@@ -34,6 +34,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	public var progressBlocks: [(Connection, Double) -> Void] = []
 	public var cachingPolicy: NSURLRequestCachePolicy = .ReloadIgnoringLocalCacheData
 	public var coalescing = Coalescing.CoalesceSimilarConnections
+	public var tag: Int = 0
 
 	// pertaining to completion, cascaded down to subconnections
 	private(set) var startedAt: NSDate? { didSet { self.subconnections.forEach { $0.startedAt = self.startedAt } } }
