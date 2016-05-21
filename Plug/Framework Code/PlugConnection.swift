@@ -40,6 +40,7 @@ extension Plug {
 		public var errorBlocks: [(Plug.Connection, NSError) -> Void] = []
 		public var progressBlocks: [(Plug.Connection, Double) -> Void] = []
 		public var cachingPolicy: NSURLRequestCachePolicy = .ReloadIgnoringLocalCacheData
+		public var coalescing = Coalescing.CoalesceSimilarConnections
 
 		// pertaining to completion, cascaded down to subconnections
 		private(set) var startedAt: NSDate? { didSet { self.subconnections.forEach { $0.startedAt = self.startedAt } } }
@@ -229,6 +230,8 @@ extension Plug.Connection {
 		public var isRunning: Bool { return self == .Running }
 		public var hasStarted: Bool { return self != .Waiting && self != .Queued }
 	}
+	
+	public enum Coalescing: Int { case CoalesceSimilarConnections, DoNotCoalesceConnections }
 }
 
 extension Plug.Connection {

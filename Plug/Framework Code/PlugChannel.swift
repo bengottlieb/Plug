@@ -78,7 +78,7 @@ extension Plug {
 			self.serialize {
 				if connection.state == .Queued { return }
 				
-				if let existing = self.existingConnectionMatching(connection) {
+				if connection.coalescing == .CoalesceSimilarConnections, let existing = self.existingConnectionMatching(connection) {
 					existing.addSubconnection(connection)
 				} else {
 					connection.state = .Queued
