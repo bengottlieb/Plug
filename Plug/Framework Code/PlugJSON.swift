@@ -110,6 +110,18 @@ public extension NSData {
 		}
 		return nil
 	}
+	
+	public func jsonContainer(options: NSJSONReadingOptions = []) -> JSONContainer? {
+		do {
+			let container = try NSJSONSerialization.JSONObjectWithData(self, options: options)
+			
+			if let array = container as? JSONArray { return array }
+			if let dict = container as? JSONDictionary { return dict }
+		} catch let error {
+			print("Error while parsing JSON Array: \(error)")
+		}
+		return nil
+	}
 }
 
 let JSONSeparatorsCharacterSet = NSCharacterSet(charactersInString: ".[]")

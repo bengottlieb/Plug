@@ -14,7 +14,7 @@ import Foundation
 
 public typealias PlugCompletionClosure = (Connection, Plug.ConnectionData) -> Void
 
-public class Connection: NSObject {
+public class Connection: Hashable, CustomStringConvertible {
 	public var state: State = .Waiting {
 		didSet {
 			if self.state == oldValue { return }
@@ -78,6 +78,11 @@ public class Connection: NSObject {
 		}
 		return 0
 	}
+	
+	public var hashValue: Int {
+		return self.URL.hash
+	}
+
 	public func addHeader(header: Plug.Header) {
 		if self.headers == nil { self.headers = Plug.instance.defaultHeaders }
 		self.headers?.append(header)
@@ -108,7 +113,7 @@ public class Connection: NSObject {
 		method = parameters.normalizeMethod(meth)
 		URLLike = url
 		
-		super.init()
+		//super.init()
 		channel.addConnectionToChannel(self)
 		if url.URL == nil {
 			print("Unable to create a connection with URL: \(url)")
@@ -195,11 +200,22 @@ public class Connection: NSObject {
 		
 		return request
 	}
+	
 	public func notifyPersistentDelegateOfCompletion() {
 		self.persistence.persistentDelegate?.connectionCompleted(self, info: self.persistence.persistentInfo)
 	}
 
 	static var noopConnection: Connection { return Connection(URL: "about:blank")! }
+
+	func handleDownloadedData(data: Plug.ConnectionData) {
+		let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
+		
+		for block in self.completionBlocks {
+			let op = NSBlockOperation(block: { block(self, data) })
+			queue.addOperations([op], waitUntilFinished: true)
+		}
+	}
+	
 }
 
 extension Connection {
@@ -232,7 +248,7 @@ extension Connection {
 
 
 extension Connection {
-	public override var description: String { return self.detailedDescription() }
+	public var description: String { return self.detailedDescription() }
 
 	public func detailedDescription(includeDelimiters: Bool = true) -> String {
 		guard let request = self.generateTask()?.originalRequest else { return "--empty connectionu--" }
@@ -366,19 +382,18 @@ extension Connection {		//actions
 		self.channel.dequeue(self)
 		self.fileHandle?.closeFile()
 		
+		let data = Plug.ConnectionData(data: self.resultsData, size: self.bytesReceived) ?? Plug.ConnectionData(URL: self.destinationFileURL, size: self.bytesReceived)
+		let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
+		
 		self.requestQueue.addOperationWithBlock {
-			let data = Plug.ConnectionData(data: self.resultsData, size: self.bytesReceived) ?? Plug.ConnectionData(URL: self.destinationFileURL, size: self.bytesReceived)
-			let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
-			
 			if data != nil || self.resultsError == nil {
-				for block in self.completionBlocks {
-					let op = NSBlockOperation(block: { block(self, data ?? Plug.ConnectionData()) })
-					queue.addOperations([op], waitUntilFinished: true)
-				}
-			} else if let error = self.resultsError {
-				for block in self.errorBlocks {
-					let op = NSBlockOperation(block: { block(self, error) })
-					queue.addOperations([op], waitUntilFinished: true)
+				self.handleDownloadedData(data ?? Plug.ConnectionData())
+			} else {
+				if let error = self.resultsError {
+					for block in self.errorBlocks {
+						let op = NSBlockOperation(block: { block(self, error) })
+						queue.addOperations([op], waitUntilFinished: true)
+					}
 				}
 			}
 		}
@@ -392,6 +407,7 @@ extension Connection {		//actions
 			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionFailed, object: self, userInfo: (self.resultsError != nil) ? ["error": self.resultsError!] : nil)
 		}
 	}
+	
 }
 
 extension Connection {

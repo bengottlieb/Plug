@@ -64,8 +64,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func testJSONDownload() {
 		let url = NSURL(string: "http://jsonview.com/example.json")!
-		Plug.request(URL: url).completion { request, data in
-			print("Request: \(request)")
+		
+		JSONConnection(URL: url)?.completion { (request: Connection, json: JSONDictionary) in
+			print("Request: \(json)")
 		}.start()
 	}
 
