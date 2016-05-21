@@ -36,16 +36,6 @@ class Plug_TestPersistentDelegate: PlugPersistentDelegate {
 	}
 }
 
-class JSONTests: XCTestCase {
-	func testPathExtraction() {
-		let url = NSBundle(forClass: self.dynamicType).URLForResource("json_sample_1", withExtension: "json")!
-		let data = NSData(contentsOfURL: url)!
-		let json = data.jsonDictionary()!
-		let result = json[path: "glossary.GlossDiv.GlossList.GlossEntry.Flavors[0]"] as! String
-		XCTAssert(result == "GML", "Failed to extract JSON")
-	}
-}
-
 class Plug_Tests: XCTestCase {
     
     override func setUp() {

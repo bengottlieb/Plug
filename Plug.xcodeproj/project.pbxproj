@@ -28,6 +28,7 @@
 		B507A3C91A8E85BC008E3DB1 /* PlugErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B507A3C81A8E85BC008E3DB1 /* PlugErrors.swift */; };
 		B507A3CA1A8E85BC008E3DB1 /* PlugErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B507A3C81A8E85BC008E3DB1 /* PlugErrors.swift */; };
 		B519F8871C498B36002C5A61 /* json_sample_1.json in Resources */ = {isa = PBXBuildFile; fileRef = B5F5EF871C497E1500284AF8 /* json_sample_1.json */; };
+		B51AFC9E1CF0842A005BD586 /* JSONTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51AFC9D1CF0842A005BD586 /* JSONTests.swift */; };
 		B5264A871AE68AED0062537C /* PlugChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5264A851AE68AA30062537C /* PlugChannel.swift */; };
 		B5264A881AE68AEE0062537C /* PlugChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5264A851AE68AA30062537C /* PlugChannel.swift */; };
 		B55097A01A9A4FE7003E5155 /* PlugJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B550979F1A9A4FE7003E5155 /* PlugJSON.swift */; };
@@ -116,6 +117,7 @@
 		B504E69C1A896E82001B414B /* Plug_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plug_Tests.swift; sourceTree = "<group>"; };
 		B504E6AF1A898110001B414B /* Plug.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Plug.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B507A3C81A8E85BC008E3DB1 /* PlugErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugErrors.swift; sourceTree = "<group>"; };
+		B51AFC9D1CF0842A005BD586 /* JSONTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONTests.swift; sourceTree = "<group>"; };
 		B5264A851AE68AA30062537C /* PlugChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugChannel.swift; sourceTree = "<group>"; };
 		B550979F1A9A4FE7003E5155 /* PlugJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugJSON.swift; sourceTree = "<group>"; };
 		B560B5261AA4A15000F3161F /* PlugReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlugReachability.h; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 			children = (
 				B58D64871A899094005A0002 /* TestHost */,
 				B504E69C1A896E82001B414B /* Plug_Tests.swift */,
+				B51AFC9D1CF0842A005BD586 /* JSONTests.swift */,
 				B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */,
 				B5F5EF871C497E1500284AF8 /* json_sample_1.json */,
 				B504E69A1A896E82001B414B /* Supporting Files */,
@@ -533,6 +536,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B504E69D1A896E82001B414B /* Plug_Tests.swift in Sources */,
+				B51AFC9E1CF0842A005BD586 /* JSONTests.swift in Sources */,
 				B5B178EE1C9F8507007BFF63 /* DuplicateConnections.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

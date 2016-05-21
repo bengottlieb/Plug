@@ -378,18 +378,12 @@ extension Connection {		//actions
 		self.fileHandle?.closeFile()
 		
 		let data = Plug.ConnectionData(data: self.resultsData, size: self.bytesReceived) ?? Plug.ConnectionData(URL: self.destinationFileURL, size: self.bytesReceived)
-		let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
 		
 		self.requestQueue.addOperationWithBlock {
 			if data != nil || self.resultsError == nil {
 				self.handleDownloadedData(data ?? Plug.ConnectionData())
 			} else {
-				if let error = self.resultsError {
-					for block in self.errorBlocks {
-						let op = NSBlockOperation(block: { block(self, error) })
-						queue.addOperations([op], waitUntilFinished: true)
-					}
-				}
+				if let error = self.resultsError { self.reportError(error) }
 			}
 		}
 		
@@ -403,6 +397,14 @@ extension Connection {		//actions
 		}
 	}
 	
+	func reportError(error: NSError) {
+		let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
+		
+		for block in self.errorBlocks {
+			let op = NSBlockOperation(block: { block(self, error) })
+			queue.addOperations([op], waitUntilFinished: true)
+		}
+	}
 }
 
 extension Connection {

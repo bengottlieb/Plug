@@ -27,7 +27,7 @@ public extension NSURLResponse {
 
 public extension NSError {
 	public class var PlugJSONErrorDomain: String { return "PlugJSONErrorDomain" }
-	public enum JSONErrors: Int { case UnableToFindJSONContainer }
+	public enum JSONErrors: Int { case UnableToFindJSONContainer, UnexpectedJSONDictionary, UnexpectedJSONArray }
 	
 	
 	public var isTimeoutError: Bool {
