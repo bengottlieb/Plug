@@ -8,7 +8,7 @@
 
 import UIKit
 import XCTest
-import Plug
+@testable import Plug
 
 var persistentDelegate = Plug_TestPersistentDelegate()
 
@@ -82,21 +82,27 @@ class Plug_Tests: XCTestCase {
 		let params: Plug.Parameters = .None
 		var completionCount = 0
 		
-		let connection = Plug.request(.GET, URL: url, parameters: params).completion { c, d in completionCount += 1 }
-		let connection2 = Plug.request(.GET, URL: url, parameters: params).completion { c, d in completionCount += 1 }
+		let connection = Plug.request(.GET, URL: url, parameters: params).completion { c, d in
+			completionCount += 1;
+			if completionCount == 2 { expectation.fulfill() }
+		}
+		let connection2 = Plug.request(.GET, URL: url, parameters: params).completion { c, d in
+			completionCount += 1;
+			if completionCount == 2 { expectation.fulfill() }
+		}
 		XCTAssert(connection == connection2, "Identical connections should be identical")
 
 		connection.completion({ (conn, data) in
 			let str = NSString(data: data.data, encoding: NSUTF8StringEncoding)
-			print("Data: \(connection): \(str)")
-			expectation.fulfill()
+			print("Data: \(str)")
 
-			XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
+			XCTAssert(Plug.activityUsageCount == 0, "Activity indicator not set to hidden");
+			print("Block3")
 		}).error({conn, error in
 			print("Got error: \(error)")
-			expectation.fulfill()
 			
-			XCTAssertFalse(NetworkActivityIndicator.isVisible, "Activity indicator not set to hidden");
+			XCTAssert(Plug.activityUsageCount == 0, "Activity indicator not set to hidden");
+			print("Block4")
 		})
 		
 		print("\(connection.log())")
@@ -157,7 +163,7 @@ class Plug_Tests: XCTestCase {
 		let request = Plug.request(.GET, URL: url)
 		
 		request.error { req, error in
-			XCTAssert(error.isTimeout, "Should have timed out")
+			XCTAssert(error.isTimeoutError, "Should have timed out")
 			expectation.fulfill()
 		}
 		
@@ -178,7 +184,7 @@ class Plug_Tests: XCTestCase {
 		let request = Plug.request(.GET, URL: url)
 		
 		request.error { req, error in
-			XCTAssert(!error.isTimeout, "Should not have timed out")
+			XCTAssert(!error.isTimeoutError, "Should not have timed out")
 			expectation.fulfill()
 		}
 		
