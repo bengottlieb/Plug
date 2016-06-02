@@ -13,9 +13,18 @@ import Foundation
 #endif
 
 
-protocol ActivityIndicatorProtocol {
+public protocol ActivityIndicatorProtocol {
 	func decrement()
 	func increment()
+}
+
+#if os(OSX)
+	public typealias UIBackgroundTaskIdentifier = Int
+#endif
+
+public protocol BackgroundActivityHandlerProtocol {
+	func beginBackgroundTaskWithName(taskName: String?, expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier
+	func endBackgroundTask(identifier: UIBackgroundTaskIdentifier)
 }
 
 public class Plug: NSObject, NSURLSessionDelegate {
@@ -24,25 +33,15 @@ public class Plug: NSObject, NSURLSessionDelegate {
 		public var description: String { return self.rawValue } 
 	}
 	
-	static var activityUsageCount = 0
-	public static var incrementActivityIndicatorCount: () -> Void = {
-		dispatch_async(dispatch_get_main_queue()) {
-			#if os(iOS)
-				if Plug.activityUsageCount == 0 { UIApplication.sharedApplication().networkActivityIndicatorVisible = true }
-			#endif
-			activityUsageCount += 1
-		}
+	public func setup(backgroundHandler: BackgroundActivityHandlerProtocol? = nil, networkActivityIndicator: ActivityIndicatorProtocol?) {
+		
+		self.backgroundActivityHandler = backgroundHandler
+		self.networkActivityIndicator = networkActivityIndicator
 	}
-
-	public static var decrementActivityIndicatorCount: () -> Void = {
-		dispatch_async(dispatch_get_main_queue()) {
-			activityUsageCount -= 1
-			#if os(iOS)
-				if Plug.activityUsageCount == 0 { UIApplication.sharedApplication().networkActivityIndicatorVisible = false }
-			#endif
-		}
-	}
-
+	
+	var backgroundActivityHandler: BackgroundActivityHandlerProtocol?
+	var networkActivityIndicator: ActivityIndicatorProtocol?
+	
 	public enum Persistence { case Transient, PersistRequest, Persistent(Plug.PersistenceInfo)
 		public var isPersistent: Bool {
 			switch (self) {
@@ -134,9 +133,6 @@ public class Plug: NSObject, NSURLSessionDelegate {
 		self.session = NSURLSession(configuration: self.configuration, delegate: self, delegateQueue: self.sessionQueue)
 	}
 	
-	
-	public func setup() {}
-
 	private var reachability: AnyObject
 	func setOnlineViaWifi(wifi: Bool, orWAN wan: Bool) {
 		var newState = ConnectionType.Offline

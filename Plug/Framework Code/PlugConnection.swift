@@ -14,8 +14,8 @@ public class Connection: Hashable, CustomStringConvertible {
 	public var state: State = .Waiting {
 		didSet {
 			if self.state == oldValue { return }
-			if oldValue == .Running { Plug.decrementActivityIndicatorCount() }
-			if self.state.isRunning { Plug.incrementActivityIndicatorCount() }
+			if oldValue == .Running { Plug.instance.networkActivityIndicator?.decrement() }
+			if self.state.isRunning { Plug.instance.networkActivityIndicator?.increment() }
 			self.subconnections.forEach { $0.state = self.state }
 		}
 	}
