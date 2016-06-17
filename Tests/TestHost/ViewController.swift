@@ -14,14 +14,14 @@ class ViewController: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ViewController.onlineStatusChanged), name: Plug.notifications.onlineStatusChanged, object: nil)
+		NotificationCenter.default().addObserver(self, selector: #selector(ViewController.onlineStatusChanged), name: Plug.notifications.onlineStatusChanged, object: nil)
 		
 		self.onlineStatusChanged()
 		// Do any additional setup after loading the view, typically from a nib.
 	}
 	
 	func onlineStatusChanged() {
-		dispatch_async(dispatch_get_main_queue()) {
+		DispatchQueue.main.async {
 			switch (Plug.connectionType) {
 			case .Offline: self.statusLabel.text = "Offline"
 			case .Wifi: self.statusLabel.text = "WiFi"

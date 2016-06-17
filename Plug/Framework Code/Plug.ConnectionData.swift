@@ -11,25 +11,25 @@ import Foundation
 
 public extension Plug {
 	public class ConnectionData {
-		public var data: NSData {
+		public var data: Data {
 			if let data = self.rawData { return data }
 			
 			if let url = self.URL {
-				self.rawData = NSData(contentsOfURL: url)
+				self.rawData = Data(contentsOfURL: url)
 			}
 			
-			return self.rawData ?? NSData()
+			return self.rawData ?? Data()
 		}
-		public var URL: NSURL?
-		private var rawData: NSData?
+		public var URL: URL?
+		private var rawData: Data?
 		
-		init?(data: NSData?, size: UInt64) {
+		init?(data: Data?, size: UInt64) {
 			length = size
 			if data == nil { return nil }
 			self.rawData = data
 		}
 		
-		init?(URL: NSURL?, size: UInt64) {
+		init?(URL: URL?, size: UInt64) {
 			length = size
 			if URL == nil { return nil }
 			self.URL = URL

@@ -11,8 +11,8 @@ import XCTest
 
 class JSONTests: XCTestCase {
 	func testPathExtraction() {
-		let url = NSBundle(forClass: self.dynamicType).URLForResource("json_sample_1", withExtension: "json")!
-		let data = NSData(contentsOfURL: url)!
+		let url = Bundle(for: self.dynamicType).URLForResource("json_sample_1", withExtension: "json")!
+		let data = Data(contentsOfURL: url)!
 		let json = data.jsonDictionary()!
 		let result = json[path: "glossary.GlossDiv.GlossList.GlossEntry.Flavors[0]"] as! String
 		XCTAssert(result == "GML", "Failed to extract JSON")
@@ -20,7 +20,7 @@ class JSONTests: XCTestCase {
 
 	func testJSONDictionaryDownload() {
 		let expectation = expectationWithDescription("JSONDictionary")
-		let url = NSURL(string: "http://jsonview.com/example.json")!
+		let url = URL(string: "http://jsonview.com/example.json")!
 		
 		JSONConnection(URL: url)?.completion { (request: Connection, json: JSONDictionary) in
 			expectation.fulfill()
@@ -34,7 +34,7 @@ class JSONTests: XCTestCase {
 
 	func testJSONArrayDownload() {
 		let expectation = expectationWithDescription("JSONDictionary")
-		let url = NSURL(string: "http://jsonview.com/example.json")!
+		let url = URL(string: "http://jsonview.com/example.json")!
 		
 		JSONConnection(URL: url)?.completion { (request: Connection, json: JSONArray) in
 				XCTAssert(false, "Was expecting an array")

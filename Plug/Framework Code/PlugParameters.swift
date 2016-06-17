@@ -11,7 +11,7 @@ import Foundation
 extension Plug {
 	public class FormComponents: Equatable, CustomStringConvertible {
 		var fields: JSONDictionary = [:]
-		var fileURLs: [(name: String, mimeType: String, url: NSURL)] = []
+		var fileURLs: [(name: String, mimeType: String, url: URL)] = []
 		var boundary = FormComponents.generateBoundaryString()
 		var contentTypeHeader: String { return "multipart/form-data; boundary=\(self.boundary)" }
 		
@@ -20,13 +20,13 @@ extension Plug {
 			set { self.fields[key] = newValue }
 		}
 		
-		public func addFile(url: NSURL?, name: String, mimeType: String) {
+		public func addFile(url: URL?, name: String, mimeType: String) {
 			guard let url = url else { return }
 			self.fileURLs.append((name: name, mimeType: mimeType, url: url))
 		}
 		
 		class func generateBoundaryString() -> String {
-			return "Boundary-\(NSUUID().UUIDString)"
+			return "Boundary-\(NSUUID().uuidString)"
 		}
 		
 		func labeledFieldsArray(dict: JSONDictionary, prefix: String? = nil) -> [(String, String)] {
@@ -35,7 +35,7 @@ extension Plug {
 			for (key, value) in dict {
 				if let subDict = value as? JSONDictionary {
 					let extendedPrefix = prefix == nil ? key : "\(prefix!)[\(key)]"
-					results += self.labeledFieldsArray(subDict, prefix: extendedPrefix)
+					results += self.labeledFieldsArray(dict: subDict, prefix: extendedPrefix)
 				} else {
 					let label = prefix == nil ? "" : "\(prefix!)[\(key)]"
 					results.append((label, "\(value)"))
@@ -44,23 +44,23 @@ extension Plug {
 			return results
 		}
 		
-		var dataValue: NSData {
+		var dataValue: Data {
 			let data = NSMutableData()
-			let fields = self.labeledFieldsArray(self.fields)
+			let fields = self.labeledFieldsArray(dict: self.fields)
 			
 			for (key, value) in fields {
 				for line in ["--\(self.boundary)\r\n",
 							 "Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n",
 							 "\(value)\r\n"
 					] {
-					if let lineData = line.dataUsingEncoding(NSUTF8StringEncoding) {
+					if let lineData = line.data(String.Encoding.utf8) {
 						data.appendData(lineData)
 					}
 				}
 			}
 			
 			for (name, mimeType, url) in self.fileURLs {
-				guard let filedata = NSData(contentsOfURL: url) else { continue }
+				guard let filedata = Data(contentsOfURL: url) else { continue }
 				guard let path = url.path else { continue }
 				let filename = (path as NSString).lastPathComponent
 				
@@ -68,15 +68,15 @@ extension Plug {
 					"Content-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\r\n",
 					"Content-Type: \(mimeType)\r\n\r\n"
 					] {
-						if let lineData = line.dataUsingEncoding(NSUTF8StringEncoding) {
+						if let lineData = line.dataUsingEncoding(String.Encoding.utf8) {
 							data.appendData(lineData)
 						}
 				}
 				data.appendData(filedata)
-				data.appendData("\(self.boundary)\r\n".dataUsingEncoding(NSUTF8StringEncoding)!)
+				data.appendData("\(self.boundary)\r\n".dataUsingEncoding(String.Encoding.utf8)!)
 			}
 	
-			data.appendData("--\(self.boundary)--\r\n".dataUsingEncoding(NSUTF8StringEncoding)!)
+			data.appendData("--\(self.boundary)--\r\n".dataUsingEncoding(String.Encoding.utf8)!)
 
 			return data
 		}
@@ -103,7 +103,7 @@ extension Plug {
 			}
 			
 			for (name, mimeType, url) in self.fileURLs {
-				guard let filedata = NSData(contentsOfURL: url) else { continue }
+				guard let filedata = Data(contentsOfURL: url) else { continue }
 				guard let path = url.path else { continue }
 				let filename = (path as NSString).lastPathComponent
 				
@@ -162,12 +162,12 @@ extension Plug {
 			}
 		}
 		
-		var bodyData: NSData? {
+		var bodyData: Data? {
 			switch (self) {
 			case .Form(let components):
 				return components.dataValue
 			case .JSON:
-				return self.stringValue.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)
+				return self.stringValue.dataUsingEncoding(String.Encoding.utf8, allowLossyConversion: false)
 			default: return nil
 			}
 		}

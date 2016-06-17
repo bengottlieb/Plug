@@ -1,5 +1,5 @@
 //
-//  NSURLRequest+Plug.swift
+//  URLRequest+Plug.swift
 //  Plug
 //
 //  Created by Ben Gottlieb on 5/20/16.
@@ -9,9 +9,9 @@
 import Foundation
 
 
-extension NSURLRequest {
-	public override var description: String {
-		var str = (self.HTTPMethod ?? "[no method]") + " " + "\(self.URL)"
+extension URLRequest {
+	public var description: String {
+		var str = (self.httpMethod ?? "[no method]") + " " + "\(self.url)"
 		
 		if let fields = self.allHTTPHeaderFields {
 			for (label, value) in fields {
@@ -19,21 +19,21 @@ extension NSURLRequest {
 			}
 		}
 		
-		if let data = self.HTTPBody {
-			let body = NSString(data: data, encoding: NSUTF8StringEncoding)
-			str += "\n" + (body?.description ?? "[unconvertible body: \(data.length) bytes]")
+		if let data = self.httpBody {
+			let body = String(data: data, encoding: String.Encoding.utf8)
+			str += "\n" + (body ?? "[unconvertible body: \(data.count) bytes]")
 		}
 		
 		return str
 	}
 }
 
-extension NSURLComponents {
+extension URLComponents {
 	public var queryDictionary: [String: String] {
 		var results: [String: String] = [:]
 		
-		for pair in self.query?.componentsSeparatedByString("&") ?? [] {
-			let values = pair.componentsSeparatedByString("=")
+		for pair in self.query?.components(separatedBy: "&") ?? [] {
+			let values = pair.components(separatedBy: "=")
 			
 			if values.count == 2 {
 				results[values[0]] = values[1]

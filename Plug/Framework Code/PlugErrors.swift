@@ -9,16 +9,16 @@
 import Foundation
 
 
-public extension NSURLResponse {
+public extension URLResponse {
 	public class var PlugHTTPErrorDomain: String { return "PlugHTTPErrorDomain" }
 	
 	var error: NSError? {
-		if let response = self as? NSHTTPURLResponse {
+		if let response = self as? HTTPURLResponse {
 			switch response.statusCode {
 			case 200...299: return nil		//no error
 			
 			default:
-				return NSError(domain: NSURLResponse.PlugHTTPErrorDomain, code: response.statusCode, userInfo: ["response": self])
+				return NSError(domain: URLResponse.PlugHTTPErrorDomain, code: response.statusCode, userInfo: ["response": self])
 			}
 		}
 		return nil
@@ -29,12 +29,9 @@ public extension NSError {
 	public class var PlugJSONErrorDomain: String { return "PlugJSONErrorDomain" }
 	public enum JSONErrors: Int { case UnableToFindJSONContainer, UnexpectedJSONDictionary, UnexpectedJSONArray }
 	
-	public var isCancelledError: Bool {
-		return self.domain == NSURLErrorDomain && self.code == Int(CFNetworkErrors.CFURLErrorCancelled.rawValue)
-	}
 	
 	public var isTimeoutError: Bool {
-		return self.domain == NSURLErrorDomain && self.code == Int(CFNetworkErrors.CFURLErrorTimedOut.rawValue)
+		return self.domain == URLErrorDomain && self.code == -1001
 	}
 }
 

@@ -19,7 +19,7 @@ public typealias JSONDictionary = [String : AnyObject]
 
 public protocol JSONObject {
 	var JSONString: String? { get }
-	var JSONData: NSData? { get }
+	var JSONData: Data? { get }
 }
 
 public protocol JSONInitable {
@@ -32,22 +32,22 @@ public protocol JSONConvertible {
 
 extension NSString: JSONObject {
 	public var JSONString: String? { return (self as String) }
-	public var JSONData: NSData? { return self.dataUsingEncoding(NSUTF8StringEncoding) }
+	public var JSONData: Data? { return self.dataUsingEncoding(String.Encoding.utf8) }
 }
 
-extension NSData: JSONObject {
+extension Data: JSONObject {
 	public var JSONString: String? { return self.base64EncodedStringWithOptions([]) }
-	public var JSONData: NSData? { return self.base64EncodedStringWithOptions([]).dataUsingEncoding(NSUTF8StringEncoding) }
+	public var JSONData: Data? { return self.base64EncodedStringWithOptions([]).dataUsingEncoding(String.Encoding.utf8) }
 }
 
 extension NSNumber: JSONObject {
 	public var JSONString: String? { return self.description }
-	public var JSONData: NSData? { return self.description.dataUsingEncoding(NSUTF8StringEncoding) }
+	public var JSONData: Data? { return self.description.dataUsingEncoding(String.Encoding.utf8) }
 }
 
 extension Bool: JSONObject {
 	public var JSONString: String? { return self ? "true" : "false" }
-	public var JSONData: NSData? { return self.JSONString?.dataUsingEncoding(NSUTF8StringEncoding) }
+	public var JSONData: Data? { return self.JSONString?.dataUsingEncoding(String.Encoding.utf8) }
 }
 
 extension JSONObject {
@@ -60,7 +60,7 @@ extension JSONObject {
 	}
 	
 	public var JSONString: String? {
-		return String(data: self.JSONData ?? NSData(), encoding: NSUTF8StringEncoding) ?? ""
+		return String(data: self.JSONData ?? Data(), encoding: String.Encoding.utf8) ?? ""
 	}
 }
 
@@ -68,9 +68,9 @@ extension Dictionary: JSONContainer {}
 extension Array: JSONContainer {}
 
 extension NSDictionary: JSONObject {
-	public var JSONData: NSData? {
+	public var JSONData: Data? {
 		do {
-			return try NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
+			return try JSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
 		} catch let error {
 			print("Unable to convert \(self) to JSON: \(error)")
 			return nil
@@ -80,9 +80,9 @@ extension NSDictionary: JSONObject {
 }
 
 extension NSArray: JSONObject {
-	public var JSONData: NSData? {
+	public var JSONData: Data? {
 		do {
-			return try NSJSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
+			return try JSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
 		} catch let error {
 			print("Unable to convert \(self) to JSON: \(error)")
 			return nil
@@ -90,10 +90,10 @@ extension NSArray: JSONObject {
 	}
 }
 
-public extension NSData {
-	public func jsonDictionary(options: NSJSONReadingOptions = []) -> JSONDictionary? {
+public extension Data {
+	public func jsonDictionary(options: JSONSerialization.ReadingOptions = []) -> JSONDictionary? {
 		do {
-			let dict = try NSJSONSerialization.JSONObjectWithData(self, options: options) as? JSONDictionary
+			let dict = try JSONSerialization.JSONObjectWithData(self, options: options) as? JSONDictionary
 			return dict
 		} catch let error {
 			print("Error while parsing JSON Dictionary: \(error)")
@@ -101,9 +101,9 @@ public extension NSData {
 		return nil
 	}
 	
-	public func jsonArray(options: NSJSONReadingOptions = []) -> JSONArray? {
+	public func jsonArray(options: JSONSerialization.ReadingOptions = []) -> JSONArray? {
 		do {
-			let dict = try NSJSONSerialization.JSONObjectWithData(self, options: options) as? JSONArray
+			let dict = try JSONSerialization.JSONObjectWithData(self, options: options) as? JSONArray
 			return dict
 		} catch let error {
 			print("Error while parsing JSON Array: \(error)")
@@ -113,7 +113,7 @@ public extension NSData {
 	
 	public func jsonContainer(options: NSJSONReadingOptions = []) -> JSONContainer? {
 		do {
-			let container = try NSJSONSerialization.JSONObjectWithData(self, options: options)
+			let container = try JSONSerialization.JSONObjectWithData(self, options: options)
 			
 			if let array = container as? JSONArray { return array }
 			if let dict = container as? JSONDictionary { return dict }
@@ -162,8 +162,8 @@ extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
 
 	public var JSONString: String? {
 		do {
-			let data = try NSJSONSerialization.dataWithJSONObject(self as! AnyObject, options: .PrettyPrinted)
-			return (NSString(data: data, encoding: NSUTF8StringEncoding) as? String) ?? ""
+			let data = try JSONSerialization.dataWithJSONObject(self as! AnyObject, options: .PrettyPrinted)
+			return (NSString(data: data, encoding: String.Encoding.utf8) as? String) ?? ""
 		} catch let error as NSError {
 			print("error while deserializing a JSON object: \(error)")
 		}
@@ -179,7 +179,7 @@ extension Dictionary: JSONObject {
 		}
 		return nil
 	}
-	public var JSONData: NSData? { return self.JSONString?.dataUsingEncoding(NSUTF8StringEncoding) }
+	public var JSONData: Data? { return self.JSONString?.dataUsingEncoding(String.Encoding.utf8) }
 }
 
 extension Array: JSONObject {
@@ -217,8 +217,8 @@ extension Array: JSONObject {
 
 	public var JSONString: String? {
 		do {
-			let data = try NSJSONSerialization.dataWithJSONObject((self as! AnyObject) as! [AnyObject], options: .PrettyPrinted)
-			return (NSString(data: data, encoding: NSUTF8StringEncoding) as? String) ?? ""
+			let data = try JSONSerialization.dataWithJSONObject((self as! AnyObject) as! [AnyObject], options: .PrettyPrinted)
+			return (NSString(data: data, encoding: String.Encoding.utf8) as? String) ?? ""
 		} catch let error as NSError {
 			print("error while deserializing a JSON object: \(error)")
 		}
@@ -226,6 +226,6 @@ extension Array: JSONObject {
 		return nil
 	}
 	
-	public var JSONData: NSData? { return self.JSONString?.dataUsingEncoding(NSUTF8StringEncoding) }
+	public var JSONData: Data? { return self.JSONString?.dataUsingEncoding(String.Encoding.utf8) }
 	var description: String { return self.JSONString ?? "" }
 }

@@ -8,30 +8,30 @@
 
 import Foundation
 
-public protocol NSURLLike {
-	var URL: NSURL? { get }
-	func isEqual(other: NSURLLike) -> Bool
+public protocol URLLike {
+	var url: URL? { get }
+	func isEqual(other: URLLike) -> Bool
 }
 
-public protocol NSURLRequestLike {
-	var URL: NSURLRequest? { get }
+public protocol URLRequestLike {
+	var url: URLRequest? { get }
 }
 
-extension NSURL: NSURLLike {
-	public var URL: NSURL? { return self }
-	public func isEqual(object: NSURLLike) -> Bool {
-		if let other = object as? NSURL { return other.absoluteString == self.absoluteString }
+extension URL: URLLike {
+	public var url: URL? { return self }
+	public func isEqual(object: URLLike) -> Bool {
+		if let other = object as? URL { return other.absoluteString == self.absoluteString }
 		return false
 	}
 }
-extension String: NSURLLike {
-	public var URL: NSURL? { return NSURL(string: self) }
-	public func isEqual(object: NSURLLike) -> Bool {
+extension String: URLLike {
+	public var url: URL? { return URL(string: self) }
+	public func isEqual(object: URLLike) -> Bool {
 		if let other = object as? String { return other == self }
 		return false
 	}
 }
 
-func ==(lhs: NSURLLike, rhs: NSURLLike) -> Bool {
+func ==(lhs: URLLike, rhs: URLLike) -> Bool {
 	return lhs.isEqual(rhs)
 }

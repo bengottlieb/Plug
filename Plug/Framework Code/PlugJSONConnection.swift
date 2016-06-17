@@ -17,7 +17,7 @@ public class JSONConnection: Connection {
 	public var jsonArrayCompletionBlocks: [PlugJSONArrayCompletionClosure] = []
 	
 	override func handleDownloadedData(data: Plug.ConnectionData) {
-		let queue = self.completionQueue ?? NSOperationQueue.mainQueue()
+		let queue = self.completionQueue ?? OperationQueue.mainQueue()
 		if let json = data.data.jsonContainer() {
 			if let dict = json as? JSONDictionary {
 				if self.jsonDictionaryCompletionBlocks.count == 0 {	//we got a dictionary, but weren't expecting it
@@ -25,7 +25,7 @@ public class JSONConnection: Connection {
 					self.reportError(NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnexpectedJSONDictionary.rawValue, userInfo: ["connection": self]))
 				}
 				for block in self.jsonDictionaryCompletionBlocks {
-					let op = NSBlockOperation(block: { block(self, dict) })
+					let op = BlockOperation(block: { block(self, dict) })
 					queue.addOperations([op], waitUntilFinished: true)
 				}
 				return
@@ -35,7 +35,7 @@ public class JSONConnection: Connection {
 					self.reportError(NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnexpectedJSONArray.rawValue, userInfo: ["connection": self]))
 				}
 				for block in self.jsonArrayCompletionBlocks {
-					let op = NSBlockOperation(block: { block(self, array) })
+					let op = BlockOperation(block: { block(self, array) })
 					queue.addOperations([op], waitUntilFinished: true)
 				}
 				return
@@ -45,12 +45,12 @@ public class JSONConnection: Connection {
 	}
 
 	public func completion(completion: PlugJSONDictionaryCompletionClosure) -> Self {
-		self.requestQueue.addOperationWithBlock { self.jsonDictionaryCompletionBlocks.append(completion) }
+		self.requestQueue.addOperation { self.jsonDictionaryCompletionBlocks.append(completion) }
 		return self
 	}
 	
 	public func completion(completion: PlugJSONArrayCompletionClosure) -> Self {
-		self.requestQueue.addOperationWithBlock { self.jsonArrayCompletionBlocks.append(completion) }
+		self.requestQueue.addOperation { self.jsonArrayCompletionBlocks.append(completion) }
 		return self
 	}
 	

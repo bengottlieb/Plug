@@ -30,14 +30,14 @@ extension Plug {
 			name = chName
 			queueState = Plug.connectionType == .Offline ? .PausedDueToOffline : .Running
 			maxSimultaneousConnections = max
-			queue = NSOperationQueue()
+			queue = OperationQueue()
 			queue.maxConcurrentOperationCount = 1//max
 			Channel.allChannels[chName] = self
 		}
 
 		internal var unfinishedConnections: Set<Connection> = []
 		internal var connections: [Int: Connection] = [:]
-		private let queue: NSOperationQueue
+		private let queue: OperationQueue
 		internal var waitingConnections: [Connection] = []
 		internal var activeConnections: [Connection] = []
 		
@@ -53,7 +53,7 @@ extension Plug {
 			return ["name": self.name, "max": self.maximumActiveConnections ]
 		}
 		
-		class func channelWithJSON(json: NSDictionary?) -> Plug.Channel {
+		class func channel(json: NSDictionary?) -> Plug.Channel {
 			let name = json?["name"] as? String ?? "default"
 			if let channel = self.allChannels[name] { return channel }
 			
@@ -75,10 +75,10 @@ extension Plug {
 		}
 		
 		func serialize(block: () -> Void) {
-			if NSOperationQueue.currentQueue() == self.queue {
+			if OperationQueue.currentQueue() == self.queue {
 				block()
 			} else {
-				self.queue.addOperations([ NSBlockOperation(block: block) ], waitUntilFinished: true)
+				self.queue.addOperations([ BlockOperation(block: block) ], waitUntilFinished: true)
 			}
 		}
 		
@@ -95,11 +95,11 @@ extension Plug {
 					self.updateQueue()
 					connection.state = .Queued
 				}
-				NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionQueued, object: connection)
+				NotificationCenter.default().postNotificationName(Plug.notifications.connectionQueued, object: connection)
 			}
 		}
 		
-		func addConnectionToChannel(connection: Connection) {
+		func addToChannel(connection: Connection) {
 			self.serialize {
 				self.unfinishedConnections.insert(connection)
 			}
@@ -112,14 +112,14 @@ extension Plug {
 			}
 		}
 		
-		func removeWaitingConnection(connection: Connection) {
+		func removeWaiting(connection: Connection) {
 			self.unfinishedConnections.remove(connection)
 			if let index = self.waitingConnections.indexOf(connection) {
 				self.waitingConnections.removeAtIndex(index)
 			}
 		}
 		
-		func removeActiveConnection(connection: Connection) {
+		func removeActive(connection: Connection) {
 			if let index = self.activeConnections.indexOf(connection) {
 				self.activeConnections.removeAtIndex(index)
 			}
@@ -130,7 +130,7 @@ extension Plug {
 			self.serialize {
 				if let index = self.waitingConnections.indexOf(connection) { self.waitingConnections.removeAtIndex(index) }
 				if self.activeConnections.indexOf(connection) == -1 { self.activeConnections.append(connection) }
-				NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionStarted, object: connection)
+				NotificationCenter.default().postNotificationName(Plug.notifications.connectionStarted, object: connection)
 			}
 		}
 		
@@ -192,8 +192,8 @@ extension Plug {
 		}
 
 
-		subscript(task: NSURLSessionTask) -> Connection? {
-			get { var connection: Connection?; self.queue.addOperations( [ NSBlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true); return connection  }
+		subscript(task: URLSessionTask) -> Connection? {
+			get { var connection: Connection?; self.queue.addOperations( [ BlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true); return connection  }
 			set { self.serialize {
 				if newValue == nil, let existing = self.connections[task.taskIdentifier] {
 					self.removeWaitingConnection(existing)
@@ -203,7 +203,7 @@ extension Plug {
 			} }
 		}
 		
-		func existingConnectionMatching(connection: Connection) -> Connection? {
+		func existingMatching(connection: Connection) -> Connection? {
 			for existing in self.activeConnections {
 				if existing === connection { continue }
 				if existing == connection { return existing }

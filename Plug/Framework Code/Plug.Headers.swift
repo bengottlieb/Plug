@@ -34,12 +34,12 @@ extension Plug {
 			switch (self) {
 			case .Accept(let types):
 				let content = types.reduce("") { "\($0)\($1);" }
-				return content.stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: ";"))
+				return content.trimmingCharacters(in: CharacterSet(charactersIn: ";"))
 				
 			case .AcceptEncoding(let encoding): return encoding
 			case .ContentType(let type): return type
 			case .BasicAuthorization(let user, let pass):
-				return "Basic " + ("\(user):\(pass)".dataUsingEncoding(NSUTF8StringEncoding)?.base64EncodedStringWithOptions([]) ?? "")
+				return "Basic " + ("\(user):\(pass)".data(using: String.Encoding.utf8)?.base64EncodedString([]) ?? "")
 			case .UserAgent(let agent): return agent
 				
 			case .Custom(_, let content): return content
@@ -52,7 +52,7 @@ extension Plug {
 		
 		public init(label: String, content: String) {
 			switch label {
-			case "Accept": self = .Accept(content.componentsSeparatedByString(","))
+			case "Accept": self = .Accept(content.components(separatedBy: ","))
 			case "Accept-Encoding": self = .AcceptEncoding(content)
 			case "Content-Type": self = .ContentType(content)
 			case "User-Agent": self = .AcceptEncoding(content)
@@ -65,8 +65,8 @@ extension Plug {
 	public struct Headers: CustomStringConvertible {
 		var headers: [Header] = []
 		public mutating func append(header: Header) {
-			for (index, existing) in self.headers.enumerate() {
-				if existing.isSameHeaderAs(header) {
+			for (index, existing) in self.headers.enumerated() {
+				if existing.isSameHeaderAs(header: header) {
 					self.headers[index] = header
 					return
 				}

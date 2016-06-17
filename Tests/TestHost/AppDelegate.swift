@@ -15,7 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
 
 	func testLargeDownloads() {
-		let largeURL = NSURL(string: "https://dl.dropboxusercontent.com/u/85235/Stereotypies%20Therapy.mp4")!
+		let largeURL = URL(string: "https://dl.dropboxusercontent.com/u/85235/Stereotypies%20Therapy.mp4")!
 		Plug.instance.timeout = 5.0
 		
 		
@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 	
 	func testSmallDownloads() {
-		let smallURL = NSURL(string: "http://stackoverflow.com/questions/34182482/nsurlsessiondatadelegate-not-called")!
+		let smallURL = URL(string: "http://stackoverflow.com/questions/34182482/nsurlsessiondatadelegate-not-called")!
 		
 		
 		let connection = Plug.request(.GET, URL: smallURL).completion { request, data in
@@ -44,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 	
 	func testMimeUpload() {
-		let fileURL = NSBundle.mainBundle().URLForResource("sample_image", withExtension: "png")
+		let fileURL = Bundle.main().URLForResource("sample_image", withExtension: "png")
 		let url = "http://posttestserver.com/post.php"
 		let payloadDict = ["Sample_Item": ["embedded": "data goes here", "Test": "Field 1", "one-level-more": ["name": "Bonzai", "career": "Buckaroo"]]]
 		
@@ -63,7 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 	
 	func testJSONDownload() {
-		let url = NSURL(string: "http://jsonview.com/example.json")!
+		let url = URL(string: "http://jsonview.com/example.json")!
 		
 		JSONConnection(URL: url)?.completion { (request: Connection, json: JSONDictionary) in
 			print("Request: \(request)")
@@ -89,9 +89,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func timeoutTests() {
 		Plug.instance.timeout = 35.0
 		
-		//let largeURL = NSURL(string: "https://developer.apple.com/services-account/download?path=/iOS/iAd_Producer_5.1/iAd_Producer_5.1.dmg")!
+		//let largeURL = URL(string: "https://developer.apple.com/services-account/download?path=/iOS/iAd_Producer_5.1/iAd_Producer_5.1.dmg")!
 		
-		let url = NSURL(string: "https://192.168.1.62")!
+		let url = URL(string: "https://192.168.1.62")!
 		let request = Plug.request(.GET, URL: url)
 		
 		request.completion { req, data in
@@ -110,7 +110,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let args = ["device": ["udid": UIDevice.currentDevice().identifierForVendor!.UUIDString]]
 	
 		Plug.request(.DELETE, URL: url, parameters: Plug.Parameters.JSON(args)).completion { conn, data in
-			print("got it \(NSString(data: data.data, encoding: NSUTF8StringEncoding))")
+			print("got it \(NSString(data: data.data, encoding: String.Encoding.utf8))")
 		}.start()
 	}
 

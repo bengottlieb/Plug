@@ -23,61 +23,62 @@ public extension Plug {
 		
 		var persistentDelegates: [PersistenceInfo: PlugPersistentDelegate] = [:]
 		var persistentConnections: [Connection] = []
-		var queue: NSOperationQueue = { var q = NSOperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
+		var queue: OperationQueue = { var q = OperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
 		
-		func registerPersisitentConnection(connection: Connection) {
-			self.queue.addOperationWithBlock {
-				if self.persistentConnections.indexOf(connection) == nil {
+		func registerPersisitent(connection: Connection) {
+			self.queue.addOperation {
+				if self.persistentConnections.index(of: connection) == nil {
 					self.persistentConnections.append(connection)
 					self.queuePersistentConnectionSave()
 				}
 			}
 		}
 		
-		func unregisterPersisitentConnection(connection: Connection) {
-			self.queue.addOperationWithBlock {
-				if let index = self.persistentConnections.indexOf(connection) {
-					self.persistentConnections.removeAtIndex(index)
+		func unregisterPersisitent(connection: Connection) {
+			self.queue.addOperation {
+				if let index = self.persistentConnections.index(of: connection) {
+					self.persistentConnections.remove(at: index)
 					self.queuePersistentConnectionSave()
 				}
 			}
 		}
 		
-		public func loadCachedURLs(fromURL: NSURL? = nil) {
+		public func loadCachedURLs(fromURL: URL? = nil) {
 			self.persistentCacheURL = fromURL ?? self.defaultPersistentCacheURL
 			
-			if let data = NSData(contentsOfURL: self.persistentCacheURL!) {
-				do {
-					if let json = try NSJSONSerialization.JSONObjectWithData(data, options: []) as? [NSDictionary] {
+			
+			do {
+				if let data = try? Data(contentsOf: self.persistentCacheURL!) {
+					if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [NSDictionary] {
 						for dict in json {
 							if let connection = Connection(JSONRepresentation: dict) {
 								connection.channel.enqueue(connection)
 							}
 						}
 					}
-				} catch {}
-			}
+				}
+			} catch {}
 		}
 		
 		
 		
-		var defaultPersistentCacheURL: NSURL { return Plug.plugDirectoryURL.URLByAppendingPathComponent("Pending_Connections.json")! }
+		var defaultPersistentCacheURL: URL { return try! Plug.plugDirectoryURL.appendingPathComponent("Pending_Connections.json") }
 		
-		var persistentCacheURL: NSURL? { didSet {
+		var persistentCacheURL: URL? { didSet {
 			if let url = self.persistentCacheURL {
 				do {
-					try NSFileManager.defaultManager().createDirectoryAtURL(url.URLByDeletingLastPathComponent!, withIntermediateDirectories: true, attributes: nil)
+					try FileManager.default().createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
 				} catch let error as NSError {
 					print("error while loading cached URLs: \(error)")
 				}
 			}
 		}}
 		
-		var saveTimer: NSTimer?
+		var saveTimer: Timer?
 		func queuePersistentConnectionSave() {
 			self.saveTimer?.invalidate()
 			
-			self.saveTimer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: #selector(savePersistentConnections), userInfo: nil, repeats: false)
+			self.saveTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(savePersistentConnections), userInfo: nil, repeats: false)
 		}
 		
 		@objc func savePersistentConnections() {
@@ -85,8 +86,8 @@ public extension Plug {
 			if self.persistentCacheURL == nil { return }
 			let dictionaries: [NSDictionary] = self.persistentConnections.map { return $0.JSONRepresentation }
 			do {
-				let json = try NSJSONSerialization.dataWithJSONObject(dictionaries, options: NSJSONWritingOptions.PrettyPrinted)
-				json.writeToURL(self.persistentCacheURL!, atomically: true)
+				let json = try JSONSerialization.data(withJSONObject: dictionaries, options: JSONSerialization.WritingOptions.prettyPrinted)
+				try json.write(to: self.persistentCacheURL!, options: [.atomicWrite])
 			} catch let error as NSError {
 				print("error while saving a persistent connection: \(error)")
 			}
@@ -98,7 +99,7 @@ public extension Plug {
 extension Connection {
 	public var JSONRepresentation: NSDictionary {
 		var json = [
-			"url": self.URL.absoluteString ?? "",
+			"url": self.url.absoluteString ?? "",
 			"persistenceIdentifier": self.persistence.JSONValue,
 			"method": self.method.rawValue,
 			"channel": self.channel.JSONRepresentation
@@ -115,7 +116,7 @@ extension Connection {
 		let method = Plug.Method(rawValue: (info["method"] as? String) ?? "GET")
 		let persistance = Plug.PersistenceInfo(JSONValue: (info["persistenceIdentifier"] as? [String]) ?? [])
 		let channelJSON = info["channel"] as? NSDictionary
-		let channel = Plug.Channel.channelWithJSON(channelJSON)
+		let channel = Plug.Channel.channel(json: channelJSON)
 		let parametersData = (info["parameters"] as? [String: NSDictionary])
 		
 		let parameters = Plug.Parameters(dictionary: parametersData ?? [:])

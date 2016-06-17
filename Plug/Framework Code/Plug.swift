@@ -27,7 +27,7 @@ public protocol BackgroundActivityHandlerProtocol {
 	func endBackgroundTask(identifier: UIBackgroundTaskIdentifier)
 }
 
-public class Plug: NSObject, NSURLSessionDelegate {
+public class Plug: NSObject, URLSessionDelegate {
 	public enum ConnectionType: Int { case Offline, Wifi, WAN }
 	public enum Method: String, CustomStringConvertible { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH"
 		public var description: String { return self.rawValue } 
@@ -49,7 +49,7 @@ public class Plug: NSObject, NSURLSessionDelegate {
 			default: return true
 			}
 		}
-		public var persistentDelegate: PlugPersistentDelegate? { return Plug.PersistenceManager.defaultManager.delegateForPersistenceInfo(self.persistentInfo) }
+		public var persistentDelegate: PlugPersistentDelegate? { return Plug.PersistenceManager.defaultManager.delegateForPersistenceInfo(info: self.persistentInfo) }
 		
 		public var persistentInfo: Plug.PersistenceInfo? {
 			switch (self) {
@@ -67,16 +67,16 @@ public class Plug: NSObject, NSURLSessionDelegate {
 	public static var online: Bool { return self.connectionType != .Offline }
 	
 	public struct notifications {
-		public static let onlineStatusChanged = "onlineStatusChanged.com.standalone.plug"
+		public static let onlineStatusChanged = NSNotification.Name("onlineStatusChanged.com.standalone.plug")
 
-		public static let connectionQueued = "connectionQueued.com.standalone.plug"
-		public static let connectionStarted = "connectionStarted.com.standalone.plug"
-		public static let connectionCompleted = "connectionCompleted.com.standalone.plug"
-		public static let connectionCancelled = "connectionCancelled.com.standalone.plug"
-		public static let connectionFailed = "connectionFailed.com.standalone.plug"
+		public static let connectionQueued = NSNotification.Name("connectionQueued.com.standalone.plug")
+		public static let connectionStarted = NSNotification.Name("connectionStarted.com.standalone.plug")
+		public static let connectionCompleted = NSNotification.Name("connectionCompleted.com.standalone.plug")
+		public static let connectionCancelled = NSNotification.Name("connectionCancelled.com.standalone.plug")
+		public static let connectionFailed = NSNotification.Name("connectionFailed.com.standalone.plug")
 	}
 	
-	public var timeout: NSTimeInterval? { didSet {
+	public var timeout: TimeInterval? { didSet {
 		if timeout != oldValue {
 			if self.areConnectionsInFlight {
 				NSLog("Unable to set timeout, connections are in flight")
@@ -86,29 +86,29 @@ public class Plug: NSObject, NSURLSessionDelegate {
 		}
 	}}
 	public var autostartConnections = true
-	public var temporaryDirectoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory())
-	public func generateTemporaryFileURL() -> NSURL {
-		let filename = NSUUID().UUIDString + ".temp"
-		return self.temporaryDirectoryURL.URLByAppendingPathComponent(filename)!
+	public var temporaryDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
+	public func generateTemporaryFileURL() -> URL {
+		let filename = NSUUID().uuidString + ".temp"
+		return try! self.temporaryDirectoryURL.appendingPathComponent(filename)
 	}
-	public var sessionQueue: NSOperationQueue = NSOperationQueue()
-	var configuration: NSURLSessionConfiguration {
-		let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+	public var sessionQueue: OperationQueue = OperationQueue()
+	var configuration: URLSessionConfiguration {
+		let config = URLSessionConfiguration.default()
 		
 		if let timeout = self.timeout { config.timeoutIntervalForRequest = timeout }
 		return config
 	}
-	public var session: NSURLSession!
+	public var session: URLSession!
 	public var defaultHeaders = Plug.Headers([
 			.Accept(["application/json"]),
 			.AcceptEncoding("gzip;q=1.0,compress;q=0.5"),
-			.UserAgent("plug-\(NSBundle.mainBundle().bundleIdentifier ?? String())"),
+			.UserAgent("plug-\(Bundle.main().bundleIdentifier ?? "")"),
 	])
 	
-	class public var libraryDirectoryURL: NSURL {
-		return NSURL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.LibraryDirectory, [.UserDomainMask], true).first!)
+	class public var libraryDirectoryURL: URL {
+		return URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.libraryDirectory, [.userDomainMask], true).first!)
 	}
-	class public var plugDirectoryURL: NSURL { return self.libraryDirectoryURL.URLByAppendingPathComponent("Plug")! }
+	class public var plugDirectoryURL: URL { return try! self.libraryDirectoryURL.appendingPathComponent("Plug") }
 	
 	public override init() {
 		let reachabilityClassReference : AnyObject.Type = NSClassFromString("Plug_Reachability")!
@@ -118,14 +118,6 @@ public class Plug: NSObject, NSURLSessionDelegate {
 		super.init()
 		self.reachability.setValue(self, forKey: "delegate");
 		self.rebuildSession()
-		
-		#if os(iOS)
-			NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(didBecomeActive), name: UIApplicationDidBecomeActiveNotification, object: nil)
-		#endif
-	}
-	
-	public func didBecomeActive() {
-		Channel.restartAllChannels()
 	}
 	
 	public var areConnectionsInFlight: Bool {
@@ -138,7 +130,7 @@ public class Plug: NSObject, NSURLSessionDelegate {
 	}
 	
 	public func rebuildSession() {
-		self.session = NSURLSession(configuration: self.configuration, delegate: self, delegateQueue: self.sessionQueue)
+		self.session = URLSession(configuration: self.configuration, delegate: self, delegateQueue: self.sessionQueue)
 	}
 	
 	private var reachability: AnyObject
@@ -158,13 +150,13 @@ public class Plug: NSObject, NSURLSessionDelegate {
 		if newState == Plug.connectionType { return }
 		
 		Plug.connectionType = newState
-		dispatch_async(dispatch_get_main_queue()) {
-			NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.onlineStatusChanged, object: nil)
+		DispatchQueue.main.async {
+			NotificationCenter.default().post(name: Plug.notifications.onlineStatusChanged, object: nil)
 		}
 	}
 	
 	func updateChannelStates() {
-		dispatch_async(dispatch_get_main_queue()) {
+		DispatchQueue.main.async {
 			for channel in Plug.Channel.allChannels.values {
 				if Plug.connectionType == .Offline {
 					if channel.queueState == .Running { channel.pauseQueue(); channel.queueState = .PausedDueToOffline }
@@ -175,22 +167,22 @@ public class Plug: NSObject, NSURLSessionDelegate {
 		}
 	}
 	
-	internal var channels: [Int: Plug.Channel] = [:]
-	internal var serialQueue: NSOperationQueue = { var q = NSOperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
+	internal var channels: [Int: Channel] = [:]
+	internal var serialQueue: OperationQueue = { var q = OperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
 }
 
 public extension Plug {
-	public class func request(method: Method = .GET, URL: NSURLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Connection {
-		return Connection(method: method, URL: URL, parameters: parameters, persistence: persistence, channel: channel) ?? Connection.noopConnection
+	public class func request(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Connection {
+		return Connection(method: method, url: url, parameters: parameters, persistence: persistence, channel: channel) ?? Connection.noopConnection
 	}
 }
 
-extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate, NSURLSessionDataDelegate {
-//	public func URLSession(session: NSURLSession, dataTask task: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
+extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDataDelegate {
+//	public func URLSession(session: URLSession, dataTask task: URLSessionDataTask, didReceiveResponse response: URLResponse, completionHandler: (URLSessionResponseDisposition) -> Void) {
 //		self[task]?.response = response
 //	}
 
-	public func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
+	public func URLSession(session: URLSession, dataTask: URLSessionDataTask, didReceiveData data: Data) {
 		guard let task = self[dataTask] else { return }
 		
 		if task.response == nil { task.response = dataTask.response }
@@ -198,31 +190,31 @@ extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate, NSURLSes
 		task.receivedData(data)
 	}
 	
-	subscript(toChannel task: NSURLSessionTask) -> Plug.Channel? {
+	subscript(toChannel task: URLSessionTask) -> Plug.Channel? {
 		get {
 			var channel: Plug.Channel?
-			self.serialQueue.addOperations( [ NSBlockOperation(block: {
+			self.serialQueue.addOperations( [ BlockOperation(block: {
 				channel = Plug.instance.channels[task.taskIdentifier]
 			} )], waitUntilFinished: true)
 			return channel  }
 		
-		set { self.serialQueue.addOperationWithBlock { [unowned self] in self.channels[task.taskIdentifier] = newValue } }
+		set { self.serialQueue.addOperation { [unowned self] in self.channels[task.taskIdentifier] = newValue } }
 	}
 
-	subscript(task: NSURLSessionTask) -> Connection? {
+	subscript(task: URLSessionTask) -> Connection? {
 		get {
 			var channel: Plug.Channel?
-			self.serialQueue.addOperations( [ NSBlockOperation(block: {
+			self.serialQueue.addOperations( [ BlockOperation(block: {
 				channel = Plug.instance.channels[task.taskIdentifier]
 			} )], waitUntilFinished: true)
 			return channel?[task]  }
 		}
 
-	public func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
+	public func URLSession(session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingToURL location: URL) {
 		
 	}
 
-	public func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
+	public func URLSession(session: URLSession, task: URLSessionTask, didCompleteWithError error: NSError?) {
 		if let err = error where err.code == -1005 {
 			print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 		}
@@ -233,7 +225,7 @@ extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate, NSURLSes
 		}
 	}
 	
-	public func URLSession(session: NSURLSession, task: NSURLSessionTask, willPerformHTTPRedirection response: NSHTTPURLResponse, newRequest request: NSURLRequest, completionHandler: (NSURLRequest?) -> Void) {
+	public func URLSession(session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: (URLRequest?) -> Void) {
 		print("Received redirect request from \(task.originalRequest)")
 		completionHandler(request)
 	}
@@ -242,14 +234,14 @@ extension Plug: NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate, NSURLSes
 }
 
 extension Plug {
-	func registerConnection(connection: Connection) {
+	func register(connection: Connection) {
 		if let task = connection.task {
 			connection.channel.connections[task.taskIdentifier] = connection
 			if connection.persistence.isPersistent { PersistenceManager.defaultManager.registerPersisitentConnection(connection) }
 		}
 	}
 	
-	func unregisterConnection(connection: Connection) {
+	func unregister(connection: Connection) {
 		if let task = connection.task {
 			connection.channel.connections.removeValueForKey(task.taskIdentifier)
 			if connection.persistence.isPersistent { PersistenceManager.defaultManager.unregisterPersisitentConnection(connection) }

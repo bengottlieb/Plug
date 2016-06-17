@@ -16,7 +16,7 @@ class Plug_TestPersistentDelegate: PlugPersistentDelegate {
 	var persistenceInfo = Plug.PersistenceInfo(objectKey: "test")
 	var expectations: [XCTestExpectation] = []
 	
-	func connectionCompleted(connection: Connection, info: Plug.PersistenceInfo?) {
+	func connectionCompleted(_ connection: Connection, info: Plug.PersistenceInfo?) {
 		if info == nil { return }
 		if self.expectations.count > 0 {
 			let expectation = self.expectations[0]
@@ -83,7 +83,7 @@ class Plug_Tests: XCTestCase {
 		XCTAssert(connection == connection2, "Identical connections should be identical")
 
 		connection.completion({ (conn, data) in
-			let str = NSString(data: data.data, encoding: NSUTF8StringEncoding)
+			let str = NSString(data: data.data, encoding: String.Encoding.utf8)
 			print("Data: \(str)")
 
 			XCTAssert(Plug.activityUsageCount == 0, "Activity indicator not set to hidden");
@@ -122,7 +122,7 @@ class Plug_Tests: XCTestCase {
 		connection.cancel()
 		
 		do {
-			if let dict = try NSJSONSerialization.JSONObjectWithData(json!.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, options: []) as? NSDictionary {
+			if let dict = try JSONSerialization.JSONObjectWithData(json!.dataUsingEncoding(String.Encoding.utf8, allowLossyConversion: false)!, options: []) as? NSDictionary {
 				let replacement = Connection(JSONRepresentation: dict)
 				
 				replacement?.completion { req, data in
