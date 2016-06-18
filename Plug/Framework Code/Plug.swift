@@ -33,7 +33,7 @@ public class Plug: NSObject, URLSessionDelegate {
 		public var description: String { return self.rawValue } 
 	}
 	
-	public func setup(backgroundHandler: BackgroundActivityHandlerProtocol? = nil, networkActivityIndicator: ActivityIndicatorProtocol?) {
+	public func setup(backgroundHandler: BackgroundActivityHandlerProtocol? = nil, networkActivityIndicator: ActivityIndicatorProtocol? = nil) {
 		
 		self.backgroundActivityHandler = backgroundHandler
 		self.networkActivityIndicator = networkActivityIndicator
@@ -134,7 +134,7 @@ public class Plug: NSObject, URLSessionDelegate {
 	}
 	
 	private var reachability: AnyObject
-	func setOnlineViaWifi(wifi: Bool, orWAN wan: Bool) {
+	func setOnlineViaWifi(_ wifi: Bool, orWAN wan: Bool) {
 		var newState = ConnectionType.Offline
 		
 		if wifi {

@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		Plug.instance.timeout = 5.0
 		
 		
-		let connection = Plug.request(.GET, URL: largeURL).completion { request, data in
+		let connection = Plug.request(method: .GET, url: largeURL).completion { request, data in
 			print("Completed")
 		}.error { request, error in
 			print("Failed with error: \(error)")
@@ -34,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let smallURL = URL(string: "http://stackoverflow.com/questions/34182482/nsurlsessiondatadelegate-not-called")!
 		
 		
-		let connection = Plug.request(.GET, URL: smallURL).completion { request, data in
+		let connection = Plug.request(method: .GET, url: smallURL).completion { request, data in
 			print("Completed, got \(data.length) bytes")
 		}.error { request, error in
 			print("Failed with error: \(error)")
@@ -44,18 +44,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 	
 	func testMimeUpload() {
-		let fileURL = Bundle.main().URLForResource("sample_image", withExtension: "png")
+		let fileURL = Bundle.main().urlForResource("sample_image", withExtension: "png")
 		let url = "http://posttestserver.com/post.php"
 		let payloadDict = ["Sample_Item": ["embedded": "data goes here", "Test": "Field 1", "one-level-more": ["name": "Bonzai", "career": "Buckaroo"]]]
 		
 		let components = Plug.FormComponents(fields: payloadDict)
-		components.addFile(fileURL, name: "test file", mimeType: "image/png")
+		components.addFile(url: fileURL, name: "test file", mimeType: "image/png")
 		
 		let payload = Plug.Parameters.Form(components)
 		
 		
 		
-		Plug.request(.POST, URL: url, parameters: payload).completion { request, data in
+		Plug.request(method: .POST, url: url, parameters: payload).completion { request, data in
 			print("Request: \(request)")
 		}.error { request, error in
 				
@@ -63,27 +63,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 	
 	func testJSONDownload() {
-		let url = URL(string: "http://jsonview.com/example.json")!
+		let url = "http://jsonview.com/example.json"
 		
-		JSONConnection(URL: url)?.completion { (request: Connection, json: JSONDictionary) in
-			print("Request: \(request)")
+		JSONConnection(JSONRepresentation: ["url": url])?.completion { (request: Connection, json: JSONDictionary) in
+			print("Request: \(json)")
 		}.start()
 	}
 
-	func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-//		Plug.instance.setup()
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+		Plug.instance.setup()
 		
 //		self.testLargeDownloads()
 //		self.testLargeDownloads()
-//		for _ in 0...10 {
-//			self.testJSONDownload()
-//		}
-		self.testJSONDownload()
-
+		for _ in 0...10 {
+			self.testJSONDownload()
+		}
 		return true
 	}
 
-	func applicationWillResignActive(application: UIApplication) {
+	func applicationWillResignActive(_ application: UIApplication) {
 	}
 
 	func timeoutTests() {
@@ -92,35 +90,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		//let largeURL = URL(string: "https://developer.apple.com/services-account/download?path=/iOS/iAd_Producer_5.1/iAd_Producer_5.1.dmg")!
 		
 		let url = URL(string: "https://192.168.1.62")!
-		let request = Plug.request(.GET, URL: url)
+		let request = Plug.request(method: .GET, url: url)
 		
-		request.completion { req, data in
+		_ = request.completion { req, data in
 			print("complete")
 		}
 		
-		request.error { req, error in
+		_ = request.error { req, error in
 			print("Error: \(error)")
 		}
 		
 		request.start()
 	}
 	
-	func applicationDidEnterBackground(application: UIApplication) {
+	func applicationDidEnterBackground(_ application: UIApplication) {
 		let url = "https://serenitynow.herokuapp.com/devices/online"
-		let args = ["device": ["udid": UIDevice.currentDevice().identifierForVendor!.UUIDString]]
+		let args = ["device": ["udid": UIDevice.current().identifierForVendor!.uuidString]]
 	
-		Plug.request(.DELETE, URL: url, parameters: Plug.Parameters.JSON(args)).completion { conn, data in
-			print("got it \(NSString(data: data.data, encoding: String.Encoding.utf8))")
+		Plug.request(method: .DELETE, url: url, parameters: Plug.Parameters.JSON(args)).completion { conn, data in
+			print("got it \(NSString(data: data.data, encoding: String.Encoding.utf8.rawValue))")
 		}.start()
 	}
 
-	func applicationWillEnterForeground(application: UIApplication) {
+	func applicationWillEnterForeground(_ application: UIApplication) {
 	}
 
-	func applicationDidBecomeActive(application: UIApplication) {
+	func applicationDidBecomeActive(_ application: UIApplication) {
 	}
 
-	func applicationWillTerminate(application: UIApplication) {
+	func applicationWillTerminate(_ application: UIApplication) {
 	}
 
 
