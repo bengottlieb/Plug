@@ -32,22 +32,22 @@ public protocol JSONConvertible {
 
 extension NSString: JSONObject {
 	public var JSONString: String? { return (self as String) }
-	public var JSONData: Data? { return self.dataUsingEncoding(String.Encoding.utf8) }
+	public var JSONData: Data? { return self.data(using: String.Encoding.utf8.rawValue) }
 }
 
 extension Data: JSONObject {
-	public var JSONString: String? { return self.base64EncodedStringWithOptions([]) }
-	public var JSONData: Data? { return self.base64EncodedStringWithOptions([]).dataUsingEncoding(String.Encoding.utf8) }
+	public var JSONString: String? { return self.base64EncodedString([]) }
+	public var JSONData: Data? { return self.base64EncodedString([]).data(using: String.Encoding.utf8) }
 }
 
 extension NSNumber: JSONObject {
 	public var JSONString: String? { return self.description }
-	public var JSONData: Data? { return self.description.dataUsingEncoding(String.Encoding.utf8) }
+	public var JSONData: Data? { return self.description.data(using: String.Encoding.utf8) }
 }
 
 extension Bool: JSONObject {
 	public var JSONString: String? { return self ? "true" : "false" }
-	public var JSONData: Data? { return self.JSONString?.dataUsingEncoding(String.Encoding.utf8) }
+	public var JSONData: Data? { return self.JSONString?.data(using: String.Encoding.utf8) }
 }
 
 extension JSONObject {
@@ -70,7 +70,7 @@ extension Array: JSONContainer {}
 extension NSDictionary: JSONObject {
 	public var JSONData: Data? {
 		do {
-			return try JSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
+			return try JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
 		} catch let error {
 			print("Unable to convert \(self) to JSON: \(error)")
 			return nil
@@ -82,7 +82,7 @@ extension NSDictionary: JSONObject {
 extension NSArray: JSONObject {
 	public var JSONData: Data? {
 		do {
-			return try JSONSerialization.dataWithJSONObject(self, options: .PrettyPrinted)
+			return try JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
 		} catch let error {
 			print("Unable to convert \(self) to JSON: \(error)")
 			return nil
@@ -93,7 +93,7 @@ extension NSArray: JSONObject {
 public extension Data {
 	public func jsonDictionary(options: JSONSerialization.ReadingOptions = []) -> JSONDictionary? {
 		do {
-			let dict = try JSONSerialization.JSONObjectWithData(self, options: options) as? JSONDictionary
+			let dict = try JSONSerialization.jsonObject(with: self, options: options) as? JSONDictionary
 			return dict
 		} catch let error {
 			print("Error while parsing JSON Dictionary: \(error)")
@@ -103,7 +103,7 @@ public extension Data {
 	
 	public func jsonArray(options: JSONSerialization.ReadingOptions = []) -> JSONArray? {
 		do {
-			let dict = try JSONSerialization.JSONObjectWithData(self, options: options) as? JSONArray
+			let dict = try JSONSerialization.jsonObject(with: self, options: options) as? JSONArray
 			return dict
 		} catch let error {
 			print("Error while parsing JSON Array: \(error)")
@@ -111,9 +111,9 @@ public extension Data {
 		return nil
 	}
 	
-	public func jsonContainer(options: NSJSONReadingOptions = []) -> JSONContainer? {
+	public func jsonContainer(options: JSONSerialization.ReadingOptions = []) -> JSONContainer? {
 		do {
-			let container = try JSONSerialization.JSONObjectWithData(self, options: options)
+			let container = try JSONSerialization.jsonObject(with: self, options: options)
 			
 			if let array = container as? JSONArray { return array }
 			if let dict = container as? JSONDictionary { return dict }
@@ -124,16 +124,16 @@ public extension Data {
 	}
 }
 
-let JSONSeparatorsCharacterSet = NSCharacterSet(charactersInString: ".[]")
+let JSONSeparatorsCharacterSet = CharacterSet(charactersIn: ".[]")
 extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
 //	public func path(path: String) -> AnyObject? {
 	public subscript(path path: String) -> AnyObject? {
-		let components = path.componentsSeparatedByCharactersInSet(JSONSeparatorsCharacterSet)
+		let components = path.components(separatedBy: JSONSeparatorsCharacterSet)
 		return self[components: components]
 	}
 	
 	public subscript(int int: String) -> Int? {
-		let components = int.componentsSeparatedByCharactersInSet(JSONSeparatorsCharacterSet)
+		let components = int.components(separatedBy: JSONSeparatorsCharacterSet)
 		if let integer = self[components: components] as? Int { return integer }
 		if let str = self[components: components] as? String { return Int(str) }
 		return nil
@@ -143,12 +143,12 @@ extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
 		guard let dict = (self as? AnyObject) as? [String: AnyObject] else { return nil }
 		var components = comps
 		
-		while components.first == "" { components.removeAtIndex(0) }
+		while components.first == "" { components.remove(at: 0) }
 		guard components.count > 0 else { return nil }
 		
 		let key = components[0]
 
-		components.removeAtIndex(0)
+		components.remove(at: 0)
 		guard components.count > 0 else { return dict[key] }
 		
 		if Int(components[0]) != nil {
@@ -162,8 +162,8 @@ extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
 
 	public var JSONString: String? {
 		do {
-			let data = try JSONSerialization.dataWithJSONObject(self as! AnyObject, options: .PrettyPrinted)
-			return (NSString(data: data, encoding: String.Encoding.utf8) as? String) ?? ""
+			let data = try JSONSerialization.data(withJSONObject: self as! AnyObject, options: .prettyPrinted)
+			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as? String) ?? ""
 		} catch let error as NSError {
 			print("error while deserializing a JSON object: \(error)")
 		}
@@ -179,17 +179,17 @@ extension Dictionary: JSONObject {
 		}
 		return nil
 	}
-	public var JSONData: Data? { return self.JSONString?.dataUsingEncoding(String.Encoding.utf8) }
+	public var JSONData: Data? { return self.JSONString?.data(using: String.Encoding.utf8) }
 }
 
 extension Array: JSONObject {
 	public subscript(path: String) -> AnyObject? {
-		let components = path.componentsSeparatedByCharactersInSet(JSONSeparatorsCharacterSet)
+		let components = path.components(separatedBy: JSONSeparatorsCharacterSet)
 		return self[components: components]
 	}
 	
 	public subscript(int int: String) -> Int? {
-		let components = int.componentsSeparatedByCharactersInSet(JSONSeparatorsCharacterSet)
+		let components = int.components(separatedBy: JSONSeparatorsCharacterSet)
 		if let integer = self[components: components] as? Int { return integer }
 		if let str = self[components: components] as? String { return Int(str) }
 		return nil
@@ -198,12 +198,12 @@ extension Array: JSONObject {
 	public subscript(components comps: [String]) -> AnyObject? {
 		var components = comps
 		
-		while components.first == "" { components.removeAtIndex(0) }
+		while components.first == "" { components.remove(at: 0) }
 		guard components.count > 0 else { return nil }
 		
 		guard let index = Int(components[0]) else { return nil }
-		components.removeAtIndex(0)
-		while components.first == "" { components.removeAtIndex(0) }
+		components.remove(at: 0)
+		while components.first == "" { components.remove(at: 0) }
 		guard components.count > 0 else { return self[index] as? AnyObject }
 		
 		if Int(components[0]) != nil {
@@ -217,8 +217,8 @@ extension Array: JSONObject {
 
 	public var JSONString: String? {
 		do {
-			let data = try JSONSerialization.dataWithJSONObject((self as! AnyObject) as! [AnyObject], options: .PrettyPrinted)
-			return (NSString(data: data, encoding: String.Encoding.utf8) as? String) ?? ""
+			let data = try JSONSerialization.data(withJSONObject: (self as! AnyObject) as! [AnyObject], options: .prettyPrinted)
+			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as? String) ?? ""
 		} catch let error as NSError {
 			print("error while deserializing a JSON object: \(error)")
 		}
@@ -226,6 +226,6 @@ extension Array: JSONObject {
 		return nil
 	}
 	
-	public var JSONData: Data? { return self.JSONString?.dataUsingEncoding(String.Encoding.utf8) }
+	public var JSONData: Data? { return self.JSONString?.data(using: String.Encoding.utf8) }
 	var description: String { return self.JSONString ?? "" }
 }

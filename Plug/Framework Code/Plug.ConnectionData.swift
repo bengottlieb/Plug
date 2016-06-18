@@ -14,13 +14,15 @@ public extension Plug {
 		public var data: Data {
 			if let data = self.rawData { return data }
 			
-			if let url = self.URL {
-				self.rawData = Data(contentsOfURL: url)
+			if let url = self.url {
+				do {
+					try self.rawData = Data(contentsOf: url)
+				} catch {}
 			}
 			
 			return self.rawData ?? Data()
 		}
-		public var URL: URL?
+		public var url: URL?
 		private var rawData: Data?
 		
 		init?(data: Data?, size: UInt64) {
@@ -29,10 +31,10 @@ public extension Plug {
 			self.rawData = data
 		}
 		
-		init?(URL: URL?, size: UInt64) {
+		init?(url: URL?, size: UInt64) {
 			length = size
-			if URL == nil { return nil }
-			self.URL = URL
+			if url == nil { return nil }
+			self.url = url
 		}
 		
 		public var length: UInt64

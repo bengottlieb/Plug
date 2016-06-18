@@ -31,7 +31,7 @@ public extension NSError {
 	
 	
 	public var isTimeoutError: Bool {
-		return self.domain == URLErrorDomain && self.code == -1001
+		return self.domain == NSURLErrorDomain && self.code == -1001
 	}
 }
 

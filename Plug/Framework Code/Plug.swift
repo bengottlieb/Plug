@@ -182,15 +182,15 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 //		self[task]?.response = response
 //	}
 
-	public func URLSession(session: URLSession, dataTask: URLSessionDataTask, didReceiveData data: Data) {
+	public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
 		guard let task = self[dataTask] else { return }
 		
 		if task.response == nil { task.response = dataTask.response }
 		
-		task.receivedData(data)
+		task.received(data)
 	}
 	
-	subscript(toChannel task: URLSessionTask) -> Plug.Channel? {
+	subscript(toChannel task: URLSessionTask) -> Channel? {
 		get {
 			var channel: Plug.Channel?
 			self.serialQueue.addOperations( [ BlockOperation(block: {
@@ -210,22 +210,22 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 			return channel?[task]  }
 		}
 
-	public func URLSession(session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingToURL location: URL) {
+	public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
 		
 	}
 
-	public func URLSession(session: URLSession, task: URLSessionTask, didCompleteWithError error: NSError?) {
+	public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: NSError?) {
 		if let err = error where err.code == -1005 {
 			print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 		}
 		if let error = error {
-			self[task]?.failedWithError(error)
+			self[task]?.failedWithError(error: error)
 		} else {
 			self[task]?.succeeded()
 		}
 	}
 	
-	public func URLSession(session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: (URLRequest?) -> Void) {
+	public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: (URLRequest?) -> Void) {
 		print("Received redirect request from \(task.originalRequest)")
 		completionHandler(request)
 	}
@@ -237,14 +237,14 @@ extension Plug {
 	func register(connection: Connection) {
 		if let task = connection.task {
 			connection.channel.connections[task.taskIdentifier] = connection
-			if connection.persistence.isPersistent { PersistenceManager.defaultManager.registerPersisitentConnection(connection) }
+			if connection.persistence.isPersistent { PersistenceManager.defaultManager.register(connection) }
 		}
 	}
 	
 	func unregister(connection: Connection) {
 		if let task = connection.task {
-			connection.channel.connections.removeValueForKey(task.taskIdentifier)
-			if connection.persistence.isPersistent { PersistenceManager.defaultManager.unregisterPersisitentConnection(connection) }
+			connection.channel.connections.removeValue(forKey: task.taskIdentifier)
+			if connection.persistence.isPersistent { PersistenceManager.defaultManager.unregister(connection) }
 		}
 	}
 	

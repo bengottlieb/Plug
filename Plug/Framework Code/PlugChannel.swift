@@ -75,7 +75,7 @@ extension Plug {
 		}
 		
 		func serialize(block: () -> Void) {
-			if OperationQueue.currentQueue() == self.queue {
+			if OperationQueue.current() == self.queue {
 				block()
 			} else {
 				self.queue.addOperations([ BlockOperation(block: block) ], waitUntilFinished: true)
@@ -88,14 +88,14 @@ extension Plug {
 				if self.queueState != .Running { print("Queing connection on a non-running queue (\(self))") }
 				connection.state = .Queuing
 				
-				if connection.coalescing == .CoalesceSimilarConnections, let existing = self.existingConnectionMatching(connection) {
+				if connection.coalescing == .CoalesceSimilarConnections, let existing = self.existing(matching: connection) {
 					existing.addSubconnection(connection)
 				} else {
 					self.waitingConnections.append(connection)
 					self.updateQueue()
 					connection.state = .Queued
 				}
-				NotificationCenter.default().postNotificationName(Plug.notifications.connectionQueued, object: connection)
+				NotificationCenter.default().post(name: Plug.notifications.connectionQueued, object: connection)
 			}
 		}
 		
@@ -107,37 +107,37 @@ extension Plug {
 		
 		func dequeue(connection: Connection) {
 			self.serialize {
-				self.removeWaitingConnection(connection)
+				self.removeWaiting(connection)
 				self.updateQueue()
 			}
 		}
 		
-		func removeWaiting(connection: Connection) {
+		func removeWaiting(_ connection: Connection) {
 			self.unfinishedConnections.remove(connection)
-			if let index = self.waitingConnections.indexOf(connection) {
-				self.waitingConnections.removeAtIndex(index)
+			if let index = self.waitingConnections.index(of: connection) {
+				self.waitingConnections.remove(at: index)
 			}
 		}
 		
-		func removeActive(connection: Connection) {
-			if let index = self.activeConnections.indexOf(connection) {
-				self.activeConnections.removeAtIndex(index)
+		func removeActive(_ connection: Connection) {
+			if let index = self.activeConnections.index(of: connection) {
+				self.activeConnections.remove(at: index)
 			}
 		}
 		
 		func connectionStarted(connection: Connection) {
 			self.startBackgroundTask()
 			self.serialize {
-				if let index = self.waitingConnections.indexOf(connection) { self.waitingConnections.removeAtIndex(index) }
-				if self.activeConnections.indexOf(connection) == -1 { self.activeConnections.append(connection) }
-				NotificationCenter.default().postNotificationName(Plug.notifications.connectionStarted, object: connection)
+				if let index = self.waitingConnections.index(of: connection) { self.waitingConnections.remove(at: index) }
+				if self.activeConnections.index(of: connection) == -1 { self.activeConnections.append(connection) }
+				NotificationCenter.default().post(name: Plug.notifications.connectionStarted, object: connection)
 			}
 		}
 		
 		func connectionStopped(connection: Connection, totallyRemove: Bool = false) {
 			self.serialize {
 				if totallyRemove { self.unfinishedConnections.remove(connection) }
-				self.removeActiveConnection(connection)
+				self.removeActive(connection)
 				self.updateQueue()
 			}
 		}
@@ -152,8 +152,8 @@ extension Plug {
 			func startBackgroundTask() {
 				if self.backgroundTaskID == nil {
 					self.serialize {
-						self.backgroundTaskID = Plug.instance.backgroundActivityHandler?.beginBackgroundTaskWithName("plug.queue.\(self.name)", expirationHandler: {
-							self.endBackgroundTask(true)
+						self.backgroundTaskID = Plug.instance.backgroundActivityHandler?.beginBackgroundTaskWithName(taskName: "plug.queue.\(self.name)", expirationHandler: {
+							self.endBackgroundTask(onlyClearTaskID: true)
 							self.pauseQueue()
 						})
 					}
@@ -163,9 +163,9 @@ extension Plug {
 			func endBackgroundTask(onlyClearTaskID: Bool) {
 				self.serialize {
 					if let taskID = self.backgroundTaskID where !self.isRunning {
-						dispatch_async(dispatch_get_main_queue(), {
-							if (!onlyClearTaskID) { Plug.instance.backgroundActivityHandler?.endBackgroundTask(taskID) }
-						})
+						DispatchQueue.main.async {
+							if (!onlyClearTaskID) { Plug.instance.backgroundActivityHandler?.endBackgroundTask(identifier: taskID) }
+						}
 						self.backgroundTaskID = nil
 					}
 				}
@@ -178,13 +178,13 @@ extension Plug {
 		func updateQueue() {
 			self.serialize {
 				if !self.isRunning {
-					self.endBackgroundTask(false)
+					self.endBackgroundTask(onlyClearTaskID: false)
 					return
 				}
 				
 				if self.waitingConnections.count > 0 && (self.maximumActiveConnections == 0 || self.activeConnections.count < self.maximumActiveConnections) {
 					let connection = self.waitingConnections[0]
-					self.waitingConnections.removeAtIndex(0)
+					self.waitingConnections.remove(at: 0)
 					self.activeConnections.append(connection)
 					connection.run()
 				}
@@ -196,14 +196,14 @@ extension Plug {
 			get { var connection: Connection?; self.queue.addOperations( [ BlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true); return connection  }
 			set { self.serialize {
 				if newValue == nil, let existing = self.connections[task.taskIdentifier] {
-					self.removeWaitingConnection(existing)
-					self.removeActiveConnection(existing)
+					self.removeWaiting(existing)
+					self.removeActive(existing)
 				}
 				self.connections[task.taskIdentifier] = newValue
 			} }
 		}
 		
-		func existingMatching(connection: Connection) -> Connection? {
+		func existing(matching connection: Connection) -> Connection? {
 			for existing in self.activeConnections {
 				if existing === connection { continue }
 				if existing == connection { return existing }

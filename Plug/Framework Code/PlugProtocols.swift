@@ -19,19 +19,19 @@ public protocol URLRequestLike {
 
 extension URL: URLLike {
 	public var url: URL? { return self }
-	public func isEqual(object: URLLike) -> Bool {
+	public func isEqual(other object: URLLike) -> Bool {
 		if let other = object as? URL { return other.absoluteString == self.absoluteString }
 		return false
 	}
 }
 extension String: URLLike {
 	public var url: URL? { return URL(string: self) }
-	public func isEqual(object: URLLike) -> Bool {
+	public func isEqual(other object: URLLike) -> Bool {
 		if let other = object as? String { return other == self }
 		return false
 	}
 }
 
 func ==(lhs: URLLike, rhs: URLLike) -> Bool {
-	return lhs.isEqual(rhs)
+	return lhs.isEqual(other: rhs)
 }

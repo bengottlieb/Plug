@@ -12,7 +12,7 @@ public extension Plug {
 	public class PersistenceManager {
 		public class var defaultManager: PersistenceManager { struct s { static let mgr = PersistenceManager() }; return s.mgr }
 		
-		public func registerObject(object: PlugPersistentDelegate) {
+		public func register(_ object: PlugPersistentDelegate) {
 			self.persistentDelegates[object.persistenceInfo] = object
 		}
 		
@@ -25,7 +25,7 @@ public extension Plug {
 		var persistentConnections: [Connection] = []
 		var queue: OperationQueue = { var q = OperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
 		
-		func registerPersisitent(connection: Connection) {
+		func register(_ connection: Connection) {
 			self.queue.addOperation {
 				if self.persistentConnections.index(of: connection) == nil {
 					self.persistentConnections.append(connection)
@@ -34,7 +34,7 @@ public extension Plug {
 			}
 		}
 		
-		func unregisterPersisitent(connection: Connection) {
+		func unregister(_ connection: Connection) {
 			self.queue.addOperation {
 				if let index = self.persistentConnections.index(of: connection) {
 					self.persistentConnections.remove(at: index)
@@ -52,7 +52,7 @@ public extension Plug {
 					if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [NSDictionary] {
 						for dict in json {
 							if let connection = Connection(JSONRepresentation: dict) {
-								connection.channel.enqueue(connection)
+								connection.channel.enqueue(connection: connection)
 							}
 						}
 					}
@@ -121,7 +121,7 @@ extension Connection {
 		
 		let parameters = Plug.Parameters(dictionary: parametersData ?? [:])
 		
-		self.init(method: method ?? .GET, URL: url, parameters: parameters, persistence: (persistance == nil) ? .PersistRequest : .Persistent(persistance!), channel: channel)
+		self.init(method: method ?? .GET, url: url, parameters: parameters, persistence: (persistance == nil) ? .PersistRequest : .Persistent(persistance!), channel: channel)
 	}
 }
 

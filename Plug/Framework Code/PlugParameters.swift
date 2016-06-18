@@ -45,7 +45,7 @@ extension Plug {
 		}
 		
 		var dataValue: Data {
-			let data = NSMutableData()
+			var data = Data()
 			let fields = self.labeledFieldsArray(dict: self.fields)
 			
 			for (key, value) in fields {
@@ -53,14 +53,14 @@ extension Plug {
 							 "Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n",
 							 "\(value)\r\n"
 					] {
-					if let lineData = line.data(String.Encoding.utf8) {
-						data.appendData(lineData)
+					if let lineData = line.data(using: String.Encoding.utf8) {
+						data.append(lineData)
 					}
 				}
 			}
 			
 			for (name, mimeType, url) in self.fileURLs {
-				guard let filedata = Data(contentsOfURL: url) else { continue }
+				guard let filedata = try? Data(contentsOf: url) else { continue }
 				guard let path = url.path else { continue }
 				let filename = (path as NSString).lastPathComponent
 				
@@ -68,17 +68,17 @@ extension Plug {
 					"Content-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\r\n",
 					"Content-Type: \(mimeType)\r\n\r\n"
 					] {
-						if let lineData = line.dataUsingEncoding(String.Encoding.utf8) {
-							data.appendData(lineData)
+						if let lineData = line.data(using: String.Encoding.utf8) {
+							data.append(lineData)
 						}
 				}
-				data.appendData(filedata)
-				data.appendData("\(self.boundary)\r\n".dataUsingEncoding(String.Encoding.utf8)!)
+				data.append(filedata)
+				data.append("\(self.boundary)\r\n".data(using: String.Encoding.utf8)!)
 			}
 	
-			data.appendData("--\(self.boundary)--\r\n".dataUsingEncoding(String.Encoding.utf8)!)
+			data.append("--\(self.boundary)--\r\n".data(using: String.Encoding.utf8)!)
 
-			return data
+			return data as Data
 		}
 		
 		var JSONValue: String {
@@ -91,7 +91,7 @@ extension Plug {
 		
 		public var description: String {
 			var string = ""
-			let fields = self.labeledFieldsArray(self.fields)
+			let fields = self.labeledFieldsArray(dict: self.fields)
 			
 			for (key, value) in fields {
 				for line in ["--\(self.boundary)\r\n",
@@ -103,7 +103,7 @@ extension Plug {
 			}
 			
 			for (name, mimeType, url) in self.fileURLs {
-				guard let filedata = Data(contentsOfURL: url) else { continue }
+				guard let filedata = try? Data(contentsOf: url) else { continue }
 				guard let path = url.path else { continue }
 				let filename = (path as NSString).lastPathComponent
 				
@@ -113,7 +113,7 @@ extension Plug {
 					] {
 						string += line
 				}
-				string += "<<<<<<\(filedata.length) bytes>>>>>>\n"
+				string += "<<<<<<\(filedata.count) bytes>>>>>>\n"
 				string += "\(self.boundary)\n"
 			}
 			
@@ -133,7 +133,7 @@ extension Plug {
 			switch (self) {
 			case .URL(let params):
 				if params.keys.count == 0 { return "" }
-				return (params.keys.reduce("?") { if let v = params[$1] { return $0 + "\($1)=\(v.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!)&" }; return $0 })
+				return (params.keys.reduce("?") { if let v = params[$1] { return $0 + "\($1)=\(v.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlHostAllowed)!)&" }; return $0 })
 				
 			case .Form:
 				return ""
@@ -167,7 +167,7 @@ extension Plug {
 			case .Form(let components):
 				return components.dataValue
 			case .JSON:
-				return self.stringValue.dataUsingEncoding(String.Encoding.utf8, allowLossyConversion: false)
+				return self.stringValue.data(using: String.Encoding.utf8, allowLossyConversion: false)
 			default: return nil
 			}
 		}

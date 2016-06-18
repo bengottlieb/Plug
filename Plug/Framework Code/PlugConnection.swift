@@ -22,7 +22,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	
 	// set at or immediately after instantiation
 	public let method: Plug.Method
-	public var url: URL { get { return self.URLLike.url ?? URL() } }
+	public var url: URL { get { return self.urlLike.url ?? URL(string: "about:blank")! } }
 	public var destinationFileURL: URL?
 	public let requestQueue: OperationQueue
 	public let parameters: Plug.Parameters
@@ -43,7 +43,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	public private(set) var completedAt: Date? { didSet { self.subconnections.forEach { $0.completedAt = self.completedAt } } }
 	var task: URLSessionTask? { didSet { self.subconnections.forEach { $0.task = self.task } } }
 	public private(set) var resultsError: NSError?  { didSet { self.subconnections.forEach { $0.resultsError = self.resultsError } } }
-	var resultsData: NSMutableData? { didSet { self.subconnections.forEach { $0.resultsData = self.resultsData } } }
+	var resultsData: Data? { didSet { self.subconnections.forEach { $0.resultsData = self.resultsData } } }
 	var bytesReceived: UInt64 = 0 { didSet { self.subconnections.forEach { $0.bytesReceived = self.bytesReceived } } }
 	var fileHandle: FileHandle! { didSet { self.subconnections.forEach { $0.fileHandle = self.fileHandle } } }
 	
@@ -66,7 +66,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	public var elapsedTime: TimeInterval {
 		if let startedAt = self.startedAt {
 			if let completedAt = self.completedAt {
-				return abs(startedAt.timeIntervalSinceDate(completedAt))
+				return abs(startedAt.timeIntervalSince(completedAt))
 			} else {
 				return abs(startedAt.timeIntervalSinceNow)
 			}
@@ -75,7 +75,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	}
 	
 	public var hashValue: Int {
-		return self.url.absoluteString.hash
+		return self.url.absoluteString!.hash
 	}
 
 	public func addHeader(header: Plug.Header) {
@@ -97,7 +97,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	var subconnections: [Connection] = []
 	var superconnection: Connection?
 	
-	public init?(method meth: Plug.Method = .GET, url url: urlLike, parameters params: Plug.Parameters? = nil, persistence persist: Plug.Persistence = .Transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
+	public init?(method meth: Plug.Method = .GET, url: URLLike, parameters params: Plug.Parameters? = nil, persistence persist: Plug.Persistence = .Transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
 		requestQueue = OperationQueue()
 		requestQueue.maxConcurrentOperationCount = 1
 		
@@ -105,20 +105,20 @@ public class Connection: Hashable, CustomStringConvertible {
 		parameters = params ?? .None
 		channel = chn
 		
-		method = parameters.normalizeMethod(meth)
+		method = parameters.normalizeMethod(method: meth)
 		urlLike = url
 		
 		//super.init()
-		channel.addConnectionToChannel(self)
-		if url.URL == nil {
+		channel.addToChannel(connection: self)
+		if url.url == nil {
 			print("Unable to create a connection with URL: \(url)")
 
 			return nil
 		}
-		if let header = self.parameters.contentTypeHeader { self.addHeader(header) }
+		if let header = self.parameters.contentTypeHeader { self.addHeader(header: header) }
 
 		if Plug.instance.autostartConnections {
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+			DispatchQueue.main.after(when: DispatchTime.now() + 0.5) {
 				self.start()
 			}
 		}
@@ -126,7 +126,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	
 	func generateTask() -> URLSessionTask? {
 		if self.task != nil { return self.task }
-		self.task = Plug.instance.session.dataTaskWithRequest(self.request ?? self.defaultRequest)
+		self.task = Plug.instance.session.dataTask(with: self.request ?? self.defaultRequest)
 		
 		if let identifier = self.task?.taskIdentifier {
 			Plug.instance.channels[identifier] = self.channel
@@ -134,31 +134,31 @@ public class Connection: Hashable, CustomStringConvertible {
 		return self.task
 	}
 			
-	func receivedData(data: Data) {
-		self.bytesReceived += UInt64(data.length)
+	func received(_ data: Data) {
+		self.bytesReceived += UInt64(data.count)
 		if let destURL = self.destinationFileURL, path = destURL.path {
 			if self.fileHandle == nil {
 				do {
-					try FileManager.default().createDirectoryAtURL(destURL.URLByDeletingLastPathComponent!, withIntermediateDirectories: true, attributes: nil)
+					try FileManager.default().createDirectory(at: destURL.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
 				} catch let error {
 					print("Error while creating directory for file: \(error)")
 				}
 				
-				if !FileManager.default().fileExistsAtPath(path) {
-					if !FileManager.default().createFileAtPath(path, contents: nil, attributes: nil) {
+				if !FileManager.default().fileExists(atPath: path) {
+					if !FileManager.default().createFile(atPath: path, contents: nil, attributes: nil) {
 						print("Unable to create a file at: \(path)")
 					}
 				}
 				do {
-					self.fileHandle = try FileHandle(forWritingToURL: destURL)
+					self.fileHandle = try FileHandle(forWritingTo: destURL)
 				} catch let error {
 					print("Error while opening file: \(error)")
 				}
 			}
-			self.fileHandle.writeData(data)
+			self.fileHandle.write(data)
 		} else {
-			if self.resultsData == nil { self.resultsData = NSMutableData() }
-			self.resultsData?.appendData(data)
+			if self.resultsData == nil { self.resultsData = Data() }
+			self.resultsData?.append(data)
 		}
 		
 		if let total = self.expectedContentLength {
@@ -170,7 +170,7 @@ public class Connection: Hashable, CustomStringConvertible {
 		self.response = self.task?.response
 		if let httpResponse = self.response as? HTTPURLResponse { self.statusCode = httpResponse.statusCode }
 		self.resultsError = self.task?.response?.error
-		self.complete(.Completed)
+		self.complete(state: .Completed)
 	}
 	
 	func failedWithError(error: NSError?) {
@@ -180,30 +180,30 @@ public class Connection: Hashable, CustomStringConvertible {
 		self.response = self.task?.response
 		if let httpResponse = self.response as? HTTPURLResponse { self.statusCode = httpResponse.statusCode }
 		self.resultsError = error ?? self.task?.response?.error
-		self.complete(.CompletedWithError)
+		self.complete(state: .CompletedWithError)
 	}
 
 	var defaultRequest: URLRequest {
-		let urlString = self.URL.absoluteString + self.parameters.URLString
-		let request = NSMutableURLRequest(URL: URL(string: urlString)!)
+		let urlString = self.url.absoluteString! + self.parameters.URLString
+		var request = URLRequest(url: URL(string: urlString)!)
 		let headers = (self.headers ?? Plug.instance.defaultHeaders)
 		
 		request.allHTTPHeaderFields = headers.dictionary
-		request.HTTPMethod = self.method.rawValue
-		request.HTTPBody = self.parameters.bodyData
+		request.httpMethod = self.method.rawValue
+		request.httpBody = self.parameters.bodyData
 		request.cachePolicy = self.cachingPolicy
 		
 		return request
 	}
 	
 	public func notifyPersistentDelegateOfCompletion() {
-		self.persistence.persistentDelegate?.connectionCompleted(self, info: self.persistence.persistentInfo)
+		self.persistence.persistentDelegate?.connectionCompleted(connection: self, info: self.persistence.persistentInfo)
 	}
 
-	static var noopConnection: Connection { return Connection(URL: "about:blank")! }
+	static var noopConnection: Connection { return Connection(JSONRepresentation: ["url": "about:blank"])! }
 
-	func handleDownloadedData(data: Plug.ConnectionData) {
-		let queue = self.completionQueue ?? OperationQueue.mainQueue()
+	func handleDownload(data: Plug.ConnectionData) {
+		let queue = self.completionQueue ?? OperationQueue.main()
 		
 		for block in self.completionBlocks {
 			let op = BlockOperation(block: { block(self, data) })
@@ -247,12 +247,12 @@ extension Connection {
 
 	public func detailedDescription(includeDelimiters: Bool = true) -> String {
 		guard let request = self.generateTask()?.originalRequest else { return "--empty connectionu--" }
-		var URL = "[no URL]"
-		if let url = request.URL { URL = url.description }
+		var url = "[no URL]"
+		if let requestURL = request.url { url = requestURL.description }
 		var string = includeDelimiters ? "\n▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽\n" : ""
 		let durationString = self.elapsedTime > 0.0 ? String(format: "%.2f", self.elapsedTime) + " sec elapsed" : ""
 		
-		string += "\(self.method) \(URL) \(self.parameters) \(durationString) 〘\(self.state) on \(self.channel.name)〙"
+		string += "\(self.method) \(url) \(self.parameters) \(durationString) 〘\(self.state) on \(self.channel.name)〙"
 		if let status = self.statusCode { string += " -> \(status)" }
 
 		
@@ -274,7 +274,7 @@ extension Connection {
 		if let data = self.resultsData {
 			var json: AnyObject?
 			do {
-				json = try JSONSerialization.JSONObjectWithData(data, options: [])
+				json = try JSONSerialization.jsonObject(with: data, options: [])
 			} catch {
 				json = nil
 			}
@@ -284,7 +284,7 @@ extension Connection {
 			if let json = json as? NSObject {
 				string += json.description
 			} else {
-				string += (NSString(data: data, encoding: String.Encoding.utf8)?.description ?? "--unable to parse data as! UTF8--")
+				string += (NSString(data: data as Data, encoding: String.Encoding.utf8.rawValue)?.description ?? "--unable to parse data as! UTF8--")
 			}
 		}
 		if !string.hasSuffix("\n") { string += "\n" }
@@ -293,24 +293,25 @@ extension Connection {
 	}
 	
 	public func logErrorToFile(label: String = "") {
-		let errorsDir = Plug.plugDirectoryURL.URLByAppendingPathComponent("Errors")
+		guard let errorsDir = try? Plug.plugDirectoryURL.appendingPathComponent("Errors") else { return }
 		let code = self.statusCode ?? 0
 		let seconds = Int(Date().timeIntervalSinceReferenceDate)
 		var host = ""
-		if let url = request?.URL { host = url.host ?? "" }
-		var filename = "\(code) \(host) \(seconds).txt".stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString("/", withString: "_")
+		if let url = request?.url { host = url.host ?? "" }
+		var filename = "\(code) \(host) \(seconds).txt"
+		filename = filename.replacingOccurrences(of: ":", with: "").replacingOccurrences(of: "/", with: "_")
 		if label != "" { filename = label + "- " + filename }
-		let filepath = errorsDir.URLByAppendingPathComponent(filename)
+		guard let filepath = try? errorsDir.appendingPathComponent(filename) else { return }
 		
 		do {
-			try FileManager.default().createDirectoryAtURL(errorsDir, withIntermediateDirectories: true, attributes: nil)
+			try FileManager.default().createDirectory(at: errorsDir, withIntermediateDirectories: true, attributes: nil)
 		} catch _ {
 		}
 		
-		let contents = self.detailedDescription(false)
+		let contents = self.detailedDescription(includeDelimiters: false)
 		
 		do {
-			try contents.writeToURL(filepath, atomically: true, encoding: String.Encoding.utf8)
+			try contents.data(using: String.Encoding.utf8)?.write(to: filepath, options: [.atomicWrite])
 		} catch _ {
 		}
 		
@@ -325,28 +326,28 @@ extension Connection {
 extension Connection {		//actions
 	public func start() {
 		if (state != .Waiting && state != .Queued) { return }
-		self.channel.enqueue(self)
+		self.channel.enqueue(connection: self)
 	}
 	
 	public func run() {
-		self.channel.connectionStarted(self)
+		self.channel.connectionStarted(connection: self)
 		self.state = .Running
 		self.task = self.generateTask()
-		Plug.instance.registerConnection(self)
+		Plug.instance.register(connection: self)
 		self.task!.resume()
 		self.startedAt = Date()
 	}
 	
 	public func suspend() {
 		if self.state != .Running { return }
-		self.channel.connectionStopped(self)
+		self.channel.connectionStopped(connection: self)
 		self.state = .Suspended
 		if self.superconnection == nil { self.task?.suspend() }
 	}
 	
 	public func resume() {
 		if self.state != .Suspended { return }
-		self.channel.connectionStarted(self)
+		self.channel.connectionStarted(connection: self)
 		self.state = .Running
 		if self.superconnection == nil { self.task?.resume() }
 	}
@@ -355,7 +356,7 @@ extension Connection {		//actions
 		self.channel.connectionStopped(connection: self, totallyRemove: true)
 		self.state = .Canceled
 		if self.superconnection == nil { self.task?.cancel() }
-		NotificationCenter.default().postNotificationName(Plug.notifications.connectionCancelled, object: self)
+		NotificationCenter.default().post(name: Plug.notifications.connectionCancelled, object: self)
 	}
 	
 	func complete(state: State, parent: Connection? = nil) {
@@ -377,28 +378,28 @@ extension Connection {		//actions
 		self.channel.dequeue(connection: self)
 		self.fileHandle?.closeFile()
 		
-		let data = Plug.ConnectionData(data: self.resultsData, size: self.bytesReceived) ?? Plug.ConnectionData(URL: self.destinationFileURL, size: self.bytesReceived)
+		let data = Plug.ConnectionData(data: self.resultsData, size: self.bytesReceived) ?? Plug.ConnectionData(url: self.destinationFileURL, size: self.bytesReceived)
 		
 		self.requestQueue.addOperation {
 			if data != nil || self.resultsError == nil {
-				self.handleDownloadedData(data ?? Plug.ConnectionData())
+				self.handleDownload(data: data ?? Plug.ConnectionData())
 			} else {
-				if let error = self.resultsError { self.reportError(error) }
+				if let error = self.resultsError { self.reportError(error: error) }
 			}
 		}
 		
-		self.subconnections.forEach { $0.complete(state, parent: self) }
+		self.subconnections.forEach { $0.complete(state: state, parent: self) }
 		self.requestQueue.addOperation({ self.notifyPersistentDelegateOfCompletion() })
 
 		if self.state == .Completed {
-			NotificationCenter.default().postNotificationName(Plug.notifications.connectionCompleted, object: self)
+			NotificationCenter.default().post(name: Plug.notifications.connectionCompleted, object: self)
 		} else {
-			NotificationCenter.default().postNotificationName(Plug.notifications.connectionFailed, object: self, userInfo: (self.resultsError != nil) ? ["error": self.resultsError!] : nil)
+			NotificationCenter.default().post(name: Plug.notifications.connectionFailed, object: self, userInfo: (self.resultsError != nil) ? ["error": self.resultsError!] : nil)
 		}
 	}
 	
 	func reportError(error: NSError) {
-		let queue = self.completionQueue ?? OperationQueue.mainQueue()
+		let queue = self.completionQueue ?? OperationQueue.main()
 		
 		for block in self.errorBlocks {
 			let op = BlockOperation(block: { block(self, error) })
@@ -408,8 +409,8 @@ extension Connection {		//actions
 }
 
 extension Connection {
-	func addSubconnection(connection: Connection) {
-		self.propagate(connection)
+	func addSubconnection(_ connection: Connection) {
+		self.propagate(connection: connection)
 		connection.superconnection = self
 		self.subconnections.append(connection)
 	}
@@ -427,7 +428,7 @@ extension Connection {
 }
 
 public func ==(lhs: Connection, rhs: Connection) -> Bool {
-	if !lhs.urlLike.isEqual(rhs.urlLike) { return false }
+	if !lhs.urlLike.isEqual(other: rhs.urlLike) { return false }
 	return lhs.parameters == rhs.parameters && lhs.method == rhs.method
 }
 

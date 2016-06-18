@@ -16,13 +16,13 @@ public class JSONConnection: Connection {
 	public var jsonDictionaryCompletionBlocks: [PlugJSONDictionaryCompletionClosure] = []
 	public var jsonArrayCompletionBlocks: [PlugJSONArrayCompletionClosure] = []
 	
-	override func handleDownloadedData(data: Plug.ConnectionData) {
-		let queue = self.completionQueue ?? OperationQueue.mainQueue()
+	override func handleDownload(data: Plug.ConnectionData) {
+		let queue = self.completionQueue ?? OperationQueue.main()
 		if let json = data.data.jsonContainer() {
 			if let dict = json as? JSONDictionary {
 				if self.jsonDictionaryCompletionBlocks.count == 0 {	//we got a dictionary, but weren't expecting it
 					print("Unexpected Dictionary from \(self).")
-					self.reportError(NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnexpectedJSONDictionary.rawValue, userInfo: ["connection": self]))
+					self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnexpectedJSONDictionary.rawValue, userInfo: ["connection": self]))
 				}
 				for block in self.jsonDictionaryCompletionBlocks {
 					let op = BlockOperation(block: { block(self, dict) })
@@ -32,7 +32,7 @@ public class JSONConnection: Connection {
 			} else if let array = json as? JSONArray {
 				if self.jsonArrayCompletionBlocks.count == 0 {	//we got a dictionary, but weren't expecting it
 					print("Unexpected Array from \(self).")
-					self.reportError(NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnexpectedJSONArray.rawValue, userInfo: ["connection": self]))
+					self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnexpectedJSONArray.rawValue, userInfo: ["connection": self]))
 				}
 				for block in self.jsonArrayCompletionBlocks {
 					let op = BlockOperation(block: { block(self, array) })
@@ -41,7 +41,7 @@ public class JSONConnection: Connection {
 				return
 			}
 		}
-		self.reportError(NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnableToFindJSONContainer.rawValue, userInfo: nil))
+		self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnableToFindJSONContainer.rawValue, userInfo: nil))
 	}
 
 	public func completion(completion: PlugJSONDictionaryCompletionClosure) -> Self {
