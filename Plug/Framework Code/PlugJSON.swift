@@ -36,8 +36,8 @@ extension NSString: JSONObject {
 }
 
 extension Data: JSONObject {
-	public var JSONString: String? { return self.base64EncodedString([]) }
-	public var JSONData: Data? { return self.base64EncodedString([]).data(using: String.Encoding.utf8) }
+	public var JSONString: String? { return self.base64EncodedString() }
+	public var JSONData: Data? { return self.base64EncodedString().data(using: String.Encoding.utf8) }
 }
 
 extension NSNumber: JSONObject {

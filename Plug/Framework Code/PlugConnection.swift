@@ -139,13 +139,13 @@ public class Connection: Hashable, CustomStringConvertible {
 		if let destURL = self.destinationFileURL, path = destURL.path {
 			if self.fileHandle == nil {
 				do {
-					try FileManager.default().createDirectory(at: destURL.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
+					try FileManager.default.createDirectory(at: destURL.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
 				} catch let error {
 					print("Error while creating directory for file: \(error)")
 				}
 				
-				if !FileManager.default().fileExists(atPath: path) {
-					if !FileManager.default().createFile(atPath: path, contents: nil, attributes: nil) {
+				if !FileManager.default.fileExists(atPath: path) {
+					if !FileManager.default.createFile(atPath: path, contents: nil, attributes: nil) {
 						print("Unable to create a file at: \(path)")
 					}
 				}
@@ -203,7 +203,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	static var noopConnection: Connection { return Connection(JSONRepresentation: ["url": "about:blank"])! }
 
 	func handleDownload(data: Plug.ConnectionData) {
-		let queue = self.completionQueue ?? OperationQueue.main()
+		let queue = self.completionQueue ?? OperationQueue.main
 		
 		for block in self.completionBlocks {
 			let op = BlockOperation(block: { block(self, data) })
@@ -304,7 +304,7 @@ extension Connection {
 		guard let filepath = try? errorsDir.appendingPathComponent(filename) else { return }
 		
 		do {
-			try FileManager.default().createDirectory(at: errorsDir, withIntermediateDirectories: true, attributes: nil)
+			try FileManager.default.createDirectory(at: errorsDir, withIntermediateDirectories: true, attributes: nil)
 		} catch _ {
 		}
 		
@@ -356,7 +356,7 @@ extension Connection {		//actions
 		self.channel.connectionStopped(connection: self, totallyRemove: true)
 		self.state = .Canceled
 		if self.superconnection == nil { self.task?.cancel() }
-		NotificationCenter.default().post(name: Plug.notifications.connectionCancelled, object: self)
+		NotificationCenter.default.post(name: Plug.notifications.connectionCancelled, object: self)
 	}
 	
 	func complete(state: State, parent: Connection? = nil) {
@@ -392,14 +392,14 @@ extension Connection {		//actions
 		self.requestQueue.addOperation({ self.notifyPersistentDelegateOfCompletion() })
 
 		if self.state == .Completed {
-			NotificationCenter.default().post(name: Plug.notifications.connectionCompleted, object: self)
+			NotificationCenter.default.post(name: Plug.notifications.connectionCompleted, object: self)
 		} else {
-			NotificationCenter.default().post(name: Plug.notifications.connectionFailed, object: self, userInfo: (self.resultsError != nil) ? ["error": self.resultsError!] : nil)
+			NotificationCenter.default.post(name: Plug.notifications.connectionFailed, object: self, userInfo: (self.resultsError != nil) ? ["error": self.resultsError!] : nil)
 		}
 	}
 	
 	func reportError(error: NSError) {
-		let queue = self.completionQueue ?? OperationQueue.main()
+		let queue = self.completionQueue ?? OperationQueue.main
 		
 		for block in self.errorBlocks {
 			let op = BlockOperation(block: { block(self, error) })

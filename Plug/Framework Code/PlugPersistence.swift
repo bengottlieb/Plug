@@ -67,7 +67,7 @@ public extension Plug {
 		var persistentCacheURL: URL? { didSet {
 			if let url = self.persistentCacheURL {
 				do {
-					try FileManager.default().createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
+					try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
 				} catch let error as NSError {
 					print("error while loading cached URLs: \(error)")
 				}

@@ -93,7 +93,7 @@ public class Plug: NSObject, URLSessionDelegate {
 	}
 	public var sessionQueue: OperationQueue = OperationQueue()
 	var configuration: URLSessionConfiguration {
-		let config = URLSessionConfiguration.default()
+		let config = URLSessionConfiguration.default
 		
 		if let timeout = self.timeout { config.timeoutIntervalForRequest = timeout }
 		return config
@@ -102,7 +102,7 @@ public class Plug: NSObject, URLSessionDelegate {
 	public var defaultHeaders = Plug.Headers([
 			.Accept(["application/json"]),
 			.AcceptEncoding("gzip;q=1.0,compress;q=0.5"),
-			.UserAgent("plug-\(Bundle.main().bundleIdentifier ?? "")"),
+			.UserAgent("plug-\(Bundle.main.bundleIdentifier ?? "")"),
 	])
 	
 	class public var libraryDirectoryURL: URL {
@@ -151,7 +151,7 @@ public class Plug: NSObject, URLSessionDelegate {
 		
 		Plug.connectionType = newState
 		DispatchQueue.main.async {
-			NotificationCenter.default().post(name: Plug.notifications.onlineStatusChanged, object: nil)
+			NotificationCenter.default.post(name: Plug.notifications.onlineStatusChanged, object: nil)
 		}
 	}
 	

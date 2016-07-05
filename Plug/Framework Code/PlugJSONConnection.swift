@@ -17,7 +17,7 @@ public class JSONConnection: Connection {
 	public var jsonArrayCompletionBlocks: [PlugJSONArrayCompletionClosure] = []
 	
 	override func handleDownload(data: Plug.ConnectionData) {
-		let queue = self.completionQueue ?? OperationQueue.main()
+		let queue = self.completionQueue ?? OperationQueue.main
 		if let json = data.data.jsonContainer() {
 			if let dict = json as? JSONDictionary {
 				if self.jsonDictionaryCompletionBlocks.count == 0 {	//we got a dictionary, but weren't expecting it

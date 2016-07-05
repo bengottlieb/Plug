@@ -75,7 +75,7 @@ extension Plug {
 		}
 		
 		func serialize(block: () -> Void) {
-			if OperationQueue.current() == self.queue {
+			if OperationQueue.current == self.queue {
 				block()
 			} else {
 				self.queue.addOperations([ BlockOperation(block: block) ], waitUntilFinished: true)
@@ -95,7 +95,7 @@ extension Plug {
 					self.updateQueue()
 					connection.state = .Queued
 				}
-				NotificationCenter.default().post(name: Plug.notifications.connectionQueued, object: connection)
+				NotificationCenter.default.post(name: Plug.notifications.connectionQueued, object: connection)
 			}
 		}
 		
@@ -130,7 +130,7 @@ extension Plug {
 			self.serialize {
 				if let index = self.waitingConnections.index(of: connection) { self.waitingConnections.remove(at: index) }
 				if self.activeConnections.index(of: connection) == -1 { self.activeConnections.append(connection) }
-				NotificationCenter.default().post(name: Plug.notifications.connectionStarted, object: connection)
+				NotificationCenter.default.post(name: Plug.notifications.connectionStarted, object: connection)
 			}
 		}
 		
