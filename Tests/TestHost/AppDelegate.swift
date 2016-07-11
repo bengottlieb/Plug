@@ -66,18 +66,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let url = NSURL(string: "http://jsonview.com/example.json")!
 		
 		JSONConnection(URL: url)?.completion { (request: Connection, json: JSONDictionary) in
-			print("Request: \(json)")
+			print("Request: \(request)")
 		}.start()
 	}
 
 	func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-		Plug.instance.setup()
+//		Plug.instance.setup()
 		
 //		self.testLargeDownloads()
 //		self.testLargeDownloads()
-		for _ in 0...10 {
-			self.testJSONDownload()
-		}
+//		for _ in 0...10 {
+//			self.testJSONDownload()
+//		}
+		self.testJSONDownload()
+
 		return true
 	}
 
