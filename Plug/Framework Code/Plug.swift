@@ -215,7 +215,7 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 	}
 
 	public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: NSError?) {
-		if let err = error where err.code == -1005 {
+		if let err = error , err.code == -1005 {
 			print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 		}
 		if let error = error {

@@ -136,7 +136,7 @@ public class Connection: Hashable, CustomStringConvertible {
 			
 	func received(_ data: Data) {
 		self.bytesReceived += UInt64(data.count)
-		if let destURL = self.destinationFileURL, path = destURL.path {
+		if let destURL = self.destinationFileURL, let path = destURL.path {
 			if self.fileHandle == nil {
 				do {
 					try FileManager.default.createDirectory(at: destURL.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)

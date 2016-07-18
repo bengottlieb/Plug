@@ -162,7 +162,7 @@ extension Plug {
 			
 			func endBackgroundTask(onlyClearTaskID: Bool) {
 				self.serialize {
-					if let taskID = self.backgroundTaskID where !self.isRunning {
+					if let taskID = self.backgroundTaskID , !self.isRunning {
 						DispatchQueue.main.async {
 							if (!onlyClearTaskID) { Plug.instance.backgroundActivityHandler?.endBackgroundTask(identifier: taskID) }
 						}
