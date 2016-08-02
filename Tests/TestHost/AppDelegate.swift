@@ -44,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 	
 	func testMimeUpload() {
-		let fileURL = Bundle.main().urlForResource("sample_image", withExtension: "png")
+		let fileURL = Bundle.main.url(forResource: "sample_image", withExtension: "png")
 		let url = "http://posttestserver.com/post.php"
 		let payloadDict = ["Sample_Item": ["embedded": "data goes here", "Test": "Field 1", "one-level-more": ["name": "Bonzai", "career": "Buckaroo"]]]
 		
@@ -105,7 +105,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func applicationDidEnterBackground(_ application: UIApplication) {
 		let url = "https://serenitynow.herokuapp.com/devices/online"
-		let args = ["device": ["udid": UIDevice.current().identifierForVendor!.uuidString]]
+		let args = ["device": ["udid": UIDevice.current.identifierForVendor!.uuidString]]
 	
 		Plug.request(method: .DELETE, url: url, parameters: Plug.Parameters.JSON(args)).completion { conn, data in
 			print("got it \(NSString(data: data.data, encoding: String.Encoding.utf8.rawValue))")

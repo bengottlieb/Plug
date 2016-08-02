@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
+extension Dictionary where Key: ExpressibleByStringLiteral, Value: AnyObject {
 	
 }
 
@@ -125,7 +125,7 @@ public extension Data {
 }
 
 let JSONSeparatorsCharacterSet = CharacterSet(charactersIn: ".[]")
-extension Dictionary where Key: StringLiteralConvertible, Value: AnyObject {
+extension Dictionary where Key: ExpressibleByStringLiteral, Value: AnyObject {
 //	public func path(path: String) -> AnyObject? {
 	public subscript(path path: String) -> AnyObject? {
 		let components = path.components(separatedBy: JSONSeparatorsCharacterSet)

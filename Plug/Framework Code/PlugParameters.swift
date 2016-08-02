@@ -61,7 +61,7 @@ extension Plug {
 			
 			for (name, mimeType, url) in self.fileURLs {
 				guard let filedata = try? Data(contentsOf: url) else { continue }
-				guard let path = url.path else { continue }
+				let path = url.path
 				let filename = (path as NSString).lastPathComponent
 				
 				for line in ["--\(self.boundary)\r\n",
@@ -104,7 +104,7 @@ extension Plug {
 			
 			for (name, mimeType, url) in self.fileURLs {
 				guard let filedata = try? Data(contentsOf: url) else { continue }
-				guard let path = url.path else { continue }
+				let path = url.path
 				let filename = (path as NSString).lastPathComponent
 				
 				for line in ["--\(self.boundary)\n",

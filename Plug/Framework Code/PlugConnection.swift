@@ -75,7 +75,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	}
 	
 	public var hashValue: Int {
-		return self.url.absoluteString!.hash
+		return self.url.absoluteString.hash
 	}
 
 	public func addHeader(header: Plug.Header) {
@@ -118,7 +118,7 @@ public class Connection: Hashable, CustomStringConvertible {
 		if let header = self.parameters.contentTypeHeader { self.addHeader(header: header) }
 
 		if Plug.instance.autostartConnections {
-			DispatchQueue.main.after(when: DispatchTime.now() + 0.5) {
+			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
 				self.start()
 			}
 		}
@@ -136,7 +136,8 @@ public class Connection: Hashable, CustomStringConvertible {
 			
 	func received(_ data: Data) {
 		self.bytesReceived += UInt64(data.count)
-		if let destURL = self.destinationFileURL, let path = destURL.path {
+		if let destURL = self.destinationFileURL {
+			let path = destURL.path
 			if self.fileHandle == nil {
 				do {
 					try FileManager.default.createDirectory(at: destURL.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
@@ -184,7 +185,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	}
 
 	var defaultRequest: URLRequest {
-		let urlString = self.url.absoluteString! + self.parameters.URLString
+		let urlString = self.url.absoluteString + self.parameters.URLString
 		var request = URLRequest(url: URL(string: urlString)!)
 		let headers = (self.headers ?? Plug.instance.defaultHeaders)
 		
@@ -293,7 +294,7 @@ extension Connection {
 	}
 	
 	public func logErrorToFile(label: String = "") {
-		guard let errorsDir = try? Plug.plugDirectoryURL.appendingPathComponent("Errors") else { return }
+		let errorsDir = Plug.plugDirectoryURL.appendingPathComponent("Errors")
 		let code = self.statusCode ?? 0
 		let seconds = Int(Date().timeIntervalSinceReferenceDate)
 		var host = ""
@@ -301,7 +302,7 @@ extension Connection {
 		var filename = "\(code) \(host) \(seconds).txt"
 		filename = filename.replacingOccurrences(of: ":", with: "").replacingOccurrences(of: "/", with: "_")
 		if label != "" { filename = label + "- " + filename }
-		guard let filepath = try? errorsDir.appendingPathComponent(filename) else { return }
+		let filepath = errorsDir.appendingPathComponent(filename)
 		
 		do {
 			try FileManager.default.createDirectory(at: errorsDir, withIntermediateDirectories: true, attributes: nil)

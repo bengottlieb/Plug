@@ -14,7 +14,7 @@ class ViewController: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		NotificationCenter.default().addObserver(self, selector: #selector(ViewController.onlineStatusChanged), name: Plug.notifications.onlineStatusChanged, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(ViewController.onlineStatusChanged), name: Plug.notifications.onlineStatusChanged, object: nil)
 		
 		self.onlineStatusChanged()
 		// Do any additional setup after loading the view, typically from a nib.

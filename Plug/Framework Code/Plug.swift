@@ -89,7 +89,7 @@ public class Plug: NSObject, URLSessionDelegate {
 	public var temporaryDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
 	public func generateTemporaryFileURL() -> URL {
 		let filename = NSUUID().uuidString + ".temp"
-		return try! self.temporaryDirectoryURL.appendingPathComponent(filename)
+		return self.temporaryDirectoryURL.appendingPathComponent(filename)
 	}
 	public var sessionQueue: OperationQueue = OperationQueue()
 	var configuration: URLSessionConfiguration {
@@ -108,7 +108,7 @@ public class Plug: NSObject, URLSessionDelegate {
 	class public var libraryDirectoryURL: URL {
 		return URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.libraryDirectory, [.userDomainMask], true).first!)
 	}
-	class public var plugDirectoryURL: URL { return try! self.libraryDirectoryURL.appendingPathComponent("Plug") }
+	class public var plugDirectoryURL: URL { return self.libraryDirectoryURL.appendingPathComponent("Plug") }
 	
 	public override init() {
 		let reachabilityClassReference : AnyObject.Type = NSClassFromString("Plug_Reachability")!
@@ -214,8 +214,8 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 		
 	}
 
-	public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: NSError?) {
-		if let err = error , err.code == -1005 {
+	public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+		if let err = error as? NSError , err.code == -1005 {
 			print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 		}
 		if let error = error {
