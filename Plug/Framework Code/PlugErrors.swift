@@ -29,15 +29,18 @@ public extension NSError {
 	public class var PlugJSONErrorDomain: String { return "PlugJSONErrorDomain" }
 	public enum JSONErrors: Int { case UnableToFindJSONContainer, UnexpectedJSONDictionary, UnexpectedJSONArray }
 	
+	public var isCancelledError: Bool {
+		return self.domain == NSURLErrorDomain && self.code == Int(CFNetworkErrors.cfurlErrorCancelled.rawValue)
+	}
 	
 	public var isTimeoutError: Bool {
-		return self.domain == NSURLErrorDomain && self.code == -1001
+		return self.domain == NSURLErrorDomain && self.code == Int(CFNetworkErrors.cfurlErrorTimedOut.rawValue)
 	}
 }
 
 /*
 kCFURLErrorUnknown   = -998,
-kCFURLErrorCancelled = -999,
+kcfurlErrorCancelled = -999,
 kCFURLErrorBadURL    = -1000,
 kCFURLErrorTimedOut  = -1001,
 kCFURLErrorUnsupportedURL = -1002,

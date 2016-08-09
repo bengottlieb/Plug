@@ -358,6 +358,8 @@ extension Connection {		//actions
 		self.state = .Canceled
 		if self.superconnection == nil { self.task?.cancel() }
 		NotificationCenter.default.post(name: Plug.notifications.connectionCancelled, object: self)
+		self.resultsError = NSError(domain: NSURLErrorDomain, code: Int(CFNetworkErrors.cfurlErrorCancelled.rawValue), userInfo: nil)
+		self.complete(state: .Canceled)
 	}
 	
 	func complete(state: State, parent: Connection? = nil) {
