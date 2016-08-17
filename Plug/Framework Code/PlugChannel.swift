@@ -74,7 +74,7 @@ extension Plug {
 			return self.activeConnections + self.waitingConnections
 		}
 		
-		func serialize(block: () -> Void) {
+		func serialize(block: @escaping () -> Void) {
 			if OperationQueue.current == self.queue {
 				block()
 			} else {

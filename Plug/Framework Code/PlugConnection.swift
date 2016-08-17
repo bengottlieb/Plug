@@ -37,19 +37,19 @@ public class Connection: Hashable, CustomStringConvertible {
 	public var tag: Int = 0
 
 	// pertaining to completion, cascaded down to subconnections
-	private(set) var startedAt: Date? { didSet { self.subconnections.forEach { $0.startedAt = self.startedAt } } }
-	private(set) var expectedContentLength: Int64? { didSet { self.subconnections.forEach { $0.expectedContentLength = self.expectedContentLength } } }
-	public private(set) var statusCode: Int? { didSet { self.subconnections.forEach { $0.statusCode = self.statusCode } } }
-	public private(set) var completedAt: Date? { didSet { self.subconnections.forEach { $0.completedAt = self.completedAt } } }
+	fileprivate(set) var startedAt: Date? { didSet { self.subconnections.forEach { $0.startedAt = self.startedAt } } }
+	fileprivate(set) var expectedContentLength: Int64? { didSet { self.subconnections.forEach { $0.expectedContentLength = self.expectedContentLength } } }
+	public fileprivate(set) var statusCode: Int? { didSet { self.subconnections.forEach { $0.statusCode = self.statusCode } } }
+	public fileprivate(set) var completedAt: Date? { didSet { self.subconnections.forEach { $0.completedAt = self.completedAt } } }
 	var task: URLSessionTask? { didSet { self.subconnections.forEach { $0.task = self.task } } }
-	public private(set) var resultsError: NSError?  { didSet { self.subconnections.forEach { $0.resultsError = self.resultsError } } }
+	public fileprivate(set) var resultsError: NSError?  { didSet { self.subconnections.forEach { $0.resultsError = self.resultsError } } }
 	var resultsData: Data? { didSet { self.subconnections.forEach { $0.resultsData = self.resultsData } } }
 	var bytesReceived: UInt64 = 0 { didSet { self.subconnections.forEach { $0.bytesReceived = self.bytesReceived } } }
 	var fileHandle: FileHandle! { didSet { self.subconnections.forEach { $0.fileHandle = self.fileHandle } } }
 	
 	internal(set) var response: URLResponse? { didSet {
 		if let resp = response as? HTTPURLResponse {
-			self.responseHeaders = Plug.Headers(dictionary: resp.allHeaderFields)
+			self.responseHeaders = Plug.Headers(dictionary: resp.allHeaderFields as NSDictionary)
 			self.statusCode = resp.statusCode
 		}
 		if self.response?.expectedContentLength != -1 {
@@ -230,12 +230,12 @@ extension Connection {
 		return self
 	}
 
-	public func error(completion: (Connection, NSError) -> Void) -> Self {
+	public func error(completion: @escaping (Connection, NSError) -> Void) -> Self {
 		self.requestQueue.addOperation { self.errorBlocks.append(completion) }
 		return self
 	}
 	
-	public func progress(closure: (Connection, Double) -> Void) -> Self {
+	public func progress(closure: @escaping (Connection, Double) -> Void) -> Self {
 		self.requestQueue.addOperation { self.progressBlocks.append(closure) }
 		return self
 	}
@@ -275,7 +275,7 @@ extension Connection {
 		if let data = self.resultsData {
 			var json: AnyObject?
 			do {
-				json = try JSONSerialization.jsonObject(with: data, options: [])
+				json = try JSONSerialization.jsonObject(with: data, options: []) as AnyObject
 			} catch {
 				json = nil
 			}

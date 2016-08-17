@@ -74,7 +74,7 @@ extension Plug {
 			self.headers.append(header)
 		}
 		
-		init(dictionary: NSDictionary) {
+		init(dictionary: NSDictionary?) {
 			if let dict = dictionary as? [String: String] {
 				for (key, value) in dict {
 					self.headers.append(Header(label: key, content: value))

@@ -84,7 +84,7 @@ public extension Plug {
 		@objc func savePersistentConnections() {
 			self.saveTimer = nil
 			if self.persistentCacheURL == nil { return }
-			let dictionaries: [NSDictionary] = self.persistentConnections.map { return $0.JSONRepresentation }
+			let dictionaries: [[String : Any]] = self.persistentConnections.map { return $0.JSONRepresentation }
 			do {
 				let json = try JSONSerialization.data(withJSONObject: dictionaries, options: JSONSerialization.WritingOptions.prettyPrinted)
 				try json.write(to: self.persistentCacheURL!, options: [.atomicWrite])
@@ -97,9 +97,9 @@ public extension Plug {
 
 
 extension Connection {
-	public var JSONRepresentation: NSDictionary {
-		var json = [
-			"url": self.url.absoluteString ?? "",
+	public var JSONRepresentation: [String : Any] {
+		var json: [String : Any] = [
+			"url": self.url.absoluteString,
 			"persistenceIdentifier": self.persistence.JSONValue,
 			"method": self.method.rawValue,
 			"channel": self.channel.JSONRepresentation

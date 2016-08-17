@@ -203,7 +203,7 @@ extension Plug {
 		public var JSONValue: [String: NSDictionary]? {
 			switch (self) {
 			case .URL(let params): return ["URL": NSMutableDictionary(stringDictionary: params)]
-			case .Form(let components): return ["Form": components.fields]
+			case .Form(let components): return ["Form": components.fields as NSDictionary]
 			case .JSON(let json): return ["JSON": json]
 				
 			default: return nil
@@ -216,7 +216,7 @@ extension Plug {
 				return
 			}
 			if let formParams = dictionary["Form"] as? [String: String] {
-				self = .Form(FormComponents(fields: formParams))
+				self = .Form(FormComponents(fields: formParams as JSONDictionary))
 				return
 			}
 			

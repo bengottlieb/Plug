@@ -58,7 +58,7 @@ public class Plug: NSObject, URLSessionDelegate {
 			}
 		}
 		
-		public var JSONValue: AnyObject { return self.persistentInfo?.JSONValue ?? [] }
+		public var JSONValue: Any { return self.persistentInfo?.JSONValue ?? [] }
 		
 	}
 	
@@ -219,7 +219,7 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 			print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 		}
 		if let error = error {
-			self[task]?.failedWithError(error: error)
+			self[task]?.failedWithError(error: error as NSError?)
 		} else {
 			self[task]?.succeeded()
 		}

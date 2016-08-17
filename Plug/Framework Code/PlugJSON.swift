@@ -140,7 +140,7 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: AnyObject {
 	}
 	
 	public subscript(components comps: [String]) -> AnyObject? {
-		guard let dict = (self as? AnyObject) as? [String: AnyObject] else { return nil }
+		guard let dict = (self as AnyObject) as? [String: AnyObject] else { return nil }
 		var components = comps
 		
 		while components.first == "" { components.remove(at: 0) }
@@ -162,7 +162,7 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: AnyObject {
 
 	public var JSONString: String? {
 		do {
-			let data = try JSONSerialization.data(withJSONObject: self as! AnyObject, options: .prettyPrinted)
+			let data = try JSONSerialization.data(withJSONObject: self as AnyObject, options: .prettyPrinted)
 			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as? String) ?? ""
 		} catch let error as NSError {
 			print("error while deserializing a JSON object: \(error)")
@@ -174,7 +174,7 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: AnyObject {
 
 extension Dictionary: JSONObject {
 	public var JSONString: String? {
-		if let dict = (self as? AnyObject) as? NSDictionary {
+		if let dict = (self as AnyObject) as? NSDictionary {
 			return dict.JSONString
 		}
 		return nil
@@ -204,7 +204,7 @@ extension Array: JSONObject {
 		guard let index = Int(components[0]) else { return nil }
 		components.remove(at: 0)
 		while components.first == "" { components.remove(at: 0) }
-		guard components.count > 0 else { return self[index] as? AnyObject }
+		guard components.count > 0 else { return self[index] as AnyObject }
 		
 		if Int(components[0]) != nil {
 			guard let array = self[index] as? JSONArray else { return nil }
@@ -217,7 +217,7 @@ extension Array: JSONObject {
 
 	public var JSONString: String? {
 		do {
-			let data = try JSONSerialization.data(withJSONObject: (self as! AnyObject) as! [AnyObject], options: .prettyPrinted)
+			let data = try JSONSerialization.data(withJSONObject: (self as AnyObject) as! [AnyObject], options: .prettyPrinted)
 			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as? String) ?? ""
 		} catch let error as NSError {
 			print("error while deserializing a JSON object: \(error)")
