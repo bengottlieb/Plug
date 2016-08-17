@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B504E6661A89690C001B414B"
-               BuildableName = "Build Combined"
-               BlueprintName = "Build Combined"
+               BuildableName = "Plug Combined"
+               BlueprintName = "Plug Combined"
                ReferencedContainer = "container:Plug.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,8 +46,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B504E6661A89690C001B414B"
-            BuildableName = "Build Combined"
-            BlueprintName = "Build Combined"
+            BuildableName = "Plug Combined"
+            BlueprintName = "Plug Combined"
             ReferencedContainer = "container:Plug.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -64,8 +64,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B504E6661A89690C001B414B"
-            BuildableName = "Build Combined"
-            BlueprintName = "Build Combined"
+            BuildableName = "Plug Combined"
+            BlueprintName = "Plug Combined"
             ReferencedContainer = "container:Plug.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

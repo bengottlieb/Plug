@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		B504E6661A89690C001B414B /* Build Combined */ = {
+		B504E6661A89690C001B414B /* Plug Combined */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = B504E6671A89690C001B414B /* Build configuration list for PBXAggregateTarget "Build Combined" */;
+			buildConfigurationList = B504E6671A89690C001B414B /* Build configuration list for PBXAggregateTarget "Plug Combined" */;
 			buildPhases = (
 				B504E66B1A89698A001B414B /* ShellScript */,
 			);
 			dependencies = (
 			);
-			name = "Build Combined";
+			name = "Plug Combined";
 			productName = "Combined Framework";
 		};
 /* End PBXAggregateTarget section */
@@ -435,7 +435,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B504E6661A89690C001B414B /* Build Combined */,
+				B504E6661A89690C001B414B /* Plug Combined */,
 				B504E6121A89230F001B414B /* PlugTest */,
 				B504E6451A8968DC001B414B /* Plug_iOS */,
 				B504E6AE1A898110001B414B /* Plug_Mac */,
@@ -909,7 +909,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B504E6671A89690C001B414B /* Build configuration list for PBXAggregateTarget "Build Combined" */ = {
+		B504E6671A89690C001B414B /* Build configuration list for PBXAggregateTarget "Plug Combined" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B504E6681A89690C001B414B /* Debug */,
