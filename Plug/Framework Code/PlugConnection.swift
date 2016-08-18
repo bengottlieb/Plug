@@ -215,10 +215,10 @@ public class Connection: Hashable, CustomStringConvertible {
 }
 
 extension Connection {
-	public enum State: String, CustomStringConvertible { case Waiting = "Waiting", Queued = "Queued", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Completed with Error"
+	public enum State: String, CustomStringConvertible { case Waiting = "Waiting", Queuing = "Queuing", Queued = "Queued", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Completed with Error"
 		public var description: String { return self.rawValue }
 		public var isRunning: Bool { return self == .Running }
-		public var hasStarted: Bool { return self != .Waiting && self != .Queued }
+		public var hasStarted: Bool { return self != .Waiting && self != .Queued && self != .Queuing }
 	}
 	
 	public enum Coalescing: Int { case CoalesceSimilarConnections, DoNotCoalesceConnections }
@@ -326,7 +326,7 @@ extension Connection {
 
 extension Connection {		//actions
 	public func start() {
-		if (state != .Waiting && state != .Queued) { return }
+		if (state != .Waiting && state != .Queued && state != .Queuing) { return }
 		self.channel.enqueue(connection: self)
 	}
 	
