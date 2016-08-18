@@ -77,13 +77,15 @@ extension Plug {
 		func enqueue(connection: Connection) {
 			self.serialize {
 				if connection.state == .Queued { return }
+				if self.queueState != .Running { print("Queing connection on a non-running queue (\(self))") }
+				connection.state = .Queuing
 				
 				if connection.coalescing == .CoalesceSimilarConnections, let existing = self.existingConnectionMatching(connection) {
 					existing.addSubconnection(connection)
 				} else {
-					connection.state = .Queued
 					self.waitingConnections.append(connection)
 					self.updateQueue()
+					connection.state = .Queued
 				}
 				NSNotificationCenter.defaultCenter().postNotificationName(Plug.notifications.connectionQueued, object: connection)
 			}
