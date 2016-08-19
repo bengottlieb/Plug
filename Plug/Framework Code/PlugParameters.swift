@@ -15,7 +15,7 @@ extension Plug {
 		var boundary = FormComponents.generateBoundaryString()
 		var contentTypeHeader: String { return "multipart/form-data; boundary=\(self.boundary)" }
 		
-		public subscript(key: String) -> AnyObject? {
+		public subscript(key: String) -> Any? {
 			get { return self.fields[key] }
 			set { self.fields[key] = newValue }
 		}

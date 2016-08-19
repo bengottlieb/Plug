@@ -14,8 +14,8 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: AnyObject {
 
 public protocol JSONContainer {}			//either a JSONArray or JSONDictionary
 
-public typealias JSONArray = [AnyObject]
-public typealias JSONDictionary = [String : AnyObject]
+public typealias JSONArray = [Any]
+public typealias JSONDictionary = [String : Any]
 
 public protocol JSONObject {
 	var JSONString: String? { get }
@@ -125,9 +125,9 @@ public extension Data {
 }
 
 let JSONSeparatorsCharacterSet = CharacterSet(charactersIn: ".[]")
-extension Dictionary where Key: ExpressibleByStringLiteral, Value: AnyObject {
+extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
 //	public func path(path: String) -> AnyObject? {
-	public subscript(path path: String) -> AnyObject? {
+	public subscript(path path: String) -> Any? {
 		let components = path.components(separatedBy: JSONSeparatorsCharacterSet)
 		return self[components: components]
 	}
@@ -139,7 +139,7 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: AnyObject {
 		return nil
 	}
 	
-	public subscript(components comps: [String]) -> AnyObject? {
+	public subscript(components comps: [String]) -> Any? {
 		guard let dict = (self as AnyObject) as? [String: AnyObject] else { return nil }
 		var components = comps
 		
@@ -183,7 +183,7 @@ extension Dictionary: JSONObject {
 }
 
 extension Array: JSONObject {
-	public subscript(path: String) -> AnyObject? {
+	public subscript(path: String) -> Any? {
 		let components = path.components(separatedBy: JSONSeparatorsCharacterSet)
 		return self[components: components]
 	}
@@ -195,7 +195,7 @@ extension Array: JSONObject {
 		return nil
 	}
 	
-	public subscript(components comps: [String]) -> AnyObject? {
+	public subscript(components comps: [String]) -> Any? {
 		var components = comps
 		
 		while components.first == "" { components.remove(at: 0) }
