@@ -14,12 +14,12 @@ import Foundation
 extension Plug {
 	public class Channel {
 		public var maximumActiveConnections = 0
-		public var queueState: QueueState = .PausedDueToOffline
+		public var pausedReason: PauseReason? = .offline
 		public let name: String
 		public var count: Int { return self.waitingConnections.count + self.activeConnections.count }
 		public var maxSimultaneousConnections = 1// { didSet { self.queue.maxConcurrentOperationCount = self.maxSimultaneousConnections }}
 		
-		public enum QueueState: Int { case Paused, PausedDueToOffline, Running }
+		public enum PauseReason: Int { case manual, offline, backgrounding }
 
 		public static var defaultChannel: Channel = { return Channel(name: "default", maxSimultaneousConnections: 1) }()
 		public static var resourceChannel: Channel = { return Channel(name: "resources", maxSimultaneousConnections: 50) }()
@@ -28,7 +28,7 @@ extension Plug {
 		
 		init(name chName: String, maxSimultaneousConnections max: Int) {
 			name = chName
-			queueState = Plug.connectionType == .Offline ? .PausedDueToOffline : .Running
+			pausedReason = Plug.connectionType == .Offline ? .offline : nil
 			maxSimultaneousConnections = max
 			queue = OperationQueue()
 			queue.maxConcurrentOperationCount = 1//max
@@ -62,12 +62,12 @@ extension Plug {
 		}
 		
 		func startQueue() {
-			self.queueState = .Running
+			self.pausedReason = nil
 			self.updateQueue()
 		}
 		
-		func pauseQueue() {
-			self.queueState = .Paused
+		func pauseQueue(reason: PauseReason = .manual) {
+			self.pausedReason = reason
 		}
 		
 		var allConnections: [Connection] {
@@ -85,7 +85,7 @@ extension Plug {
 		func enqueue(connection: Connection) {
 			self.serialize {
 				if connection.state == .Queued { return }
-				if self.queueState != .Running { print("Queing connection on a non-running queue (\(self))") }
+				if self.pausedReason != nil { print("Queing connection on a non-running queue (\(self))") }
 				connection.state = .Queuing
 				
 				if connection.coalescing == .CoalesceSimilarConnections, let existing = self.existing(matching: connection) {
@@ -143,7 +143,7 @@ extension Plug {
 		}
 		
 		var isRunning: Bool {
-			return self.queueState == .Running
+			return self.pausedReason == nil
 		}
 		
 		#if os(iOS)
@@ -154,7 +154,7 @@ extension Plug {
 					self.serialize {
 						self.backgroundTaskID = Plug.instance.backgroundActivityHandler?.beginBackgroundTaskWithName(taskName: "plug.queue.\(self.name)", expirationHandler: {
 							self.endBackgroundTask(onlyClearTaskID: true)
-							self.pauseQueue()
+							self.pauseQueue(reason: .backgrounding)
 						})
 					}
 				}

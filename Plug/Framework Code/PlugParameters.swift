@@ -127,7 +127,7 @@ extension Plug {
 		case None
 		case URL([String: String])
 		case Form(FormComponents)
-		case JSON(NSDictionary)
+		case JSON(JSONDictionary)
 		
 		var stringValue: String {
 			switch (self) {
@@ -139,7 +139,7 @@ extension Plug {
 				return ""
 				
 			case .JSON(let object):
-				return object.JSONString ?? ""
+				return (object as NSDictionary).JSONString ?? ""
 				
 			case .None:
 				return ""
@@ -204,7 +204,7 @@ extension Plug {
 			switch (self) {
 			case .URL(let params): return ["URL": NSMutableDictionary(stringDictionary: params)]
 			case .Form(let components): return ["Form": components.fields as NSDictionary]
-			case .JSON(let json): return ["JSON": json]
+			case .JSON(let json): return ["JSON": json as NSDictionary]
 				
 			default: return nil
 			}
@@ -220,7 +220,7 @@ extension Plug {
 				return
 			}
 			
-			if let JSONParams = dictionary["JSON"] {
+			if let JSONParams = dictionary["JSON"] as? JSONDictionary {
 				self = .JSON(JSONParams)
 				return
 			}
@@ -239,7 +239,7 @@ public func ==(lhs: Plug.Parameters, rhs: Plug.Parameters) -> Bool {
 		return lhComponents == rhComponents
 		
 	case (.JSON(let lhJson), .JSON(let rhJson)):
-		return lhJson == rhJson
+		return (lhJson as NSDictionary) == (rhJson as NSDictionary)
 	
 	case (.None, .None): return true
 		

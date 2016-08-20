@@ -167,9 +167,9 @@ public class Plug: NSObject, URLSessionDelegate {
 		DispatchQueue.main.async {
 			for channel in Plug.Channel.allChannels.values {
 				if Plug.connectionType == .Offline {
-					if channel.queueState == .Running { channel.pauseQueue(); channel.queueState = .PausedDueToOffline }
+					if channel.isRunning { channel.pauseQueue(); channel.pausedReason = .offline }
 				} else {
-					if channel.queueState == .PausedDueToOffline { channel.startQueue() }
+					if channel.pausedReason == .offline || channel.pausedReason == .backgrounding { channel.startQueue() }
 				}
 			}
 		}

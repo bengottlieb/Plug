@@ -70,7 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}.start()
 	}
 
-	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
 		Plug.instance.setup()
 		
 //		self.testLargeDownloads()
@@ -105,7 +105,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func applicationDidEnterBackground(_ application: UIApplication) {
 		let url = "https://serenitynow.herokuapp.com/devices/online"
-		let args = ["device": ["udid": UIDevice.current.identifierForVendor!.uuidString]]
+		let args: JSONDictionary = ["device": ["udid": UIDevice.current.identifierForVendor!.uuidString]]
 	
 		Plug.request(method: .DELETE, url: url, parameters: Plug.Parameters.JSON(args)).completion { conn, data in
 			print("got it \(NSString(data: data.data, encoding: String.Encoding.utf8.rawValue))")
