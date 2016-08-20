@@ -41,6 +41,14 @@ extension Plug {
 		internal var waitingConnections: [Connection] = []
 		internal var activeConnections: [Connection] = []
 		
+		public class func restartAllChannels(evenIfOffline: Bool = false) {
+			if !evenIfOffline && Plug.connectionType == .Offline { return }
+			
+			for channel in allChannels.values {
+				if !channel.isRunning { channel.startQueue() }
+			}
+		}
+		
 		var JSONRepresentation: NSDictionary {
 			return ["name": self.name, "max": self.maximumActiveConnections ]
 		}

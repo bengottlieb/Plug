@@ -118,6 +118,12 @@ public class Plug: NSObject, NSURLSessionDelegate {
 		super.init()
 		self.reachability.setValue(self, forKey: "delegate");
 		self.rebuildSession()
+		
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(didBecomeActive), name: UIApplicationDidBecomeActiveNotification, object: nil)
+	}
+	
+	public func didBecomeActive() {
+		Channel.restartAllChannels()
 	}
 	
 	public var areConnectionsInFlight: Bool {
