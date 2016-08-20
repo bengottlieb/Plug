@@ -119,7 +119,9 @@ public class Plug: NSObject, URLSessionDelegate {
 		self.reachability.setValue(self, forKey: "delegate");
 		self.rebuildSession()
 		
-		NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive), name: .UIApplicationDidBecomeActive, object: nil)
+		#if os(iOS)
+			NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive), name: .UIApplicationDidBecomeActive, object: nil)
+		#endif
 	}
 	
 	public func didBecomeActive() {
