@@ -48,7 +48,14 @@ extension Plug {
 				if !channel.isRunning { channel.startQueue() }
 			}
 		}
-		
+
+		class func restartBackgroundedChannels() {
+			if Plug.connectionType == .offline { return }
+			for channel in allChannels.values where channel.pausedReason == .backgrounding {
+				if !channel.isRunning { channel.startQueue() }
+			}
+		}
+
 		var JSONRepresentation: NSDictionary {
 			return ["name": self.name, "max": self.maximumActiveConnections ]
 		}

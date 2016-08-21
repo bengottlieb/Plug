@@ -124,8 +124,8 @@ public class Plug: NSObject, URLSessionDelegate {
 		#endif
 	}
 	
-	public func didBecomeActive() {
-		Channel.restartAllChannels()
+	func didBecomeActive() {
+		Channel.restartBackgroundedChannels()
 	}
 	
 	public var areConnectionsInFlight: Bool {
