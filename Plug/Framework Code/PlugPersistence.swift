@@ -121,7 +121,7 @@ extension Connection {
 		
 		let parameters = Plug.Parameters(dictionary: parametersData ?? [:])
 		
-		self.init(method: method ?? .GET, url: url, parameters: parameters, persistence: (persistance == nil) ? .PersistRequest : .Persistent(persistance!), channel: channel)
+		self.init(method: method ?? .GET, url: url, parameters: parameters, persistence: (persistance == nil) ? .persistRequest : .persistent(persistance!), channel: channel)
 	}
 }
 

@@ -124,49 +124,49 @@ extension Plug {
 	}
 	
 	public enum Parameters: CustomStringConvertible {
-		case None
-		case URL([String: String])
-		case Form(FormComponents)
-		case JSON(JSONDictionary)
+		case none
+		case url([String: String])
+		case form(FormComponents)
+		case json(JSONDictionary)
 		
 		var stringValue: String {
 			switch (self) {
-			case .URL(let params):
+			case .url(let params):
 				if params.keys.count == 0 { return "" }
 				return (params.keys.reduce("?") { if let v = params[$1] { return $0 + "\($1)=\(v.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlHostAllowed)!)&" }; return $0 })
 				
-			case .Form:
+			case .form:
 				return ""
 				
-			case .JSON(let object):
+			case .json(let object):
 				return (object as NSDictionary).JSONString ?? ""
 				
-			case .None:
+			case .none:
 				return ""
 			}
 		}
 		
 		var type: String {
 			switch (self) {
-			case .URL: return "URL"
-			case .Form: return "Form"
-			case .JSON: return "JSON"
+			case .url: return "URL"
+			case .form: return "Form"
+			case .json: return "JSON"
 			default: return "None"
 			}
 		}
 		
 		public var URLString: String {
 			switch (self) {
-			case .URL: return self.stringValue
+			case .url: return self.stringValue
 			default: return ""
 			}
 		}
 		
 		var bodyData: Data? {
 			switch (self) {
-			case .Form(let components):
+			case .form(let components):
 				return components.dataValue
-			case .JSON:
+			case .json:
 				return self.stringValue.data(using: String.Encoding.utf8, allowLossyConversion: false)
 			default: return nil
 			}
@@ -174,8 +174,8 @@ extension Plug {
 		
 		func normalizeMethod(method: Plug.Method) -> Plug.Method {
 			switch (self) {
-			case .Form: fallthrough
-			case .JSON:
+			case .form: fallthrough
+			case .json:
 				if method == .GET { return .POST }
 				return method
 			default: return method
@@ -184,17 +184,17 @@ extension Plug {
 		
 		var contentTypeHeader: Plug.Header? {
 			switch (self) {
-			case .Form(let components): return .ContentType(components.contentTypeHeader)
-			case .JSON: return .ContentType("application/json")
+			case .form(let components): return .contentType(components.contentTypeHeader)
+			case .json: return .contentType("application/json")
 			default: return nil
 			}
 		}
 		
 		public var description: String {
 			switch (self) {
-			case .URL(let params): return params.keys.reduce("[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
-			case .Form(let components): return "\(components)"
-			case .JSON: return "[" + self.stringValue + "]"
+			case .url(let params): return params.keys.reduce("[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
+			case .form(let components): return "\(components)"
+			case .json: return "[" + self.stringValue + "]"
 				
 			default: return ""
 			}
@@ -202,9 +202,9 @@ extension Plug {
 		
 		public var JSONValue: [String: NSDictionary]? {
 			switch (self) {
-			case .URL(let params): return ["URL": NSMutableDictionary(stringDictionary: params)]
-			case .Form(let components): return ["Form": components.fields as NSDictionary]
-			case .JSON(let json): return ["JSON": json as NSDictionary]
+			case .url(let params): return ["URL": NSMutableDictionary(stringDictionary: params)]
+			case .form(let components): return ["Form": components.fields as NSDictionary]
+			case .json(let json): return ["JSON": json as NSDictionary]
 				
 			default: return nil
 			}
@@ -212,36 +212,36 @@ extension Plug {
 		
 		init(dictionary: [String: NSDictionary]) {
 			if let urlParams = dictionary["URL"] as? [String: String] {
-				self = .URL(urlParams)
+				self = .url(urlParams)
 				return
 			}
 			if let formParams = dictionary["Form"] as? [String: String] {
-				self = .Form(FormComponents(fields: formParams as JSONDictionary))
+				self = .form(FormComponents(fields: formParams as JSONDictionary))
 				return
 			}
 			
 			if let JSONParams = dictionary["JSON"] as? JSONDictionary {
-				self = .JSON(JSONParams)
+				self = .json(JSONParams)
 				return
 			}
 			
-			self = .None
+			self = .none
 		}
 	}
 }
 
 public func ==(lhs: Plug.Parameters, rhs: Plug.Parameters) -> Bool {
 	switch (lhs, rhs) {
-	case (.URL(let lhString), .URL(let rhString)):
+	case (.url(let lhString), .url(let rhString)):
 		return lhString == rhString
 		
-	case (.Form(let lhComponents), .Form(let rhComponents)):
+	case (.form(let lhComponents), .form(let rhComponents)):
 		return lhComponents == rhComponents
 		
-	case (.JSON(let lhJson), .JSON(let rhJson)):
+	case (.json(let lhJson), .json(let rhJson)):
 		return (lhJson as NSDictionary) == (rhJson as NSDictionary)
 	
-	case (.None, .None): return true
+	case (.none, .none): return true
 		
 	default: return false
 	}

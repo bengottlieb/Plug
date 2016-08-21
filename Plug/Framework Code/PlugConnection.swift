@@ -11,10 +11,10 @@ import Foundation
 public typealias PlugCompletionClosure = (Connection, Plug.ConnectionData) -> Void
 
 public class Connection: Hashable, CustomStringConvertible {
-	public var state: State = .Waiting {
+	public var state: State = .waiting {
 		didSet {
 			if self.state == oldValue { return }
-			if oldValue == .Running { Plug.instance.networkActivityIndicator?.decrement() }
+			if oldValue.isRunning { Plug.instance.networkActivityIndicator?.decrement() }
 			if self.state.isRunning { Plug.instance.networkActivityIndicator?.increment() }
 			self.subconnections.forEach { $0.state = self.state }
 		}
@@ -33,7 +33,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	public var errorBlocks: [(Connection, NSError) -> Void] = []
 	public var progressBlocks: [(Connection, Double) -> Void] = []
 	public var cachingPolicy: URLRequest.CachePolicy = .reloadIgnoringLocalCacheData
-	public var coalescing = Coalescing.CoalesceSimilarConnections
+	public var coalescing = Coalescing.coalesceSimilarConnections
 	public var tag: Int = 0
 
 	// pertaining to completion, cascaded down to subconnections
@@ -97,12 +97,12 @@ public class Connection: Hashable, CustomStringConvertible {
 	var subconnections: [Connection] = []
 	var superconnection: Connection?
 	
-	public init?(method meth: Plug.Method = .GET, url: URLLike, parameters params: Plug.Parameters? = nil, persistence persist: Plug.Persistence = .Transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
+	public init?(method meth: Plug.Method = .GET, url: URLLike, parameters params: Plug.Parameters? = nil, persistence persist: Plug.Persistence = .transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
 		requestQueue = OperationQueue()
 		requestQueue.maxConcurrentOperationCount = 1
 		
 		persistence = persist
-		parameters = params ?? .None
+		parameters = params ?? .none
 		channel = chn
 		
 		method = parameters.normalizeMethod(method: meth)
@@ -171,7 +171,7 @@ public class Connection: Hashable, CustomStringConvertible {
 		self.response = self.task?.response
 		if let httpResponse = self.response as? HTTPURLResponse { self.statusCode = httpResponse.statusCode }
 		self.resultsError = self.task?.response?.error
-		self.complete(state: .Completed)
+		self.complete(state: .completed)
 	}
 	
 	func failedWithError(error: NSError?) {
@@ -181,7 +181,7 @@ public class Connection: Hashable, CustomStringConvertible {
 		self.response = self.task?.response
 		if let httpResponse = self.response as? HTTPURLResponse { self.statusCode = httpResponse.statusCode }
 		self.resultsError = error ?? self.task?.response?.error
-		self.complete(state: .CompletedWithError)
+		self.complete(state: .completedWithError)
 	}
 
 	var defaultRequest: URLRequest {
@@ -215,13 +215,13 @@ public class Connection: Hashable, CustomStringConvertible {
 }
 
 extension Connection {
-	public enum State: String, CustomStringConvertible { case Waiting = "Waiting", Queuing = "Queuing", Queued = "Queued", Running = "Running", Suspended = "Suspended", Completed = "Completed", Canceled = "Canceled", CompletedWithError = "Completed with Error"
+	public enum State: String, CustomStringConvertible { case waiting = "Waiting", queuing = "Queuing", queued = "Queued", running = "Running", suspended = "Suspended", completed = "Completed", canceled = "Canceled", completedWithError = "Completed with Error"
 		public var description: String { return self.rawValue }
-		public var isRunning: Bool { return self == .Running }
-		public var hasStarted: Bool { return self != .Waiting && self != .Queued && self != .Queuing }
+		public var isRunning: Bool { return self == .running }
+		public var hasStarted: Bool { return self != .waiting && self != .queued && self != .queuing }
 	}
 	
-	public enum Coalescing: Int { case CoalesceSimilarConnections, DoNotCoalesceConnections }
+	public enum Coalescing: Int { case coalesceSimilarConnections, doNotCoalesceConnections }
 }
 
 extension Connection {
@@ -326,13 +326,13 @@ extension Connection {
 
 extension Connection {		//actions
 	public func start() {
-		if (state != .Waiting && state != .Queued && state != .Queuing) { return }
+		if (state != .waiting && state != .queued && state != .queuing) { return }
 		self.channel.enqueue(connection: self)
 	}
 	
 	public func run() {
 		self.channel.connectionStarted(connection: self)
-		self.state = .Running
+		self.state = .running
 		self.task = self.generateTask()
 		Plug.instance.register(connection: self)
 		self.task!.resume()
@@ -340,26 +340,26 @@ extension Connection {		//actions
 	}
 	
 	public func suspend() {
-		if self.state != .Running { return }
+		if self.state != .running { return }
 		self.channel.connectionStopped(connection: self)
-		self.state = .Suspended
+		self.state = .suspended
 		if self.superconnection == nil { self.task?.suspend() }
 	}
 	
 	public func resume() {
-		if self.state != .Suspended { return }
+		if self.state != .suspended { return }
 		self.channel.connectionStarted(connection: self)
-		self.state = .Running
+		self.state = .running
 		if self.superconnection == nil { self.task?.resume() }
 	}
 	
 	public func cancel() {
 		self.channel.connectionStopped(connection: self, totallyRemove: true)
-		self.state = .Canceled
+		self.state = .canceled
 		if self.superconnection == nil { self.task?.cancel() }
 		NotificationCenter.default.post(name: Plug.notifications.connectionCancelled, object: self)
 		self.resultsError = NSError(domain: NSURLErrorDomain, code: Int(CFNetworkErrors.cfurlErrorCancelled.rawValue), userInfo: nil)
-		self.complete(state: .Canceled)
+		self.complete(state: .canceled)
 	}
 	
 	func complete(state: State, parent: Connection? = nil) {
@@ -394,7 +394,7 @@ extension Connection {		//actions
 		self.subconnections.forEach { $0.complete(state: state, parent: self) }
 		self.requestQueue.addOperation({ self.notifyPersistentDelegateOfCompletion() })
 
-		if self.state == .Completed {
+		if self.state == .completed {
 			NotificationCenter.default.post(name: Plug.notifications.connectionCompleted, object: self)
 		} else {
 			NotificationCenter.default.post(name: Plug.notifications.connectionFailed, object: self, userInfo: (self.resultsError != nil) ? ["error": self.resultsError!] : nil)

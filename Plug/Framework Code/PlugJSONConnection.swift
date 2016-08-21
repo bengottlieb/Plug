@@ -22,7 +22,7 @@ public class JSONConnection: Connection {
 			if let dict = json as? JSONDictionary {
 				if self.jsonDictionaryCompletionBlocks.count == 0 {	//we got a dictionary, but weren't expecting it
 					print("Unexpected Dictionary from \(self).")
-					self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnexpectedJSONDictionary.rawValue, userInfo: ["connection": self]))
+					self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.unexpectedJSONDictionary.rawValue, userInfo: ["connection": self]))
 				}
 				for block in self.jsonDictionaryCompletionBlocks {
 					let op = BlockOperation(block: { block(self, dict) })
@@ -32,7 +32,7 @@ public class JSONConnection: Connection {
 			} else if let array = json as? JSONArray {
 				if self.jsonArrayCompletionBlocks.count == 0 {	//we got a dictionary, but weren't expecting it
 					print("Unexpected Array from \(self).")
-					self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnexpectedJSONArray.rawValue, userInfo: ["connection": self]))
+					self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.unexpectedJSONArray.rawValue, userInfo: ["connection": self]))
 				}
 				for block in self.jsonArrayCompletionBlocks {
 					let op = BlockOperation(block: { block(self, array) })
@@ -41,7 +41,7 @@ public class JSONConnection: Connection {
 				return
 			}
 		}
-		self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.UnableToFindJSONContainer.rawValue, userInfo: nil))
+		self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.unableToFindJSONContainer.rawValue, userInfo: nil))
 	}
 
 	public func completion(completion: PlugJSONDictionaryCompletionClosure) -> Self {

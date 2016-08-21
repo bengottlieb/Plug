@@ -84,16 +84,16 @@ extension Plug {
 		
 		func enqueue(connection: Connection) {
 			self.serialize {
-				if connection.state == .Queued { return }
+				if connection.state == .queued { return }
 				if self.pausedReason != nil { print("Queing connection on a non-running queue (\(self))") }
-				connection.state = .Queuing
+				connection.state = .queuing
 				
-				if connection.coalescing == .CoalesceSimilarConnections, let existing = self.existing(matching: connection) {
+				if connection.coalescing == .coalesceSimilarConnections, let existing = self.existing(matching: connection) {
 					existing.addSubconnection(connection)
 				} else {
 					self.waitingConnections.append(connection)
 					self.updateQueue()
-					connection.state = .Queued
+					connection.state = .queued
 				}
 				NotificationCenter.default.post(name: Plug.notifications.connectionQueued, object: connection)
 			}

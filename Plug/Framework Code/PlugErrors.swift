@@ -27,7 +27,7 @@ public extension URLResponse {
 
 public extension NSError {
 	public class var PlugJSONErrorDomain: String { return "PlugJSONErrorDomain" }
-	public enum JSONErrors: Int { case UnableToFindJSONContainer, UnexpectedJSONDictionary, UnexpectedJSONArray }
+	public enum JSONErrors: Int { case unableToFindJSONContainer, unexpectedJSONDictionary, unexpectedJSONArray }
 	
 	public var isCancelledError: Bool {
 		return self.domain == NSURLErrorDomain && self.code == Int(CFNetworkErrors.cfurlErrorCancelled.rawValue)

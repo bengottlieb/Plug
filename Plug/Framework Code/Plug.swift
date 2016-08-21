@@ -42,10 +42,10 @@ public class Plug: NSObject, URLSessionDelegate {
 	var backgroundActivityHandler: BackgroundActivityHandlerProtocol?
 	var networkActivityIndicator: ActivityIndicatorProtocol?
 	
-	public enum Persistence { case Transient, PersistRequest, Persistent(Plug.PersistenceInfo)
+	public enum Persistence { case transient, persistRequest, persistent(Plug.PersistenceInfo)
 		public var isPersistent: Bool {
 			switch (self) {
-			case .Transient: return false
+			case .transient: return false
 			default: return true
 			}
 		}
@@ -53,7 +53,7 @@ public class Plug: NSObject, URLSessionDelegate {
 		
 		public var persistentInfo: Plug.PersistenceInfo? {
 			switch (self) {
-			case .Persistent(let info): return info
+			case .persistent(let info): return info
 			default: return nil
 			}
 		}
@@ -100,9 +100,9 @@ public class Plug: NSObject, URLSessionDelegate {
 	}
 	public var session: URLSession!
 	public var defaultHeaders = Plug.Headers([
-			.Accept(["application/json"]),
-			.AcceptEncoding("gzip;q=1.0,compress;q=0.5"),
-			.UserAgent("plug-\(Bundle.main.bundleIdentifier ?? "")"),
+			.accept(["application/json"]),
+			.acceptEncoding("gzip;q=1.0,compress;q=0.5"),
+			.userAgent("plug-\(Bundle.main.bundleIdentifier ?? "")"),
 	])
 	
 	class public var libraryDirectoryURL: URL {
@@ -180,7 +180,7 @@ public class Plug: NSObject, URLSessionDelegate {
 }
 
 public extension Plug {
-	public class func request(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .Transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Connection {
+	public class func request(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Connection {
 		return Connection(method: method, url: url, parameters: parameters, persistence: persistence, channel: channel) ?? Connection.noopConnection
 	}
 }

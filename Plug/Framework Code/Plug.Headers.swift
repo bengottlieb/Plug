@@ -10,39 +10,39 @@ import Foundation
 
 extension Plug {
 	public enum Header {
-		case Accept([String])
-		case AcceptEncoding(String)
-		case ContentType(String)
-		case BasicAuthorization(String, String)
-		case UserAgent(String)
+		case accept([String])
+		case acceptEncoding(String)
+		case contentType(String)
+		case basicAuthorization(String, String)
+		case userAgent(String)
 		
-		case Custom(String, String)
+		case custom(String, String)
 		
 		public var label: String {
 			switch (self) {
-			case .Accept: return "Accept"
-			case .AcceptEncoding: return "Accept-Encoding"
-			case .ContentType: return "Content-Type"
-			case .BasicAuthorization: return "Authorization"
-			case .UserAgent: return "User-Agent"
+			case .accept: return "Accept"
+			case .acceptEncoding: return "Accept-Encoding"
+			case .contentType: return "Content-Type"
+			case .basicAuthorization: return "Authorization"
+			case .userAgent: return "User-Agent"
 				
-			case .Custom(let label,  _): return label
+			case .custom(let label,  _): return label
 			}
 		}
 		
 		public var content: String {
 			switch (self) {
-			case .Accept(let types):
+			case .accept(let types):
 				let content = types.reduce("") { "\($0)\($1);" }
 				return content.trimmingCharacters(in: CharacterSet(charactersIn: ";"))
 				
-			case .AcceptEncoding(let encoding): return encoding
-			case .ContentType(let type): return type
-			case .BasicAuthorization(let user, let pass):
+			case .acceptEncoding(let encoding): return encoding
+			case .contentType(let type): return type
+			case .basicAuthorization(let user, let pass):
 				return "Basic " + ("\(user):\(pass)".data(using: String.Encoding.utf8)?.base64EncodedString() ?? "")
-			case .UserAgent(let agent): return agent
+			case .userAgent(let agent): return agent
 				
-			case .Custom(_, let content): return content
+			case .custom(_, let content): return content
 			}
 		}
 		
@@ -52,12 +52,12 @@ extension Plug {
 		
 		public init(label: String, content: String) {
 			switch label {
-			case "Accept": self = .Accept(content.components(separatedBy: ","))
-			case "Accept-Encoding": self = .AcceptEncoding(content)
-			case "Content-Type": self = .ContentType(content)
-			case "User-Agent": self = .AcceptEncoding(content)
+			case "Accept": self = .accept(content.components(separatedBy: ","))
+			case "Accept-Encoding": self = .acceptEncoding(content)
+			case "Content-Type": self = .contentType(content)
+			case "User-Agent": self = .acceptEncoding(content)
 				
-			default: self = .Custom(label, content)
+			default: self = .custom(label, content)
 			}
 		}
 	}
