@@ -28,7 +28,7 @@ extension Plug {
 		
 		init(name chName: String, maxSimultaneousConnections max: Int) {
 			name = chName
-			pausedReason = Plug.connectionType == .Offline ? .offline : nil
+			pausedReason = Plug.connectionType == .offline ? .offline : nil
 			maxSimultaneousConnections = max
 			queue = OperationQueue()
 			queue.maxConcurrentOperationCount = 1//max
@@ -42,7 +42,7 @@ extension Plug {
 		internal var activeConnections: [Connection] = []
 		
 		public class func restartAllChannels(evenIfOffline: Bool = false) {
-			if !evenIfOffline && Plug.connectionType == .Offline { return }
+			if !evenIfOffline && Plug.connectionType == .offline { return }
 			
 			for channel in allChannels.values {
 				if !channel.isRunning { channel.startQueue() }

@@ -28,7 +28,7 @@ public protocol BackgroundActivityHandlerProtocol {
 }
 
 public class Plug: NSObject, URLSessionDelegate {
-	public enum ConnectionType: Int { case Offline, Wifi, WAN }
+	public enum ConnectionType: Int { case offline, wifi, wan }
 	public enum Method: String, CustomStringConvertible { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH"
 		public var description: String { return self.rawValue } 
 	}
@@ -63,8 +63,8 @@ public class Plug: NSObject, URLSessionDelegate {
 	}
 	
 	public static let instance = Plug()
-	public static var connectionType = ConnectionType.Offline
-	public static var online: Bool { return self.connectionType != .Offline }
+	public static var connectionType = ConnectionType.offline
+	public static var online: Bool { return self.connectionType != .offline }
 	
 	public struct notifications {
 		public static let onlineStatusChanged = NSNotification.Name("onlineStatusChanged.com.standalone.plug")
@@ -143,14 +143,14 @@ public class Plug: NSObject, URLSessionDelegate {
 	
 	private var reachability: AnyObject
 	func setOnlineViaWifi(_ wifi: Bool, orWAN wan: Bool) {
-		var newState = ConnectionType.Offline
+		var newState = ConnectionType.offline
 		
 		if wifi {
-			newState = .Wifi
+			newState = .wifi
 		} else if wan {
-			newState = .WAN
+			newState = .wan
 		} else {
-			newState = .Offline
+			newState = .offline
 		}
 		
 		self.updateChannelStates()
@@ -166,7 +166,7 @@ public class Plug: NSObject, URLSessionDelegate {
 	func updateChannelStates() {
 		DispatchQueue.main.async {
 			for channel in Plug.Channel.allChannels.values {
-				if Plug.connectionType == .Offline {
+				if Plug.connectionType == .offline {
 					if channel.isRunning { channel.pauseQueue(); channel.pausedReason = .offline }
 				} else {
 					if channel.pausedReason == .offline || channel.pausedReason == .backgrounding { channel.startQueue() }
