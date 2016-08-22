@@ -9,6 +9,7 @@
 import Foundation
 
 public typealias PlugCompletionClosure = (Connection, Plug.ConnectionData) -> Void
+public typealias PlugJSONCompletionClosure = (Connection, JSONDictionary) -> Void
 
 public class Connection: Hashable, CustomStringConvertible {
 	public var state: State = .waiting {
@@ -30,6 +31,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	public let persistence: Plug.Persistence
 	public var completionQueue: OperationQueue?
 	public var completionBlocks: [PlugCompletionClosure] = []
+	public var jsonBlocks: [PlugJSONCompletionClosure] = []
 	public var errorBlocks: [(Connection, NSError) -> Void] = []
 	public var progressBlocks: [(Connection, Double) -> Void] = []
 	public var cachingPolicy: URLRequest.CachePolicy = .reloadIgnoringLocalCacheData

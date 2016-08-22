@@ -44,8 +44,8 @@ public extension Plug {
 			self.rawData = nil
 		}
 		
-		public var utf8: String { return String(data: self.data, encoding: NSUTF8StringEncoding) ?? "" }
-		public var utf16: String { return String(data: self.data, encoding: NSUTF16StringEncoding) ?? "" }
-		public var ascii: String { return String(data: self.data, encoding: NSASCIIStringEncoding) ?? "" }
+		public var json: JSONDictionary? {
+			return self.rawData?.json
+		}
 	}
 }

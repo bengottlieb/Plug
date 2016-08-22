@@ -91,6 +91,8 @@ extension NSArray: JSONObject {
 }
 
 public extension Data {
+	public var json: JSONDictionary? { return self.jsonDictionary() }
+	
 	public func jsonDictionary(options: JSONSerialization.ReadingOptions = []) -> JSONDictionary? {
 		do {
 			let dict = try JSONSerialization.jsonObject(with: self, options: options) as? JSONDictionary
