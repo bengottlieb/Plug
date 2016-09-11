@@ -61,7 +61,7 @@ public extension Plug {
 		
 		
 		
-		var defaultPersistentCacheURL: NSURL { return Plug.plugDirectoryURL.URLByAppendingPathComponent("Pending_Connections.json") }
+		var defaultPersistentCacheURL: NSURL { return Plug.plugDirectoryURL.URLByAppendingPathComponent("Pending_Connections.json")! }
 		
 		var persistentCacheURL: NSURL? { didSet {
 			if let url = self.persistentCacheURL {

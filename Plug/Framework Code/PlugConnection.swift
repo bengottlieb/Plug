@@ -136,7 +136,7 @@ public class Connection: Hashable, CustomStringConvertible {
 			
 	func receivedData(data: NSData) {
 		self.bytesReceived += UInt64(data.length)
-		if let destURL = self.destinationFileURL, path = destURL.path {
+		if let destURL = self.destinationFileURL, let path = destURL.path {
 			if self.fileHandle == nil {
 				do {
 					try NSFileManager.defaultManager().createDirectoryAtURL(destURL.URLByDeletingLastPathComponent!, withIntermediateDirectories: true, attributes: nil)
@@ -184,7 +184,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	}
 
 	var defaultRequest: NSURLRequest {
-		let urlString = self.URL.absoluteString + self.parameters.URLString
+		let urlString = self.URL.absoluteString ?? "://" + self.parameters.URLString
 		let request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
 		let headers = (self.headers ?? Plug.instance.defaultHeaders)
 		
@@ -281,7 +281,7 @@ extension Connection {
 
 			string += "\n╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍ [Body] ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍➡︎\n"
 
-			if let json = json as? JSONObject, jString = json.JSONString {
+			if let json = json as? JSONObject, let jString = json.JSONString {
 				string += jString
 			} else {
 				string += (NSString(data: data, encoding: NSUTF8StringEncoding)?.description ?? "--unable to parse data as! UTF8--")
@@ -293,7 +293,7 @@ extension Connection {
 	}
 	
 	public func logErrorToFile(label: String = "") {
-		let errorsDir = Plug.plugDirectoryURL.URLByAppendingPathComponent("Errors")
+		guard let errorsDir = Plug.plugDirectoryURL.URLByAppendingPathComponent("Errors") else { return }
 		let code = self.statusCode ?? 0
 		let seconds = Int(NSDate().timeIntervalSinceReferenceDate)
 		var host = ""
@@ -310,7 +310,7 @@ extension Connection {
 		let contents = self.detailedDescription(false)
 		
 		do {
-			try contents.writeToURL(filepath, atomically: true, encoding: NSUTF8StringEncoding)
+			try contents.writeToURL(filepath!, atomically: true, encoding: NSUTF8StringEncoding)
 		} catch _ {
 		}
 		
