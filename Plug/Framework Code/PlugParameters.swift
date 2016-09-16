@@ -128,6 +128,7 @@ extension Plug {
 		case url([String: String])
 		case form(FormComponents)
 		case json(JSONDictionary)
+		case data(Data)
 		
 		var stringValue: String {
 			switch (self) {
@@ -137,6 +138,9 @@ extension Plug {
 				
 			case .form:
 				return ""
+				
+			case .data(let data):
+				return String(data: data, encoding: .utf8) ?? ""
 				
 			case .json(let object):
 				return (object as NSDictionary).JSONString ?? ""
@@ -150,6 +154,7 @@ extension Plug {
 			switch (self) {
 			case .url: return "URL"
 			case .form: return "Form"
+			case .data: return "Data"
 			case .json: return "JSON"
 			default: return "None"
 			}
@@ -168,6 +173,7 @@ extension Plug {
 				return components.dataValue
 			case .json:
 				return self.stringValue.data(using: String.Encoding.utf8, allowLossyConversion: false)
+			case .data(let data): return data
 			default: return nil
 			}
 		}
@@ -175,6 +181,7 @@ extension Plug {
 		func normalizeMethod(method: Plug.Method) -> Plug.Method {
 			switch (self) {
 			case .form: fallthrough
+			case .data: fallthrough
 			case .json:
 				if method == .GET { return .POST }
 				return method
@@ -185,6 +192,7 @@ extension Plug {
 		var contentTypeHeader: Plug.Header? {
 			switch (self) {
 			case .form(let components): return .contentType(components.contentTypeHeader)
+			case .data: return .contentType("application/data")
 			case .json: return .contentType("application/json")
 			default: return nil
 			}
@@ -194,7 +202,8 @@ extension Plug {
 			switch (self) {
 			case .url(let params): return params.keys.reduce("[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
 			case .form(let components): return "\(components)"
-			case .json: return "[" + self.stringValue + "]"
+			case .json: return "JSON:[" + self.stringValue + "]"
+			case .data: return "[" + self.stringValue + "]"
 				
 			default: return ""
 			}
