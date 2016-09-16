@@ -44,12 +44,12 @@ public class JSONConnection: Connection {
 		self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.unableToFindJSONContainer.rawValue, userInfo: nil))
 	}
 
-	public func completion(completion: PlugJSONDictionaryCompletionClosure) -> Self {
+	public func completion(completion: @escaping PlugJSONDictionaryCompletionClosure) -> Self {
 		self.requestQueue.addOperation { self.jsonDictionaryCompletionBlocks.append(completion) }
 		return self
 	}
 	
-	public func completion(completion: PlugJSONArrayCompletionClosure) -> Self {
+	public func completion(completion: @escaping PlugJSONArrayCompletionClosure) -> Self {
 		self.requestQueue.addOperation { self.jsonArrayCompletionBlocks.append(completion) }
 		return self
 	}

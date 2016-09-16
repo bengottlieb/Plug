@@ -227,7 +227,7 @@ extension Connection {
 }
 
 extension Connection {
-	public func completion(completion: PlugCompletionClosure) -> Self {
+	public func completion(completion: @escaping PlugCompletionClosure) -> Self {
 		self.requestQueue.addOperation { self.completionBlocks.append(completion) }
 		return self
 	}

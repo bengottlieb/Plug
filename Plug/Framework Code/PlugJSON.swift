@@ -64,6 +64,13 @@ extension JSONObject {
 	}
 }
 
+public func ==(lhs: JSONDictionary, rhs: JSONDictionary) -> Bool {
+	let lhd = lhs as NSDictionary
+	let rhd = rhs as NSDictionary
+	
+	return lhd == rhd
+}
+
 extension Dictionary: JSONContainer {}
 extension Array: JSONContainer {}
 

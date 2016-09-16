@@ -18,6 +18,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let largeURL = URL(string: "https://dl.dropboxusercontent.com/u/85235/Stereotypies%20Therapy.mp4")!
 		Plug.instance.timeout = 5.0
 		
+		let d1: JSONDictionary = ["h": "y"]
+		let d2: JSONDictionary = ["h": "y"]
+		
+		print(d1 == d2)
+		
 		
 		let connection = Plug.request(method: .GET, url: largeURL).completion { request, data in
 			print("Completed")
@@ -51,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let components = Plug.FormComponents(fields: payloadDict)
 		components.addFile(url: fileURL, name: "test file", mimeType: "image/png")
 		
-		let payload = Plug.Parameters.Form(components)
+		let payload = Plug.Parameters.form(components)
 		
 		
 		
@@ -107,7 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let url = "https://serenitynow.herokuapp.com/devices/online"
 		let args: JSONDictionary = ["device": ["udid": UIDevice.current.identifierForVendor!.uuidString]]
 	
-		Plug.request(method: .DELETE, url: url, parameters: Plug.Parameters.JSON(args)).completion { conn, data in
+		Plug.request(method: .DELETE, url: url, parameters: Plug.Parameters.json(args)).completion { conn, data in
 			print("got it \(NSString(data: data.data, encoding: String.Encoding.utf8.rawValue))")
 		}.start()
 	}
