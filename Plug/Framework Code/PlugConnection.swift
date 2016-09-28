@@ -184,7 +184,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	}
 
 	var defaultRequest: NSURLRequest {
-		let urlString = self.URL.absoluteString ?? "://" + self.parameters.URLString
+		let urlString = (self.URL.absoluteString ?? "://") + self.parameters.URLString
 		let request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
 		let headers = (self.headers ?? Plug.instance.defaultHeaders)
 		
