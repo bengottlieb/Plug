@@ -16,12 +16,12 @@ class Plug_TestPersistentDelegate: PlugPersistentDelegate {
 	var persistenceInfo = Plug.PersistenceInfo(objectKey: "test")
 	var expectations: [XCTestExpectation] = []
 	
-	func connectionCompleted(_ connection: Connection, info: Plug.PersistenceInfo?) {
+	func connectionCompleted(connection: Connection, info: Plug.PersistenceInfo?) {
 		if info == nil { return }
 		if self.expectations.count > 0 {
 			let expectation = self.expectations[0]
 			expectation.fulfill()
-			self.expectations.removeAtIndex(0)
+			self.expectations.remove(at: 0)
 		}
 		
 		connection.log()
@@ -32,7 +32,7 @@ class Plug_TestPersistentDelegate: PlugPersistentDelegate {
 	}
 	
 	init() {		
-		Plug.PersistenceManager.defaultManager.registerObject(self)
+		Plug.PersistenceManager.defaultManager.register(self)
 	}
 }
 
@@ -50,116 +50,116 @@ class Plug_Tests: XCTestCase {
 	
 	func testDownloadToFile() {
 		let url = "https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2@2x.png"
-		let expectation = expectationWithDescription("GET download to file")
-		let connection = Plug.request(.GET, URL: url)
+		let expect = expectation(description: "GET download to file")
+		let connection = Plug.request(method: .GET, url: url)
 		connection.destinationFileURL = Plug.instance.generateTemporaryFileURL()
 		print("Downloading to \(connection.destinationFileURL!)")
 		connection.completion { connection, data in
 			print("got \(data.length) bytes")
-			XCTAssert(data.length == 34245, "Failed to download correct file bytes: (expected 34245, got \(data.length)")
+			XCTAssert(data.length == 35460, "Failed to download correct file bytes: (expected 35460, got \(data.length)")
 			
-			expectation.fulfill()
+			expect.fulfill()
 		}
-		waitForExpectationsWithTimeout(20) { (error) in
+		waitForExpectations(timeout: 20) { (error) in
 			XCTAssert(error == nil, "Failed to download to file")
 		}
 		
 	}
 	
     func testGET2() {
-		let expectation = expectationWithDescription("GET")
+		let expect = expectation(description: "GET")
 		let url = "http://httpbin.org/get"
-		let params: Plug.Parameters = .None
+		let params: Plug.Parameters = .none
 		var completionCount = 0
 		
-		let connection = Plug.request(.GET, URL: url, parameters: params).completion { c, d in
+		let connection = Plug.request(method: .GET, url: url, parameters: params).completion { c, d in
 			completionCount += 1;
-			if completionCount == 2 { expectation.fulfill() }
+			if completionCount == 2 { expect.fulfill() }
 		}
-		let connection2 = Plug.request(.GET, URL: url, parameters: params).completion { c, d in
+		let connection2 = Plug.request(method: .GET, url: url, parameters: params).completion { c, d in
 			completionCount += 1;
-			if completionCount == 2 { expectation.fulfill() }
+			if completionCount == 2 { expect.fulfill() }
 		}
 		XCTAssert(connection == connection2, "Identical connections should be identical")
 
-		connection.completion({ (conn, data) in
-			let str = NSString(data: data.data, encoding: String.Encoding.utf8)
+		connection.completion(completion: { (conn, data) in
+			let str = String(data: data.data, encoding: .utf8)
 			print("Data: \(str)")
 
-			XCTAssert(Plug.activityUsageCount == 0, "Activity indicator not set to hidden");
+			//XCTAssert(Plug.activityUsageCount == 0, "Activity indicator not set to hidden");
 			print("Block3")
-		}).error({conn, error in
+		}).error(completion: {conn, error in
 			print("Got error: \(error)")
 			
-			XCTAssert(Plug.activityUsageCount == 0, "Activity indicator not set to hidden");
+			//XCTAssert(Plug.activityUsageCount == 0, "Activity indicator not set to hidden");
 			print("Block4")
 		})
 		
 		print("\(connection.log())")
 		connection.start()
 
-		waitForExpectationsWithTimeout(10) { (error) in
+		waitForExpectations(timeout: 10) { (error) in
 			XCTAssert(completionCount == 2, "Failed to complete one or more connections")
 		}
 		
 		connection.log()
-		connection.logErrorToFile("test label")
+		connection.logErrorToFile(label: "test label")
 		XCTAssert(true, "Pass")
     }
 	
 	func testPersistent2() {
-		let expectation = expectationWithDescription("GET_Persistent")
+		let expect = expectation(description: "GET_Persistent")
 //		persistentDelegate.expectations.append()
 		let url = "http://httpbin.org/get"
-		let params: Plug.Parameters = .None
-		let headers = Plug.Headers([.Accept(["*/*"])])
+		let params: Plug.Parameters = .none
+		let headers = Plug.Headers([.accept(["*/*"])])
 		
-		let connection = Plug.request(.GET, URL: url, parameters: params, persistence: .Persistent(persistentDelegate.persistenceInfo))
+		let connection = Plug.request(method: .GET, url: url, parameters: params, persistence: .persistent(persistentDelegate.persistenceInfo))
 		connection.headers = headers
-		let dict = connection.JSONRepresentation
+		let dict: JSONDictionary = connection.JSONRepresentation
 		
-		let json = dict.JSONString
+		guard let json = dict.JSONData else { return }
 		connection.cancel()
 		
 		do {
-			if let dict = try JSONSerialization.JSONObjectWithData(json!.dataUsingEncoding(String.Encoding.utf8, allowLossyConversion: false)!, options: []) as? NSDictionary {
+			if let dict = try JSONSerialization.jsonObject(with: json, options: []) as? NSDictionary {
 				let replacement = Connection(JSONRepresentation: dict)
 				
 				replacement?.completion { req, data in
-					expectation.fulfill()
+					expect.fulfill()
 				}.start()
 			}
 		} catch let error as NSError {
 			print("Error while decoding JSON: \(error)")
 		}
 		
-		waitForExpectationsWithTimeout(1000) { (error) in
+		waitForExpectations(timeout: 1000) { (error) in
 			
 		}
 	}
     
     func _testPerformanceExample() {
         // This is an example of a performance test case.
-        self.measureBlock() {
+        self.measure() {
             // Put the code you want to measure the time of here.
         }
     }
 	
 	func testTimeout() {
-		let expectation = expectationWithDescription("GET")
+		let expect = expectation(description: "GET")
 		let url = "http://128.0.0.1/"
 		
 		Plug.instance.timeout = 5
-		let request = Plug.request(.GET, URL: url)
+		let request = Plug.request(method: .GET, url: url)
 		
 		request.error { req, error in
 			XCTAssert(error.isTimeoutError, "Should have timed out")
-			expectation.fulfill()
+			expect.fulfill()
 		}
 		
 		request.start()
 		
-		waitForExpectationsWithTimeout(10) { (error) in
+		waitForExpectations(timeout: 10) { (error) in
 			
 		}
 	}
@@ -167,15 +167,15 @@ class Plug_Tests: XCTestCase {
 	let largeURL = "http://mirror.internode.on.net/pub/test/50meg.test"
 	var lastPercent = 0.0
 	func testTimeoutLargeDownload() {
-		let expectation = expectationWithDescription("GET")
+		let expect = expectation(description: "GET")
 		let url = largeURL
 		
 		Plug.instance.timeout = 10
-		let request = Plug.request(.GET, URL: url)
+		let request = Plug.request(method: .GET, url: url)
 		
 		request.error { req, error in
 			XCTAssert(!error.isTimeoutError, "Should not have timed out")
-			expectation.fulfill()
+			expect.fulfill()
 		}
 		
 		request.progress { req, percent in
@@ -187,12 +187,12 @@ class Plug_Tests: XCTestCase {
 		
 		request.completion { req, data in
 			print("Downloaded \(data.length)")
-			expectation.fulfill()
+			expect.fulfill()
 		}
 		
 		request.start()
 		
-		waitForExpectationsWithTimeout(200) { (error) in
+		waitForExpectations(timeout: 200) { (error) in
 			
 		}
 	}

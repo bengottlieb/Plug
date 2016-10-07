@@ -34,7 +34,10 @@ public extension NSError {
 	}
 	
 	public var isTimeoutError: Bool {
-		return self.domain == NSURLErrorDomain && self.code == Int(CFNetworkErrors.cfurlErrorTimedOut.rawValue)
+		if self.domain != NSURLErrorDomain { return false }
+		if self.code == Int(CFNetworkErrors.cfurlErrorTimedOut.rawValue) { return true }
+		if self.code == Int(CFNetworkErrors.cfurlErrorCannotConnectToHost.rawValue) { return true }
+		return false
 	}
 }
 

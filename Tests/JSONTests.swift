@@ -11,39 +11,42 @@ import XCTest
 
 class JSONTests: XCTestCase {
 	func testPathExtraction() {
-		let url = Bundle(for: self.dynamicType).URLForResource("json_sample_1", withExtension: "json")!
-		let data = Data(contentsOfURL: url)!
+		let url = Bundle(for: type(of: self)).url(forResource: "json_sample_1", withExtension: "json")!
+		let data = try! Data(contentsOf: url)
 		let json = data.jsonDictionary()!
 		let result = json[path: "glossary.GlossDiv.GlossList.GlossEntry.Flavors[0]"] as! String
 		XCTAssert(result == "GML", "Failed to extract JSON")
 	}
 
 	func testJSONDictionaryDownload() {
-		let expectation = expectationWithDescription("JSONDictionary")
+		let expect = expectation(description: "JSONDictionary")
 		let url = URL(string: "http://jsonview.com/example.json")!
 		
-		JSONConnection(URL: url)?.completion { (request: Connection, json: JSONDictionary) in
-			expectation.fulfill()
+		JSONConnection(url: url)?.completion { (request: Connection, json: JSONDictionary) in
+			expect.fulfill()
 			}.start()
 		
-		waitForExpectationsWithTimeout(10) { (error) in
+		waitForExpectations(timeout: 10) { (error) in
 			XCTAssert(error == nil, "Failed to download JSON Dictionary")
 		}
 		
 	}
 
+	var sharedExpectation: XCTestExpectation?
+	
 	func testJSONArrayDownload() {
-		let expectation = expectationWithDescription("JSONDictionary")
+		self.sharedExpectation = expectation(description: "JSONDictionary")
 		let url = URL(string: "http://jsonview.com/example.json")!
 		
-		JSONConnection(URL: url)?.completion { (request: Connection, json: JSONArray) in
+		JSONConnection(url: url)?.completion { (request: Connection, json: JSONArray) in
 				XCTAssert(false, "Was expecting an array")
 			}.error { request, error in
-				expectation.fulfill()
+				self.sharedExpectation?.fulfill()
+				self.sharedExpectation = nil
 		}
 		
 		
-		waitForExpectationsWithTimeout(10) { (error) in
+		waitForExpectations(timeout: 10) { (error) in
 			XCTAssert(error == nil, "Failed to download JSON Dictionary")
 		}
 		

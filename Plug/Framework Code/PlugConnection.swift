@@ -227,17 +227,17 @@ extension Connection {
 }
 
 extension Connection {
-	public func completion(completion: @escaping PlugCompletionClosure) -> Self {
+	@discardableResult public func completion(completion: @escaping PlugCompletionClosure) -> Self {
 		self.requestQueue.addOperation { self.completionBlocks.append(completion) }
 		return self
 	}
 
-	public func error(completion: @escaping (Connection, NSError) -> Void) -> Self {
+	@discardableResult public func error(completion: @escaping (Connection, NSError) -> Void) -> Self {
 		self.requestQueue.addOperation { self.errorBlocks.append(completion) }
 		return self
 	}
 	
-	public func progress(closure: @escaping (Connection, Double) -> Void) -> Self {
+	@discardableResult public func progress(closure: @escaping (Connection, Double) -> Void) -> Self {
 		self.requestQueue.addOperation { self.progressBlocks.append(closure) }
 		return self
 	}

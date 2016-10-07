@@ -83,6 +83,13 @@
 			remoteGlobalIDString = B504E6121A89230F001B414B;
 			remoteInfo = TestHost;
 		};
+		B5A026A21DA7277B00D79BA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B504E60B1A89230F001B414B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B504E6451A8968DC001B414B;
+			remoteInfo = Plug_iOS;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -364,6 +371,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B5A026A31DA7277B00D79BA2 /* PBXTargetDependency */,
 				B58D64981A899FE9005A0002 /* PBXTargetDependency */,
 			);
 			name = "Plug Tests";
@@ -570,6 +578,11 @@
 			isa = PBXTargetDependency;
 			target = B504E6121A89230F001B414B /* PlugTest */;
 			targetProxy = B58D64971A899FE9005A0002 /* PBXContainerItemProxy */;
+		};
+		B5A026A31DA7277B00D79BA2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B504E6451A8968DC001B414B /* Plug_iOS */;
+			targetProxy = B5A026A21DA7277B00D79BA2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -803,7 +816,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PlugTest.app/PlugTest";
 			};
 			name = Debug;
 		};

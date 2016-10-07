@@ -22,10 +22,10 @@ class DuplicateConnections: XCTestCase {
     }
 
     func testDupes() {
-		let expectation = expectationWithDescription("Duplicate Request Test")
+		let expect = expectation(description: "Duplicate Request Test")
 		let channel = Plug.Channel.defaultChannel
-		let request1 = Plug.request(.GET, URL: "http://httpbin.org/get", parameters: nil, channel: channel)
-		let request2 = Plug.request(.GET, URL: "http://httpbin.org/get", parameters: nil, channel: channel)
+		let request1 = Plug.request(method: .GET, url: "http://httpbin.org/get", parameters: nil, channel: channel)
+		let request2 = Plug.request(method: .GET, url: "http://httpbin.org/get", parameters: nil, channel: channel)
 		
 		request1.tag = 1
 		request2.tag = 2
@@ -33,10 +33,10 @@ class DuplicateConnections: XCTestCase {
 		request1.start()
 		request2.completion { request, data in
 			XCTAssert(request.superconnection == request1, "Second request did not have first as its superconnection")
-			expectation.fulfill()
+			expect.fulfill()
 		}.start()
 		
-		waitForExpectationsWithTimeout(20) { (error) in
+		waitForExpectations(timeout: 20) { (error) in
 			XCTAssert(error == nil, "Failed to complete duplicate downloads")
 		}
 		
