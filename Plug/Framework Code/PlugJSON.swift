@@ -19,7 +19,9 @@ func ValidateJSON(object value: Any) -> Bool {
 	
 	if value is Int || value is String || value is JSONArray || value is Bool || value is Float || value is Double { return true }
 	
-	print("Illegal value: \(value)")
+	print("▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽")
+	print("Illegal value \(type(of: value)):  \(value)")
+	print("△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△")
 	
 	return false
 }
