@@ -8,8 +8,68 @@
 
 import Foundation
 
-extension Dictionary where Key: ExpressibleByStringLiteral, Value: AnyObject {
+func ValidateJSON(object value: Any) -> Bool {
+	if let dict = value as? JSONDictionary {
+		if dict.validateJSON() { return true }
+	}
 	
+	if let array = value as? JSONArray {
+		if array.validateJSON() { return true }
+	}
+	
+	if value is Int || value is String || value is JSONArray || value is Bool || value is Float || value is Double { return true }
+	
+	print("Illegal value: \(value)")
+	
+	return false
+}
+
+public extension Dictionary {
+	@discardableResult public func validateJSON() -> Bool {
+		for (key, value) in self {
+			if !(key is String) {
+				print("Illegal key: \(key)")
+				return false
+			}
+			
+			if !ValidateJSON(object: value) { return false }
+		}
+		return true
+	}
+}
+
+public extension NSDictionary {
+	@discardableResult public func validateJSON() -> Bool {
+		for (key, value) in self {
+			if !(key is String) {
+				print("Illegal key: \(key)")
+				return false
+			}
+			
+			if !ValidateJSON(object: value) { return false }
+		}
+		return true
+	}
+}
+
+public extension Array {
+	@discardableResult public func validateJSON() -> Bool {
+		for value in self {
+			if !ValidateJSON(object: value) { return false }
+		}
+		
+		return true
+	}
+}
+
+public extension NSArray {
+	@discardableResult public func validateJSON() -> Bool {
+		for value in self {
+			if !ValidateJSON(object: value) { return false }
+		}
+		
+		return true
+	}
 }
 
 public protocol JSONContainer {}			//either a JSONArray or JSONDictionary
@@ -77,6 +137,7 @@ extension Array: JSONContainer {}
 extension NSDictionary: JSONObject {
 	public var JSONData: Data? {
 		do {
+			if !self.validateJSON() { return nil }
 			return try JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
 		} catch let error {
 			print("Unable to convert \(self) to JSON: \(error)")
@@ -89,11 +150,28 @@ extension NSDictionary: JSONObject {
 extension NSArray: JSONObject {
 	public var JSONData: Data? {
 		do {
+			if !self.validateJSON() { return nil }
 			return try JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
 		} catch let error {
 			print("Unable to convert \(self) to JSON: \(error)")
 			return nil
 		}
+	}
+}
+
+public extension String {
+	public var json: JSONDictionary? { return self.jsonDictionary() }
+	
+	public func jsonDictionary(options: JSONSerialization.ReadingOptions = []) -> JSONDictionary? {
+		guard let data = self.data(using: .utf8) else { return nil }
+
+		do {
+			let dict = try JSONSerialization.jsonObject(with: data, options: options) as? JSONDictionary
+			return dict
+		} catch let error {
+			print("Error while parsing JSON Dictionary: \(error)")
+		}
+		return nil
 	}
 }
 
@@ -188,7 +266,10 @@ extension Dictionary: JSONObject {
 		}
 		return nil
 	}
-	public var JSONData: Data? { return self.JSONString?.data(using: String.Encoding.utf8) }
+	public var JSONData: Data? {
+		if !self.validateJSON() { return nil }
+		return self.JSONString?.data(using: String.Encoding.utf8)
+	}
 }
 
 extension Array: JSONObject {
