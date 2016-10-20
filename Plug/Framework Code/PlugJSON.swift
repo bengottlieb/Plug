@@ -329,8 +329,8 @@ public extension Date {
 		return formatter
 	}
 	
-	public init?(jsonString: String) {
-		if let date = Date.formatter.date(from: jsonString) {
+	public init?(jsonString: String?) {
+		if let string = jsonString, let date = Date.formatter.date(from: string) {
 			self = date
 		} else {
 			return nil
