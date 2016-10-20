@@ -321,3 +321,21 @@ extension Array: JSONObject {
 	public var JSONData: Data? { return self.JSONString?.data(using: String.Encoding.utf8) }
 	var description: String { return self.JSONString ?? "" }
 }
+
+public extension Date {
+	private static var formatter: DateFormatter {
+		let formatter = DateFormatter()
+		formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+		return formatter
+	}
+	
+	public init?(jsonString: String) {
+		if let date = Date.formatter.date(from: jsonString) {
+			self = date
+		} else {
+			return nil
+		}
+	}
+	
+	public var jsonString: String { return Date.formatter.string(from: self) }
+}
