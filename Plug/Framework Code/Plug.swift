@@ -23,8 +23,8 @@ public protocol ActivityIndicatorProtocol {
 #endif
 
 public protocol BackgroundActivityHandlerProtocol {
-	func beginBackgroundTaskWithName(taskName: String?, expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier
-	func endBackgroundTask(identifier: UIBackgroundTaskIdentifier)
+	func beginBackgroundTaskWithName(_ taskName: String?, expirationHandler handler: (() -> Void)?) -> UIBackgroundTaskIdentifier
+	func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier)
 }
 
 public class Plug: NSObject, URLSessionDelegate {

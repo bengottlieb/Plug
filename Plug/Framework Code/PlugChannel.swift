@@ -159,7 +159,7 @@ extension Plug {
 			func startBackgroundTask() {
 				if self.backgroundTaskID == nil {
 					self.serialize {
-						self.backgroundTaskID = Plug.instance.backgroundActivityHandler?.beginBackgroundTaskWithName(taskName: "plug.queue.\(self.name)", expirationHandler: {
+						self.backgroundTaskID = Plug.instance.backgroundActivityHandler?.beginBackgroundTaskWithName("plug.queue.\(self.name)", expirationHandler: {
 							self.endBackgroundTask(onlyClearTaskID: true)
 							self.pauseQueue(reason: .backgrounding)
 						})
@@ -171,7 +171,7 @@ extension Plug {
 				self.serialize {
 					if let taskID = self.backgroundTaskID , !self.isRunning {
 						DispatchQueue.main.async {
-							if (!onlyClearTaskID) { Plug.instance.backgroundActivityHandler?.endBackgroundTask(identifier: taskID) }
+							if (!onlyClearTaskID) { Plug.instance.backgroundActivityHandler?.endBackgroundTask(taskID) }
 						}
 						self.backgroundTaskID = nil
 					}
