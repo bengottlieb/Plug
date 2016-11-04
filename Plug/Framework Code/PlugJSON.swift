@@ -17,7 +17,7 @@ func ValidateJSON(object value: Any) -> Bool {
 		if array.validateJSON() { return true }
 	}
 	
-	if value is Int || value is String || value is JSONArray || value is Bool || value is Float || value is Double { return true }
+	if value is Int || value is String || value is JSONArray || value is Bool || value is Float || value is Double || value is NSNull { return true }
 	
 	print("▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽")
 	print("Illegal value \(type(of: value)):  \(value)")
@@ -225,6 +225,17 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
 		let components = int.components(separatedBy: JSONSeparatorsCharacterSet)
 		if let integer = self[components: components] as? Int { return integer }
 		if let str = self[components: components] as? String { return Int(str) }
+		return nil
+	}
+	
+	public subscript(bool bool: String) -> Bool? {
+		let components = bool.components(separatedBy: JSONSeparatorsCharacterSet)
+		if let boolean = self[components: components] as? Bool { return boolean }
+		if let integer = self[components: components] as? Int { return integer != 0 }
+		if let str = self[components: components] as? String {
+			let lower = str.lowercased()
+			return lower == "false" || lower == "no"
+		}
 		return nil
 	}
 	
