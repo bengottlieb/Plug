@@ -223,9 +223,12 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 	}
 
 	public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-		if let err = error as? NSError , err.code == -1005 {
-			print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
-		}
+		#if (arch(i386) || arch(x86_64)) && os(iOS)
+			if let err = error as? NSError , err.code == -1005 {
+				print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
+			}
+		#endif
+		
 		if let error = error {
 			self[task]?.failedWithError(error: error as NSError?)
 		} else {
@@ -234,7 +237,7 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 	}
 	
 	public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
-		print("Received redirect request from \(task.originalRequest)")
+		//print("Received redirect request from \(task.originalRequest)")
 		completionHandler(request)
 	}
 
