@@ -47,7 +47,7 @@ extension Plug {
 		}
 		
 		public func isSameHeaderAs(header: Header) -> Bool {
-			return self.label == header.label
+			return self.label.lowercased() == header.label.lowercased()
 		}
 		
 		public init(label: String, content: String) {
@@ -98,8 +98,11 @@ extension Plug {
 		
 		public subscript(key: String) -> Header? {
 			get {
+				let lowerKey = key.lowercased()
 				for header in self.headers {
-					if header.label == key { return header }
+					if header.label.lowercased() == lowerKey {
+						return header
+					}
 				}
 				return nil
 			}
