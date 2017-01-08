@@ -127,7 +127,12 @@ public class Plug: NSObject, URLSessionDelegate {
 	func didBecomeActive() {
 		Channel.restartBackgroundedChannels()
 	}
-	
+    
+    public static func attemptReconnection(completion: (() -> Void)? = nil) {
+        Plug.connectionType = .wifi
+        completion?()
+    }
+    
 	public var areConnectionsInFlight: Bool {
 		for (_, channel) in Plug.Channel.allChannels {
 			if channel.activeConnections.count > 0 {

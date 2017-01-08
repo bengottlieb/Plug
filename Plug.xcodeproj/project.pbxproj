@@ -37,6 +37,7 @@
 		B560B52B1AA4A15000F3161F /* PlugReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = B560B5261AA4A15000F3161F /* PlugReachability.h */; };
 		B560B52C1AA4A15000F3161F /* PlugReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B560B5271AA4A15000F3161F /* PlugReachability.m */; };
 		B560B52D1AA4A15000F3161F /* PlugReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B560B5271AA4A15000F3161F /* PlugReachability.m */; };
+		B56A0B361E22FADC009BA288 /* Plug+iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56A0B351E22FADC009BA288 /* Plug+iOS.swift */; };
 		B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
 		B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
 		B57AEF441C59C1AE007611F0 /* sample_image.png in Resources */ = {isa = PBXBuildFile; fileRef = B57AEF431C59C1AE007611F0 /* sample_image.png */; };
@@ -130,6 +131,7 @@
 		B550979F1A9A4FE7003E5155 /* PlugJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugJSON.swift; sourceTree = "<group>"; };
 		B560B5261AA4A15000F3161F /* PlugReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlugReachability.h; sourceTree = "<group>"; };
 		B560B5271AA4A15000F3161F /* PlugReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlugReachability.m; sourceTree = "<group>"; };
+		B56A0B351E22FADC009BA288 /* Plug+iOS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Plug+iOS.swift"; path = "Plug/Framework Code/Plug+iOS.swift"; sourceTree = "<group>"; };
 		B572EB721A8CC96E00670D8E /* Plug.Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plug.Headers.swift; sourceTree = "<group>"; };
 		B57AEF431C59C1AE007611F0 /* sample_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sample_image.png; sourceTree = "<group>"; };
 		B580E0281A99867C0067F89D /* PlugPersistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugPersistence.swift; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 		B504E60A1A89230F001B414B = {
 			isa = PBXGroup;
 			children = (
+				B56A0B351E22FADC009BA288 /* Plug+iOS.swift */,
 				B504E66A1A896980001B414B /* BuildFramework.sh */,
 				B58D64741A898F81005A0002 /* Framework Code */,
 				B58D64661A898F81005A0002 /* Plug_Mac */,
@@ -531,6 +534,7 @@
 				B5FDD9B81CEFE3380001FABA /* NSURLRequest+Plug.swift in Sources */,
 				B580E0291A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B58D64821A898FBD005A0002 /* PlugProtocols.swift in Sources */,
+				B56A0B361E22FADC009BA288 /* Plug+iOS.swift in Sources */,
 				B5FDD9BB1CEFE3500001FABA /* Plug.ConnectionData.swift in Sources */,
 				B5264A871AE68AED0062537C /* PlugChannel.swift in Sources */,
 				B507A3C91A8E85BC008E3DB1 /* PlugErrors.swift in Sources */,
