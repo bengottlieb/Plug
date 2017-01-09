@@ -21,7 +21,9 @@ extension Plug {
             alert.addAction(UIAlertAction(title: NSLocalizedString("Retry", comment: "Retry"), style: .default, handler: { action in
                 
                 Plug.attemptReconnection() {
-                    execute()
+					DispatchQueue.main.async {
+						execute()
+					}
                 }
             }))
 
