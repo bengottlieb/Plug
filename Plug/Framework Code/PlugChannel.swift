@@ -92,7 +92,13 @@ extension Plug {
 		func enqueue(connection: Connection) {
 			self.serialize {
 				if connection.state == .queued { return }
-				if self.pausedReason != nil { print("Queing connection on a non-running queue (\(self))") }
+				if let reason = self.pausedReason {
+					if reason == .offline && Plug.online {
+						self.pausedReason = nil
+					} else {
+						print("Queing connection on a non-running queue (\(self), reason: \(reason))")
+					}
+				}
 				connection.state = .queuing
 				
 				if connection.coalescing == .coalesceSimilarConnections, let existing = self.existing(matching: connection) {
