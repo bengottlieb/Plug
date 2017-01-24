@@ -63,7 +63,7 @@ public class Plug: NSObject, URLSessionDelegate {
 	}
 	
 	public static let instance = Plug()
-	public static var connectionType = ConnectionType.offline
+	public static var connectionType = ConnectionType.wifi          //let's try starting off optimistically
 	public static var online: Bool { return self.connectionType != .offline }
 	
 	public struct notifications {
