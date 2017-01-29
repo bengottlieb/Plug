@@ -29,7 +29,7 @@ public protocol BackgroundActivityHandlerProtocol {
 
 public class Plug: NSObject, URLSessionDelegate {
 	public enum ConnectionType: Int { case offline, wifi, wan }
-	public enum Method: String, CustomStringConvertible { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH"
+	public enum Method: String, CustomStringConvertible { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH", HEAD = "HEAD"
 		public var description: String { return self.rawValue } 
 	}
 	

@@ -88,7 +88,7 @@ extension Plug {
 			for header in self.headers { dict[header.label] = header.content }
 			return dict
 		}
-		public init(_ headerList: [Header]) {
+		public init(_ headerList: [Header] = []) {
 			headers = headerList
 		}
 		
