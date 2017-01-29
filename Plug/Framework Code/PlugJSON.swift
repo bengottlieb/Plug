@@ -334,19 +334,29 @@ extension Array: JSONObject {
 }
 
 public extension Date {
-	private static var formatter: DateFormatter {
-		let formatter = DateFormatter()
-		formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
-		return formatter
-	}
+	public static var JSONFormat = "yyyy-MM-dd HH:mm:ss Z"
 	
-	public init?(jsonString: String?) {
-		if let string = jsonString, let date = Date.formatter.date(from: string) {
+	public init?(jsonString: String?, format: String = Date.JSONFormat, cachedFormatter: DateFormatter? = nil) {
+		let formatter = cachedFormatter ?? {
+			let formatter = DateFormatter()
+			formatter.dateFormat = format
+			return formatter
+		}()
+		
+		if let string = jsonString, let date = formatter.date(from: string) {
 			self = date
 		} else {
 			return nil
 		}
 	}
 	
-	public var jsonString: String { return Date.formatter.string(from: self) }
+	public func jsonString(format: String = Date.JSONFormat, cachedFormatter: DateFormatter? = nil) -> String {
+		let formatter = cachedFormatter ?? {
+			let formatter = DateFormatter()
+			formatter.dateFormat = format
+			return formatter
+		}()
+
+		return formatter.string(from: self)
+	}
 }
