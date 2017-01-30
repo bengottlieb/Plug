@@ -336,14 +336,22 @@ extension Array: JSONObject {
 public extension Date {
 	public static var JSONFormat = "yyyy-MM-dd HH:mm:ss Z"
 	
-	public init?(jsonString: String?, format: String = Date.JSONFormat, cachedFormatter: DateFormatter? = nil) {
-		let formatter = cachedFormatter ?? {
-			let formatter = DateFormatter()
-			formatter.dateFormat = format
-			return formatter
-		}()
+	public init?(jsonString: String?, format: String = Date.JSONFormat, formats: [String]? = nil, cachedFormatter: DateFormatter? = nil) {
+		var result: Date?
 		
-		if let string = jsonString, let date = formatter.date(from: string) {
+		for format in formats ?? (format == Date.JSONFormat ? [format] : [format, Date.JSONFormat]) {
+			let formatter = cachedFormatter ?? {
+				let formatter = DateFormatter()
+				formatter.dateFormat = format
+				return formatter
+			}()
+			
+			if let string = jsonString, let date = formatter.date(from: string) {
+				result = date
+				break
+			}
+		}
+		if let date = result {
 			self = date
 		} else {
 			return nil
