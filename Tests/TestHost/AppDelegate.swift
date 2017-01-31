@@ -78,6 +78,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
 		Plug.instance.setup()
 		
+		let jsonD = ["A": "B"]
+		let jrep = jsonD.jsonRepresentation
+		let jsonA = ["A", "B"]
+		let jrep2 = jsonA.jsonRepresentation
+		
+		print("\(jrep), \(jrep2)")
+		
 //		self.testLargeDownloads()
 //		self.testLargeDownloads()
 		for _ in 0...10 {

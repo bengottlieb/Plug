@@ -143,7 +143,7 @@ extension Plug {
 				return String(data: data, encoding: .utf8) ?? ""
 				
 			case .json(let object):
-				return (object as NSDictionary).JSONString ?? ""
+				return (object as NSDictionary).jsonString ?? ""
 				
 			case .none:
 				return ""
