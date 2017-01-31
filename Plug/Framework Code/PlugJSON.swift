@@ -23,7 +23,7 @@ public protocol JSONInitable {				// any object that can be initialized with a J
 }
 
 public protocol JSONLoadable {				//any object that can be loaded with a JSON object
-	func load(json: JSONObject) -> Bool
+	@discardableResult func load(json: JSONObject) -> Bool
 }
 
 
