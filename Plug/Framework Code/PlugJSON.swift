@@ -8,26 +8,26 @@
 
 import Foundation
 
+
+public protocol JSONPrimitive: JSONConvertible {}			// Int, String, Float, Bool, [String: JSONPrimitive], [JSONPrimitive]
 public protocol JSONContainer {}			//either a JSONArray or JSONDictionary
 
-public protocol JSONPrimitive: JSONObject {}
-
-public protocol JSONObject {				//any object representable in JSON, including base JSON primitives
+public protocol JSONConvertible {			// any object that can be converted into a JSONPrimitive
 	var jsonRepresentation: JSONPrimitive? { get }
 	var jsonString: String? { get }
 	var jsonData: Data? { get }
 }
 
 public protocol JSONInitable {				// any object that can be initialized with a JSON object
-	init?(json: JSONObject)
+	init?(json: JSONPrimitive)
 }
 
 public protocol JSONLoadable {				//any object that can be loaded with a JSON object
-	@discardableResult func load(json: JSONObject) -> Bool
+	@discardableResult func load(json: JSONPrimitive) -> Bool
 }
 
 
-func ValidateJSON(object value: JSONObject) -> Bool {
+func ValidateJSON(object value: JSONConvertible) -> Bool {
 	if let dict = value as? JSONDictionary { return dict.validateJSON() }
 	if let array = value as? JSONArray { return array.validateJSON() }
 	
@@ -58,8 +58,15 @@ public extension Dictionary {
 				return false
 			}
 			
-			guard let jsonValue = value as? JSONObject else { return false }
-			if !ValidateJSON(object: jsonValue) { return false }
+			guard let jsonValue = value as? JSONConvertible else {
+				if value is JSONPrimitive { continue }
+				ReportInvalidJSON(value)
+				return false
+			}
+			if !ValidateJSON(object: jsonValue) {
+				ReportInvalidJSON(jsonValue)
+				return false
+			}
 		}
 		return true
 	}
@@ -73,7 +80,10 @@ public extension NSDictionary {
 				return false
 			}
 			
-			guard let jsonValue = value as? JSONObject else { return false }
+			guard let jsonValue = value as? JSONConvertible else {
+				if value is JSONPrimitive { continue }
+				return false
+			}
 			if !ValidateJSON(object: jsonValue) { return false }
 		}
 		return true
@@ -83,7 +93,10 @@ public extension NSDictionary {
 public extension Array {
 	@discardableResult public func validateJSON() -> Bool {
 		for value in self {
-			guard let jsonValue = value as? JSONObject else { return false }
+			guard let jsonValue = value as? JSONConvertible else {
+				if value is JSONPrimitive { continue }
+				return false
+			}
 			if !ValidateJSON(object: jsonValue) { return false }
 		}
 		
@@ -94,7 +107,10 @@ public extension Array {
 public extension NSArray {
 	@discardableResult public func validateJSON() -> Bool {
 		for value in self {
-			guard let jsonValue = value as? JSONObject else { return false }
+			guard let jsonValue = value as? JSONConvertible else {
+				if value is JSONPrimitive { continue }
+				return false
+			}
 			if !ValidateJSON(object: jsonValue) { return false }
 		}
 		
@@ -102,27 +118,27 @@ public extension NSArray {
 	}
 }
 
-extension NSString: JSONObject, JSONPrimitive {
+extension NSString: JSONPrimitive {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 	public var jsonString: String? { return (self as String) }
 }
 
-extension Data: JSONObject, JSONPrimitive {
+extension Data: JSONPrimitive {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 	public var jsonString: String? { return self.base64EncodedString() }
 }
 
-extension NSNumber: JSONObject, JSONPrimitive {
+extension NSNumber: JSONPrimitive {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 	public var jsonString: String? { return self.description }
 }
 
-extension Bool: JSONObject, JSONPrimitive {
+extension Bool: JSONPrimitive  {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 	public var jsonString: String? { return self ? "true" : "false" }
 }
 
-extension JSONObject {
+extension JSONConvertible {
 	public func log() {
 		if let string = self.jsonString {
 			print("\(string)")
@@ -158,11 +174,11 @@ public func ==(lhs: JSONDictionary, rhs: JSONDictionary) -> Bool {
 extension Dictionary: JSONContainer {}
 extension Array: JSONContainer {}
 
-extension NSDictionary: JSONObject {
+extension NSDictionary: JSONPrimitive {
 	public var jsonData: Data? {
 		do {
 			if !self.validateJSON() { return nil }
-			return try JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
+			return try JSONSerialization.data(withJSONObject: self, options: [])
 		} catch let error {
 			print("Unable to convert \(self) to JSON: \(error)")
 			return nil
@@ -171,11 +187,11 @@ extension NSDictionary: JSONObject {
 	public var jsonRepresentation: JSONPrimitive? { return self as? JSONDictionary }
 }
 
-extension NSArray: JSONObject {
+extension NSArray: JSONPrimitive {
 	public var jsonData: Data? {
 		do {
 			if !self.validateJSON() { return nil }
-			return try JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
+			return try JSONSerialization.data(withJSONObject: self, options: [])
 		} catch let error {
 			print("Unable to convert \(self) to JSON: \(error)")
 			return nil
@@ -283,9 +299,9 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
 		}
 	}
 
-	public var JSONString: String? {
+	public var jsonString: String? {
 		do {
-			let data = try JSONSerialization.data(withJSONObject: self as AnyObject, options: .prettyPrinted)
+			let data = try JSONSerialization.data(withJSONObject: self as AnyObject, options: [.prettyPrinted])
 			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as? String) ?? ""
 		} catch let error as NSError {
 			print("error while deserializing a JSON object: \(error)")
@@ -295,8 +311,8 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
 	}
 }
 
-extension Dictionary: JSONObject, JSONPrimitive {
-	public var JSONString: String? {
+extension Dictionary: JSONPrimitive {
+	public var jsonString: String? {
 		if let dict = (self as AnyObject) as? NSDictionary {
 			return dict.jsonString
 		}
@@ -304,7 +320,7 @@ extension Dictionary: JSONObject, JSONPrimitive {
 	}
 	public var jsonData: Data? {
 		if !self.validateJSON() { return nil }
-		return self.JSONString?.data(using: String.Encoding.utf8)
+		return try? JSONSerialization.data(withJSONObject: self, options: [])
 	}
 	public var jsonRepresentation: JSONPrimitive? { return (self as AnyObject) as? JSONDictionary }
 }
@@ -344,7 +360,7 @@ extension Array: JSONPrimitive {
 
 	public var jsonString: String? {
 		do {
-			let data = try JSONSerialization.data(withJSONObject: (self as AnyObject) as! [AnyObject], options: .prettyPrinted)
+			let data = try JSONSerialization.data(withJSONObject: (self as AnyObject) as! [AnyObject], options: [.prettyPrinted])
 			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as? String) ?? ""
 		} catch let error as NSError {
 			print("error while deserializing a JSON object: \(error)")
@@ -353,7 +369,10 @@ extension Array: JSONPrimitive {
 		return nil
 	}
 	
-	public var jsonData: Data? { return self.jsonString?.data(using: String.Encoding.utf8) }
+	public var jsonData: Data? {
+		if !self.validateJSON() { return nil }
+		return try? JSONSerialization.data(withJSONObject: self, options: [])
+	}
 	var description: String { return self.jsonString ?? "" }
 
 	public var jsonRepresentation: JSONPrimitive? { return (self as AnyObject) as? JSONArray }
@@ -394,3 +413,23 @@ public extension Date {
 		return formatter.string(from: self)
 	}
 }
+
+extension Int: JSONPrimitive {
+	public var jsonRepresentation: JSONPrimitive? { return self }
+}
+extension Float: JSONPrimitive {
+	public var jsonRepresentation: JSONPrimitive? { return self }
+}
+
+extension Double: JSONPrimitive {
+	public var jsonRepresentation: JSONPrimitive? { return self }
+}
+
+extension UInt: JSONPrimitive {
+	public var jsonRepresentation: JSONPrimitive? { return self }
+}
+
+extension String: JSONPrimitive {
+	public var jsonRepresentation: JSONPrimitive? { return self }
+}
+
