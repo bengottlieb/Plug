@@ -47,5 +47,19 @@ public extension Plug {
 		public var json: JSONDictionary? {
 			return self.rawData?.json
 		}
+		
+		#if os(iOS)
+			public var image: UIImage? {
+				if let data = self.rawData { return UIImage(data: data) }
+				return nil
+			}
+		#endif
+
+		#if os(OSX)
+			public var image: NSImage? {
+				if let data = self.rawData { return NSImage(data: data) }
+				return nil
+			}
+		#endif
 	}
 }

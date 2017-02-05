@@ -156,8 +156,9 @@ extension JSONConvertible {
 	}
 
 	public var jsonString: String? {
-		if let data = self.jsonData {
-			return String(data: data, encoding: String.Encoding.utf8) ?? ""
+		if !ValidateJSON(object: self) { return nil }
+		if let json = self.jsonRepresentation, let data = try? JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted]) {
+			return String(data: data, encoding: String.Encoding.utf8)
 		} else {
 			return nil
 		}
@@ -431,5 +432,9 @@ extension UInt: JSONPrimitive {
 
 extension String: JSONPrimitive {
 	public var jsonRepresentation: JSONPrimitive? { return self }
+}
+
+extension NSNull: JSONPrimitive {
+	public var jsonRepresentation: JSONPrimitive? { return nil }
 }
 
