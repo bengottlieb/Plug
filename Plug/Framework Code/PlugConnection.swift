@@ -284,8 +284,8 @@ extension Connection {
 
 			string += "\n╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍ [Body] ╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍\n"
 
-			if let json = json as? NSObject {
-				string += json.description
+			if let json = json as? JSONPrimitive {
+				string += json.jsonString ?? "\(json)"
 			} else {
 				string += (NSString(data: data as Data, encoding: String.Encoding.utf8.rawValue)?.description ?? "--unable to parse data as! UTF8--")
 			}
