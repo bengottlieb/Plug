@@ -13,7 +13,6 @@ IOS_SUFFIX=""
 MAC_SUFFIX=""
 CONFIG=Release	#$CONFIGURATION
 UNIVERSAL_OUTPUTFOLDER="Build/${CONFIG}-universal"
-PROJECT_DIRECTORY=`pwd`
 PROJECT_NAME="Plug"
 IOS_FRAMEWORKS=/Users/ben/Documents/ManagedProjects/Frameworks/iOS_Builds
 MAC_FRAMEWORKS=/Users/ben/Documents/ManagedProjects/Frameworks/Mac_Builds
@@ -23,18 +22,12 @@ GIT_REV=`git rev-parse --short HEAD`
 
 BUILD_DATE=`date`
 
-IOS_PLIST_PATH="${PROJECT_DIRECTORY}/Plug/iOS/info.plist"
-$(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :branch" 2> /dev/null)
-$(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :rev" 2> /dev/null)
-$(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :built" 2> /dev/null)
+IOS_PLIST_PATH="${PROJECT_DIR}/Plug/iOS/info.plist"
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :branch string ${GIT_BRANCH}"
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :rev string ${GIT_REV}"
 /usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Add :built string ${BUILD_DATE}"
 
-MAC_PLIST_PATH="${PROJECT_DIRECTORY}/Plug/Mac/info.plist"
-$(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch" 2> /dev/null)
-$(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :rev" 2> /dev/null)
-$(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :built" 2> /dev/null)
+MAC_PLIST_PATH="${PROJECT_DIR}/Plug/Mac/info.plist"
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Add :branch string ${GIT_BRANCH}"
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Add :rev string ${GIT_REV}"
 /usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Add :built string ${BUILD_DATE}"
@@ -72,21 +65,15 @@ lipo -create -output "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}${IOS_SUFFIX}.f
 
 echo "copying to iOS Framework folder"
 # Step 5. Convenience step to copy the framework to the project's directory
-mkdir -p "${PROJECT_DIRECTORY}/iOS Framework/"
-rm -rf "${PROJECT_DIRECTORY}/iOS Framework/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework"
-cp -R "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework" "${PROJECT_DIRECTORY}/iOS Framework"
+mkdir -p "${PROJECT_DIR}/iOS Framework/"
+rm -rf "${PROJECT_DIR}/iOS Framework/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework"
+cp -R "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}${IOS_SUFFIX}.framework" "${PROJECT_DIR}/iOS Framework"
 
 # Step 6. Copy the Mac framework
 echo "copying to Mac OS Framework folder"
-mkdir -p "${PROJECT_DIRECTORY}/Mac Framework/"
-rm -rf "${PROJECT_DIRECTORY}/Mac Framework/${FRAMEWORK_NAME}.framework"
-cp -R "${BASE_BUILD_DIR}/${CONFIG}/${FRAMEWORK_NAME}.framework" "${PROJECT_DIRECTORY}/Mac Framework"
-
-echo 'Copying: ${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}.framework  ${IOS_FRAMEWORKS}/${FRAMEWORK_NAME}.framework'
-cp -R "${UNIVERSAL_OUTPUTFOLDER}/${FRAMEWORK_NAME}.framework" "${IOS_FRAMEWORKS}/${FRAMEWORK_NAME}.framework"
-
-
-cp -R "${BASE_BUILD_DIR}/${CONFIG}/${FRAMEWORK_NAME}.framework" "${MAC_FRAMEWORKS}/${FRAMEWORK_NAME}.framework"
+mkdir -p "${PROJECT_DIR}/Mac Framework/"
+rm -rf "${PROJECT_DIR}/Mac Framework/${FRAMEWORK_NAME}.framework"
+cp -R "${BASE_BUILD_DIR}/${CONFIG}/${FRAMEWORK_NAME}.framework" "${PROJECT_DIR}/Mac Framework"
 
 
 $(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :branch" 2> /dev/null)
@@ -96,6 +83,3 @@ $(/usr/libexec/PlistBuddy "${MAC_PLIST_PATH}" -c "Delete :built" 2> /dev/null)
 $(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :branch" 2> /dev/null)
 $(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :rev" 2> /dev/null)
 $(/usr/libexec/PlistBuddy "${IOS_PLIST_PATH}" -c "Delete :built" 2> /dev/null)
-
-# Step 7. Convenience step to open the project's directory in Finder
-#open "${PROJECT_DIRECTORY}"
