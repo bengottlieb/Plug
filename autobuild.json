@@ -1,0 +1,5 @@
+{
+	"scriptpath": "Plug/BuildFramework.sh",
+	"ios-output": ["iOS Framework/Plug.framework"],
+	"mac-output": ["Mac Framework/Plug.framework"],
+}
