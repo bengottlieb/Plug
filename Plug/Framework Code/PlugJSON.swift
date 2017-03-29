@@ -206,10 +206,22 @@ public extension String {
 	
 	public func jsonDictionary(options: JSONSerialization.ReadingOptions = []) -> JSONDictionary? {
 		guard let data = self.data(using: .utf8) else { return nil }
-
+		
 		do {
 			let dict = try JSONSerialization.jsonObject(with: data, options: options) as? JSONDictionary
 			return dict
+		} catch let error {
+			print("Error while parsing JSON Dictionary: \(error)")
+		}
+		return nil
+	}
+	
+	public func jsonArray(options: JSONSerialization.ReadingOptions = []) -> JSONArray? {
+		guard let data = self.data(using: .utf8) else { return nil }
+		
+		do {
+			let arr = try JSONSerialization.jsonObject(with: data, options: options) as? JSONArray
+			return arr
 		} catch let error {
 			print("Error while parsing JSON Dictionary: \(error)")
 		}
@@ -303,7 +315,7 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
 	public var jsonString: String? {
 		do {
 			let data = try JSONSerialization.data(withJSONObject: self as AnyObject, options: [.prettyPrinted])
-			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as? String) ?? ""
+			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String?) ?? ""
 		} catch let error as NSError {
 			print("error while deserializing a JSON object: \(error)")
 		}
@@ -319,6 +331,9 @@ extension Dictionary: JSONPrimitive {
 		}
 		return nil
 	}
+	
+	public var prettyPrinted: String? { return self.jsonString }
+	
 	public var jsonData: Data? {
 		if !self.validateJSON() { return nil }
 		return try? JSONSerialization.data(withJSONObject: self, options: [])
@@ -362,7 +377,7 @@ extension Array: JSONPrimitive {
 	public var jsonString: String? {
 		do {
 			let data = try JSONSerialization.data(withJSONObject: (self as AnyObject) as! [AnyObject], options: [.prettyPrinted])
-			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as? String) ?? ""
+			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String?) ?? ""
 		} catch let error as NSError {
 			print("error while deserializing a JSON object: \(error)")
 		}

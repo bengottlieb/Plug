@@ -11,7 +11,7 @@ import Foundation
 
 extension URLRequest {
 	public var description: String {
-		var str = (self.httpMethod ?? "[no method]") + " " + "\(self.url)"
+		var str = (self.httpMethod ?? "[no method]") + " " + "\(String(describing: self.url))"
 		
 		if let fields = self.allHTTPHeaderFields {
 			for (label, value) in fields {

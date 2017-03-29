@@ -1,8 +1,8 @@
 {
-  "disabled" : false,
   "mac-output" : [
     "Mac Framework\/Plug.framework"
   ],
+  "disabled" : true,
   "scriptpath" : "Plug\/BuildFramework.sh",
   "ios-output" : [
     "iOS Framework\/Plug.framework"
