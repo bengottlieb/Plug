@@ -68,7 +68,7 @@ public extension Plug {
 			if let url = self.persistentCacheURL {
 				do {
 					try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
-				} catch let error as NSError {
+				} catch let error {
 					print("error while loading cached URLs: \(error)")
 				}
 			}
@@ -88,7 +88,7 @@ public extension Plug {
 			do {
 				let json = try JSONSerialization.data(withJSONObject: dictionaries, options: JSONSerialization.WritingOptions.prettyPrinted)
 				try json.write(to: self.persistentCacheURL!, options: [.atomicWrite])
-			} catch let error as NSError {
+			} catch let error {
 				print("error while saving a persistent connection: \(error)")
 			}
 		}

@@ -58,6 +58,10 @@
 		B58D64931A899094005A0002 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B58D648D1A899094005A0002 /* Images.xcassets */; };
 		B58D64951A899094005A0002 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D648F1A899094005A0002 /* ViewController.swift */; };
 		B58D64961A899285005A0002 /* Plug.h in Headers */ = {isa = PBXBuildFile; fileRef = B58D646B1A898F81005A0002 /* Plug.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B5AD59F51E9DC21A007B61BE /* PlugImageConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5AD59F41E9DC21A007B61BE /* PlugImageConnection.swift */; };
+		B5AD59F61E9DC21A007B61BE /* PlugImageConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5AD59F41E9DC21A007B61BE /* PlugImageConnection.swift */; };
+		B5AD59FF1E9DC647007B61BE /* CrossPlatformKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */; };
+		B5AD5A011E9DC64C007B61BE /* CrossPlatformKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD5A001E9DC64C007B61BE /* CrossPlatformKit.framework */; };
 		B5B178EE1C9F8507007BFF63 /* DuplicateConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */; };
 		B5F5EF881C497E1500284AF8 /* json_sample_1.json in Resources */ = {isa = PBXBuildFile; fileRef = B5F5EF871C497E1500284AF8 /* json_sample_1.json */; };
 		B5F7A9F01CA1524C00A53C48 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5F7A9EE1CA1524C00A53C48 /* Default-568h@2x.png */; };
@@ -149,6 +153,9 @@
 		B58D648D1A899094005A0002 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		B58D648E1A899094005A0002 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B58D648F1A899094005A0002 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		B5AD59F41E9DC21A007B61BE /* PlugImageConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugImageConnection.swift; sourceTree = "<group>"; };
+		B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CrossPlatformKit.framework; sourceTree = "<group>"; };
+		B5AD5A001E9DC64C007B61BE /* CrossPlatformKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CrossPlatformKit.framework; sourceTree = "<group>"; };
 		B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuplicateConnections.swift; sourceTree = "<group>"; };
 		B5F5EF871C497E1500284AF8 /* json_sample_1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = json_sample_1.json; path = TestHost/json_sample_1.json; sourceTree = "<group>"; };
 		B5F7A9EF1CA1524C00A53C48 /* Base */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Base; path = "Base.lproj/Default-568h@2x.png"; sourceTree = "<group>"; };
@@ -170,6 +177,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5AD59FF1E9DC647007B61BE /* CrossPlatformKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +193,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5AD5A011E9DC64C007B61BE /* CrossPlatformKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -199,6 +208,8 @@
 				B58D64741A898F81005A0002 /* Framework Code */,
 				B58D64661A898F81005A0002 /* Plug_Mac */,
 				B58D64691A898F81005A0002 /* Plug_iOS */,
+				B5AD59F71E9DC538007B61BE /* iOS Frameworks */,
+				B5AD59F91E9DC538007B61BE /* Mac Frameworks */,
 				B504E6991A896E82001B414B /* Plug Tests */,
 				B504E6141A89230F001B414B /* Products */,
 			);
@@ -277,6 +288,7 @@
 				B5FDD9B71CEFE3380001FABA /* NSURLRequest+Plug.swift */,
 				B5FDD9BA1CEFE3500001FABA /* Plug.ConnectionData.swift */,
 				B5FDD9B41CEFC5280001FABA /* PlugJSONConnection.swift */,
+				B5AD59F41E9DC21A007B61BE /* PlugImageConnection.swift */,
 				B580E0281A99867C0067F89D /* PlugPersistence.swift */,
 				B58D64771A898F81005A0002 /* PlugParameters.swift */,
 				B572EB721A8CC96E00670D8E /* Plug.Headers.swift */,
@@ -301,6 +313,24 @@
 				B58D648F1A899094005A0002 /* ViewController.swift */,
 			);
 			path = TestHost;
+			sourceTree = "<group>";
+		};
+		B5AD59F71E9DC538007B61BE /* iOS Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */,
+			);
+			name = "iOS Frameworks";
+			path = "ExternalFrameworks/iOS Frameworks";
+			sourceTree = "<group>";
+		};
+		B5AD59F91E9DC538007B61BE /* Mac Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B5AD5A001E9DC64C007B61BE /* CrossPlatformKit.framework */,
+			);
+			name = "Mac Frameworks";
+			path = "ExternalFrameworks/Mac Frameworks";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -529,6 +559,7 @@
 				B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */,
 				B55097A01A9A4FE7003E5155 /* PlugJSON.swift in Sources */,
 				B58D64801A898FBD005A0002 /* PlugConnection.swift in Sources */,
+				B5AD59F51E9DC21A007B61BE /* PlugImageConnection.swift in Sources */,
 				B58D64811A898FBD005A0002 /* PlugParameters.swift in Sources */,
 				B560B52C1AA4A15000F3161F /* PlugReachability.m in Sources */,
 				B5FDD9B81CEFE3380001FABA /* NSURLRequest+Plug.swift in Sources */,
@@ -567,6 +598,7 @@
 				B580E02A1A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B5FDD9BC1CEFE3500001FABA /* Plug.ConnectionData.swift in Sources */,
 				B55097A11A9A4FE7003E5155 /* PlugJSON.swift in Sources */,
+				B5AD59F61E9DC21A007B61BE /* PlugImageConnection.swift in Sources */,
 				B560B52D1AA4A15000F3161F /* PlugReachability.m in Sources */,
 				B5FDD9B61CEFC5280001FABA /* PlugJSONConnection.swift in Sources */,
 			);
@@ -748,7 +780,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ExternalFrameworks/iOS\\ Frameworks/**",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -779,7 +814,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ExternalFrameworks/iOS\\ Frameworks/**",
+				);
 				INFOPLIST_FILE = Plug/iOS/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -849,6 +887,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ExternalFrameworks/Mac\\ Frameworks/**",
+				);
 				FRAMEWORK_VERSION = A;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -881,6 +923,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ExternalFrameworks/Mac\\ Frameworks/**",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Plug/Mac/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

@@ -32,7 +32,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	public var completionQueue: OperationQueue?
 	public var completionBlocks: [PlugCompletionClosure] = []
 	public var jsonBlocks: [PlugJSONCompletionClosure] = []
-	public var errorBlocks: [(Connection, NSError) -> Void] = []
+	public var errorBlocks: [(Connection, Error) -> Void] = []
 	public var progressBlocks: [(Connection, Double) -> Void] = []
 	public var cachingPolicy: URLRequest.CachePolicy = .reloadIgnoringLocalCacheData
 	public var coalescing = Coalescing.coalesceSimilarConnections
@@ -44,7 +44,7 @@ public class Connection: Hashable, CustomStringConvertible {
 	public fileprivate(set) var statusCode: Int? { didSet { self.subconnections.forEach { $0.statusCode = self.statusCode } } }
 	public fileprivate(set) var completedAt: Date? { didSet { self.subconnections.forEach { $0.completedAt = self.completedAt } } }
 	var task: URLSessionTask? { didSet { self.subconnections.forEach { $0.task = self.task } } }
-	public fileprivate(set) var resultsError: NSError?  { didSet { self.subconnections.forEach { $0.resultsError = self.resultsError } } }
+	public fileprivate(set) var resultsError: Error?  { didSet { self.subconnections.forEach { $0.resultsError = self.resultsError } } }
 	var resultsData: Data? { didSet { self.subconnections.forEach { $0.resultsData = self.resultsData } } }
 	var bytesReceived: UInt64 = 0 { didSet { self.subconnections.forEach { $0.bytesReceived = self.bytesReceived } } }
 	var fileHandle: FileHandle! { didSet { self.subconnections.forEach { $0.fileHandle = self.fileHandle } } }
@@ -176,8 +176,8 @@ public class Connection: Hashable, CustomStringConvertible {
 		self.complete(state: .completed)
 	}
 	
-	func failedWithError(error: NSError?) {
-		if error != nil && error!.code == -1005 && self.superconnection == nil {
+	func failedWithError(error: Error?) {
+		if let err = error as NSError?, err.code == -1005 && self.superconnection == nil {
 			print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 		}
 		self.response = self.task?.response
@@ -232,7 +232,7 @@ extension Connection {
 		return self
 	}
 
-	@discardableResult public func error(completion: @escaping (Connection, NSError) -> Void) -> Self {
+	@discardableResult public func error(completion: @escaping (Connection, Error) -> Void) -> Self {
 		self.requestQueue.addOperation { self.errorBlocks.append(completion) }
 		return self
 	}
@@ -403,7 +403,7 @@ extension Connection {		//actions
 		}
 	}
 	
-	func reportError(error: NSError) {
+	func reportError(error: Error) {
 		let queue = self.completionQueue ?? OperationQueue.main
 		
 		for block in self.errorBlocks {

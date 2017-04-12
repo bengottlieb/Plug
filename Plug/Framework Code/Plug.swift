@@ -230,13 +230,13 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 
 	public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
 		#if (arch(i386) || arch(x86_64)) && os(iOS)
-			if let err = error as? NSError , err.code == -1005 {
+			if let err = error as NSError? , err.code == -1005 {
 				print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 			}
 		#endif
 		
 		if let error = error {
-			self[task]?.failedWithError(error: error as NSError?)
+			self[task]?.failedWithError(error: error)
 		} else {
 			self[task]?.succeeded()
 		}

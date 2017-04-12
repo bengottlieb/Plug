@@ -12,7 +12,7 @@ import Foundation
 public extension URLResponse {
 	public class var PlugHTTPErrorDomain: String { return "PlugHTTPErrorDomain" }
 	
-	var error: NSError? {
+	var error: Error? {
 		if let response = self as? HTTPURLResponse {
 			switch response.statusCode {
 			case 200...299: return nil		//no error

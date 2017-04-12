@@ -129,7 +129,7 @@ class Plug_Tests: XCTestCase {
 					expect.fulfill()
 				}.start()
 			}
-		} catch let error as NSError {
+		} catch let error as Error {
 			print("Error while decoding JSON: \(error)")
 		}
 		

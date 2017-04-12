@@ -316,7 +316,7 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
 		do {
 			let data = try JSONSerialization.data(withJSONObject: self as AnyObject, options: [.prettyPrinted])
 			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String?) ?? ""
-		} catch let error as NSError {
+		} catch let error {
 			print("error while deserializing a JSON object: \(error)")
 		}
 		
@@ -378,7 +378,7 @@ extension Array: JSONPrimitive {
 		do {
 			let data = try JSONSerialization.data(withJSONObject: (self as AnyObject) as! [AnyObject], options: [.prettyPrinted])
 			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String?) ?? ""
-		} catch let error as NSError {
+		} catch let error {
 			print("error while deserializing a JSON object: \(error)")
 		}
 		
