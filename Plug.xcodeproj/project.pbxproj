@@ -62,6 +62,8 @@
 		B5AD59F61E9DC21A007B61BE /* PlugImageConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5AD59F41E9DC21A007B61BE /* PlugImageConnection.swift */; };
 		B5AD59FF1E9DC647007B61BE /* CrossPlatformKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */; };
 		B5AD5A011E9DC64C007B61BE /* CrossPlatformKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD5A001E9DC64C007B61BE /* CrossPlatformKit.framework */; };
+		B5AD5A031E9DC8E3007B61BE /* SwearKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD5A021E9DC8E3007B61BE /* SwearKit.framework */; };
+		B5AD5A051E9DC8E9007B61BE /* SwearKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD5A041E9DC8E9007B61BE /* SwearKit.framework */; };
 		B5B178EE1C9F8507007BFF63 /* DuplicateConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */; };
 		B5F5EF881C497E1500284AF8 /* json_sample_1.json in Resources */ = {isa = PBXBuildFile; fileRef = B5F5EF871C497E1500284AF8 /* json_sample_1.json */; };
 		B5F7A9F01CA1524C00A53C48 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5F7A9EE1CA1524C00A53C48 /* Default-568h@2x.png */; };
@@ -156,6 +158,8 @@
 		B5AD59F41E9DC21A007B61BE /* PlugImageConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugImageConnection.swift; sourceTree = "<group>"; };
 		B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CrossPlatformKit.framework; sourceTree = "<group>"; };
 		B5AD5A001E9DC64C007B61BE /* CrossPlatformKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CrossPlatformKit.framework; sourceTree = "<group>"; };
+		B5AD5A021E9DC8E3007B61BE /* SwearKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwearKit.framework; sourceTree = "<group>"; };
+		B5AD5A041E9DC8E9007B61BE /* SwearKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwearKit.framework; sourceTree = "<group>"; };
 		B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuplicateConnections.swift; sourceTree = "<group>"; };
 		B5F5EF871C497E1500284AF8 /* json_sample_1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = json_sample_1.json; path = TestHost/json_sample_1.json; sourceTree = "<group>"; };
 		B5F7A9EF1CA1524C00A53C48 /* Base */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Base; path = "Base.lproj/Default-568h@2x.png"; sourceTree = "<group>"; };
@@ -177,6 +181,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5AD5A051E9DC8E9007B61BE /* SwearKit.framework in Frameworks */,
 				B5AD59FF1E9DC647007B61BE /* CrossPlatformKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -193,6 +198,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5AD5A031E9DC8E3007B61BE /* SwearKit.framework in Frameworks */,
 				B5AD5A011E9DC64C007B61BE /* CrossPlatformKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -318,6 +324,7 @@
 		B5AD59F71E9DC538007B61BE /* iOS Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B5AD5A041E9DC8E9007B61BE /* SwearKit.framework */,
 				B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */,
 			);
 			name = "iOS Frameworks";
@@ -327,6 +334,7 @@
 		B5AD59F91E9DC538007B61BE /* Mac Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B5AD5A021E9DC8E3007B61BE /* SwearKit.framework */,
 				B5AD5A001E9DC64C007B61BE /* CrossPlatformKit.framework */,
 			);
 			name = "Mac Frameworks";
@@ -783,6 +791,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/ExternalFrameworks/iOS\\ Frameworks/**",
+					"$(PROJECT_DIR)/ExternalFrameworks/iOS\\ Frameworks",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -817,6 +826,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/ExternalFrameworks/iOS\\ Frameworks/**",
+					"$(PROJECT_DIR)/ExternalFrameworks/iOS\\ Frameworks",
 				);
 				INFOPLIST_FILE = Plug/iOS/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -890,6 +900,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/ExternalFrameworks/Mac\\ Frameworks/**",
+					"$(PROJECT_DIR)/ExternalFrameworks/Mac\\ Frameworks",
 				);
 				FRAMEWORK_VERSION = A;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -926,6 +937,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/ExternalFrameworks/Mac\\ Frameworks/**",
+					"$(PROJECT_DIR)/ExternalFrameworks/Mac\\ Frameworks",
 				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Plug/Mac/Info.plist;

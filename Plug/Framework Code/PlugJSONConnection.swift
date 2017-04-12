@@ -7,52 +7,29 @@
 //
 
 import Foundation
+import SwearKit
 
-public typealias PlugJSONDictionaryCompletionClosure = (Connection, JSONDictionary) -> Void
-public typealias PlugJSONArrayCompletionClosure = (Connection, JSONArray) -> Void
 
-public class JSONConnection: Connection {
+extension Connection {
+	public enum JSONConnectionError: Error { case noJSONReturned }
 	
-	public var jsonDictionaryCompletionBlocks: [PlugJSONDictionaryCompletionClosure] = []
-	public var jsonArrayCompletionBlocks: [PlugJSONArrayCompletionClosure] = []
-	
-	override func handleDownload(data: Plug.ConnectionData) {
-		let queue = self.completionQueue ?? OperationQueue.main
-		if let json = data.data.jsonContainer() {
-			if let dict = json as? JSONDictionary {
-				if self.jsonDictionaryCompletionBlocks.count == 0 {	//we got a dictionary, but weren't expecting it
-					print("Unexpected Dictionary from \(self).")
-					self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.unexpectedJSONDictionary.rawValue, userInfo: ["connection": self]))
-				}
-				for block in self.jsonDictionaryCompletionBlocks {
-					let op = BlockOperation(block: { block(self, dict) })
-					queue.addOperations([op], waitUntilFinished: true)
-				}
-				return
-			} else if let array = json as? JSONArray {
-				if self.jsonArrayCompletionBlocks.count == 0 {	//we got a dictionary, but weren't expecting it
-					print("Unexpected Array from \(self).")
-					self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.unexpectedJSONArray.rawValue, userInfo: ["connection": self]))
-				}
-				for block in self.jsonArrayCompletionBlocks {
-					let op = BlockOperation(block: { block(self, array) })
-					queue.addOperations([op], waitUntilFinished: true)
-				}
-				return
+	public func fetchJSON() -> Promise<JSONDictionary> {
+		let promise = Promise<JSONDictionary>()
+		
+		self.completion { connection, data in
+			if let json = data.json {
+				promise.fulfill(json)
+			} else {
+				promise.reject(JSONConnectionError.noJSONReturned)
 			}
 		}
-		self.reportError(error: NSError(domain: NSError.PlugJSONErrorDomain, code: NSError.JSONErrors.unableToFindJSONContainer.rawValue, userInfo: nil))
-	}
-
-	public func completion(completion: @escaping PlugJSONDictionaryCompletionClosure) -> Self {
-		self.requestQueue.addOperation { self.jsonDictionaryCompletionBlocks.append(completion) }
-		return self
-	}
-	
-	public func completion(completion: @escaping PlugJSONArrayCompletionClosure) -> Self {
-		self.requestQueue.addOperation { self.jsonArrayCompletionBlocks.append(completion) }
-		return self
+		
+		self.error { connection, error in
+			promise.reject(error)
+		}
+		
+		self.start()
+		return promise
 	}
 	
-
 }

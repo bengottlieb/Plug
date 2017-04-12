@@ -8,31 +8,29 @@
 
 import Foundation
 import CrossPlatformKit
+import SwearKit
 
 
-public typealias PlugImageCompletionClosure = (Connection, UXImage) -> Void
-
-public class ImageConnection: Connection {
+extension Connection {
 	public enum ImageConnectionError: Error { case noImageReturned }
-	
-	public var imageCompletionBlocks: [PlugImageCompletionClosure] = []
-	
-	override func handleDownload(data: Plug.ConnectionData) {
-		let queue = self.completionQueue ?? OperationQueue.main
-		if let image = data.image {
-			for block in self.imageCompletionBlocks {
-				let op = BlockOperation(block: { block(self, image) })
-				queue.addOperations([op], waitUntilFinished: true)
+
+	public func fetchImage() -> Promise<UXImage> {
+		let promise = Promise<UXImage>()
+		
+		self.completion { connection, data in
+			if let image = data.image {
+				promise.fulfill(image)
+			} else {
+				promise.reject(ImageConnectionError.noImageReturned)
 			}
-			return
 		}
-		self.reportError(error: ImageConnectionError.noImageReturned)
-	}
-	
-	
-	public func completion(completion: @escaping PlugImageCompletionClosure) -> Self {
-		self.requestQueue.addOperation { self.imageCompletionBlocks.append(completion) }
-		return self
+		
+		self.error { connection, error in
+			promise.reject(error)
+		}
+		
+		self.start()
+		return promise
 	}
 	
 }
