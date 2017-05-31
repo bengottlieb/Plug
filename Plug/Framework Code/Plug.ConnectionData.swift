@@ -11,6 +11,8 @@ import CrossPlatformKit
 
 public extension Plug {
 	public class ConnectionData {
+		public enum JSONObjectType { case dictionary, array }
+		
 		public var data: Data {
 			if let data = self.rawData { return data }
 			
@@ -50,6 +52,21 @@ public extension Plug {
 
 		public var image: UXImage? {
 			if let data = self.rawData { return UXImage(data: data) }
+			return nil
+		}
+		
+		public func string(encoding: String.Encoding = .utf8) -> String? {
+			guard let data = self.rawData else { return nil }
+			return String(data: data, encoding: encoding)
+		}
+		
+		public var jsonObjectType: JSONObjectType? {
+			do {
+				let object = try JSONSerialization.jsonObject(with: data, options: [])
+				
+				if object is JSONDictionary { return .dictionary }
+				if object is JSONArray { return .array }
+			} catch { }
 			return nil
 		}
 	}

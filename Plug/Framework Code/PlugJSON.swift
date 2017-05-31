@@ -204,26 +204,26 @@ extension NSArray: JSONPrimitive {
 public extension String {
 	public var json: JSONDictionary? { return self.jsonDictionary() }
 	
-	public func jsonDictionary(options: JSONSerialization.ReadingOptions = []) -> JSONDictionary? {
+	public func jsonDictionary(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONDictionary? {
 		guard let data = self.data(using: .utf8) else { return nil }
 		
 		do {
 			let dict = try JSONSerialization.jsonObject(with: data, options: options) as? JSONDictionary
 			return dict
 		} catch let error {
-			print("Error while parsing JSON Dictionary: \(error)")
+			if !suppressErrors { print("Error while parsing JSON Dictionary: \(error)") }
 		}
 		return nil
 	}
 	
-	public func jsonArray(options: JSONSerialization.ReadingOptions = []) -> JSONArray? {
+	public func jsonArray(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONArray? {
 		guard let data = self.data(using: .utf8) else { return nil }
 		
 		do {
 			let arr = try JSONSerialization.jsonObject(with: data, options: options) as? JSONArray
 			return arr
 		} catch let error {
-			print("Error while parsing JSON Dictionary: \(error)")
+			if !suppressErrors { print("Error while parsing JSON Dictionary: \(error)") }
 		}
 		return nil
 	}
@@ -232,34 +232,34 @@ public extension String {
 public extension Data {
 	public var json: JSONDictionary? { return self.jsonDictionary() }
 	
-	public func jsonDictionary(options: JSONSerialization.ReadingOptions = []) -> JSONDictionary? {
+	public func jsonDictionary(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONDictionary? {
 		do {
 			let dict = try JSONSerialization.jsonObject(with: self, options: options) as? JSONDictionary
 			return dict
 		} catch let error {
-			print("Error while parsing JSON Dictionary: \(error)")
+			if !suppressErrors { print("Error while parsing JSON Dictionary: \(error)") }
 		}
 		return nil
 	}
 	
-	public func jsonArray(options: JSONSerialization.ReadingOptions = []) -> JSONArray? {
+	public func jsonArray(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONArray? {
 		do {
 			let dict = try JSONSerialization.jsonObject(with: self, options: options) as? JSONArray
 			return dict
 		} catch let error {
-			print("Error while parsing JSON Array: \(error)")
+			if !suppressErrors { print("Error while parsing JSON Array: \(error)") }
 		}
 		return nil
 	}
 	
-	public func jsonContainer(options: JSONSerialization.ReadingOptions = []) -> JSONContainer? {
+	public func jsonContainer(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONContainer? {
 		do {
 			let container = try JSONSerialization.jsonObject(with: self, options: options)
 			
 			if let array = container as? JSONArray { return array }
 			if let dict = container as? JSONDictionary { return dict }
 		} catch let error {
-			print("Error while parsing JSON Array: \(error)")
+			if !suppressErrors { print("Error while parsing JSON Array: \(error)") }
 		}
 		return nil
 	}
