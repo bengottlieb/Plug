@@ -20,7 +20,7 @@ public class IncomingJSON: Incoming<JSONDictionary> {
 	}
 }
 
-public class Incoming<Result> {
+open class Incoming<Result> {
 	let converter: ((Data) -> Result?)
 	public var result: Result?
 	public let url: URL
