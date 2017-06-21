@@ -8,20 +8,34 @@
 
 import Foundation
 
-public class IncomingData: Incoming<Data> {
-	convenience public init(url: URL, method: Plug.Method = .GET, parameters: Plug.Parameters? = nil, deferredStart: Bool = false) {
-		self.init(url: url, method: method, parameters: parameters, deferredStart: deferredStart) { data in return data }
+public class IncomingData {
+	var incoming: Incoming<Data>
+	public init(url: URL, method: Plug.Method = .GET, parameters: Plug.Parameters? = nil, deferredStart: Bool = false) {
+		self.incoming = Incoming<Data>(url: url, method: method, parameters: parameters, deferredStart: deferredStart) { data in
+			return data.data
+		}
 	}
+	
+	public func resolved(_ closure: @escaping (Data?) -> Void) { self.incoming.resolved(closure) }
+	public func start() { self.incoming.start() }
+	public var result: Data? { return self.incoming.result }
 }
 
-public class IncomingJSON: Incoming<JSONDictionary> {
-	convenience public init(url: URL, method: Plug.Method = .GET, parameters: Plug.Parameters? = nil, deferredStart: Bool = false) {
-		self.init(url: url, method: method, parameters: parameters, deferredStart: deferredStart) { data in return data.jsonDictionary() }
+public class IncomingJSON {
+	var incoming: Incoming<JSONDictionary>
+	public init(url: URL, method: Plug.Method = .GET, parameters: Plug.Parameters? = nil, deferredStart: Bool = false) {
+		self.incoming = Incoming<JSONDictionary>(url: url, method: method, parameters: parameters, deferredStart: deferredStart) { data in
+			return data.json
+		}
 	}
+	
+	public func resolved(_ closure: @escaping (JSONDictionary?) -> Void) { self.incoming.resolved(closure) }
+	public func start() { self.incoming.start() }
+	public var result: JSONDictionary? { return self.incoming.result }
 }
 
 open class Incoming<Result> {
-	let converter: ((Data) -> Result?)
+	let converter: ((Plug.ConnectionData) -> Result?)?
 	public var result: Result?
 	public let url: URL
 	public let parameters: Plug.Parameters?
@@ -29,7 +43,7 @@ open class Incoming<Result> {
 	public var isComplete = false
 	var pendingClosures: [(Result?) -> Void] = []
 	
-	public init(url: URL, method: Plug.Method = .GET, parameters: Plug.Parameters? = nil, deferredStart: Bool = false, converter: @escaping (Data) -> Result?) {
+	public init(url: URL, method: Plug.Method = .GET, parameters: Plug.Parameters? = nil, deferredStart: Bool = false, converter: @escaping (Plug.ConnectionData) -> Result?) {
 		self.url = url
 		self.method = method
 		self.parameters = parameters
@@ -50,10 +64,14 @@ open class Incoming<Result> {
 		let conn = Connection(method: self.method, url: self.url, parameters: self.parameters)
 		
 		conn?.completion { conn, data in
-			let result = self.converter(data.data)
-			self.callClosures(with: result)
-		}.error { connn, error in
-			self.callClosures(with: nil)
+			let bytes = data
+			if let convert = self.converter, let result = convert(bytes) {
+				self.callClosures(with: result)
+			} else {
+				self.callClosures(with: nil)
+			}
+		}.error { [weak self] connn, error in
+			self?.callClosures(with: nil)
 		}.start()
 	}
 	

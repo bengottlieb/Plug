@@ -10,7 +10,7 @@ import Foundation
 import CrossPlatformKit
 
 public extension Plug {
-	public class ConnectionData {
+	public class ConnectionData: CustomStringConvertible {
 		public enum JSONObjectType { case dictionary, array }
 		
 		public var data: Data {
@@ -26,6 +26,8 @@ public extension Plug {
 		}
 		public var url: URL?
 		private var rawData: Data?
+		
+		public var description: String { return "Data, \(ByteCountFormatter.string(fromByteCount: Int64(self.length), countStyle: .file)), \(self.data)" }
 		
 		init?(data: Data?, size: UInt64) {
 			length = size

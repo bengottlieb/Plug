@@ -13,6 +13,12 @@ import Plug
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	var window: UIWindow?
+	let pendingData = IncomingData(url: URL(string: "http://stackoverflow.com/questions/34182482/nsurlsessiondatadelegate-not-called")!)
+
+//	let incoming = Incoming<Data>(url: URL(string: "http://stackoverflow.com/questions/34182482/nsurlsessiondatadelegate-not-called")!) { data in
+//		print("Data: \(data)")
+//		return data.data
+//	}
 
 	func testLargeDownloads() {
 		let largeURL = URL(string: "https://dl.dropboxusercontent.com/u/85235/Stereotypies%20Therapy.mp4")!
@@ -70,7 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func testJSONDownload() {
 		let url = "http://jsonview.com/example.json"
 		
-		Connection(JSONRepresentation: ["url": url])?.fetchJSON().then { json in
+		Connection(url: url)?.fetchJSON().then { json in
 			print("Request: \(json)")
 		}
 	}
