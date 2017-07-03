@@ -8,6 +8,9 @@
 
 import Foundation
 
+extension URL {
+	public static let blank = URL(string: "about:blank")!
+}
 
 extension URLRequest {
 	public var description: String {

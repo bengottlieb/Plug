@@ -64,7 +64,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 	
 	// set at or immediately after instantiation
 	public let method: Plug.Method
-	public var url: URL { get { return self.urlLike.url ?? URL(string: "about:blank")! } }
+	public var url: URL { get { return self.urlLike.url ?? URL.blank } }
 	public var destinationFileURL: URL?
 	public let requestQueue: OperationQueue
 	public let parameters: Plug.Parameters
