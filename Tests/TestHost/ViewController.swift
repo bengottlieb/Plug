@@ -20,7 +20,7 @@ class ViewController: UIViewController {
 		// Do any additional setup after loading the view, typically from a nib.
 	}
 	
-	func onlineStatusChanged() {
+	@objc func onlineStatusChanged() {
 		DispatchQueue.main.async {
 			switch (Plug.connectionType) {
 			case .offline: self.statusLabel.text = "Offline"

@@ -70,11 +70,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func testJSONDownload() {
 		let url = "http://jsonview.com/example.json"
 		
-		JSONConnection(JSONRepresentation: ["url": url])?.completion { (request: Connection, json: JSONDictionary) in
+		Connection(JSONRepresentation: ["url": url])?.fetchJSON().then { json in
 			print("Request: \(json)")
-		}.start()
+		}
 	}
-
+	
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
 		Plug.instance.setup()
 		
@@ -83,7 +83,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let jsonA = ["A", "B"]
 		let jrep2 = jsonA.jsonRepresentation
 		
-		print("\(jrep), \(jrep2)")
+		print("\(jrep!), \(jrep2!)")
 		
 //		self.testLargeDownloads()
 //		self.testLargeDownloads()
@@ -120,7 +120,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let args: JSONDictionary = ["device": ["udid": UIDevice.current.identifierForVendor!.uuidString]]
 	
 		Plug.request(method: .DELETE, url: url, parameters: Plug.Parameters.json(args)).completion { conn, data in
-			print("got it \(NSString(data: data.data, encoding: String.Encoding.utf8.rawValue))")
+			print("got it \(NSString(data: data.data, encoding: String.Encoding.utf8.rawValue) ?? "??")")
 		}.start()
 	}
 

@@ -125,7 +125,7 @@ public class Plug: NSObject, URLSessionDelegate {
 		#endif
 	}
 	
-	func didBecomeActive() {
+	@objc func didBecomeActive() {
 		Channel.restartBackgroundedChannels()
 	}
     
@@ -148,7 +148,7 @@ public class Plug: NSObject, URLSessionDelegate {
 	}
 	
 	private var reachability: AnyObject
-	func setOnlineViaWifi(_ wifi: Bool, orWAN wan: Bool) {
+	@objc func setOnlineViaWifi(_ wifi: Bool, orWAN wan: Bool) {
 		var newState = ConnectionType.offline
 		
 		if wifi {
