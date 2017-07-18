@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>BuildMachineOSBuild</key>
-	<string>17A306f</string>
+	<string>16F73</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
@@ -47,7 +47,7 @@
 	<key>branch</key>
 	<string>swift_4</string>
 	<key>built</key>
-	<string>Tue Jul 11 08:58:55 CDT 2017</string>
+	<string>Tue Jul 18 15:12:30 CDT 2017</string>
 	<key>rev</key>
 	<string>6a4311d</string>
 </dict>
