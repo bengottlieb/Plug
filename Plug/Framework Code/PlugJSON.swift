@@ -438,6 +438,7 @@ public extension Date {
 		for format in formats ?? (format == Date.JSONFormat ? [format] : [format, Date.JSONFormat]) {
 			let formatter = cachedFormatter ?? {
 				let formatter = DateFormatter()
+				formatter.timeZone = TimeZone(secondsFromGMT: 0)
 				formatter.dateFormat = format
 				return formatter
 			}()
@@ -457,6 +458,7 @@ public extension Date {
 	public func jsonString(format: String = Date.JSONFormat, cachedFormatter: DateFormatter? = nil) -> String {
 		let formatter = cachedFormatter ?? {
 			let formatter = DateFormatter()
+			formatter.timeZone = TimeZone.current
 			formatter.dateFormat = format
 			return formatter
 		}()

@@ -84,6 +84,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
 		Plug.instance.setup()
 		
+		let dateString = "2017-08-06T03:10:58.001Z"
+		let date = Date(jsonString: dateString, format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+		print("\(dateString) -> \(date)")
+		
+
+		
 		let jsonD = ["A": "B"]
 		let jrep = jsonD.jsonRepresentation
 		let jsonA = ["A", "B"]
