@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CrossPlatformKit
 
 #if os(iOS)
 	import UIKit
@@ -186,8 +187,29 @@ public class Plug: NSObject, URLSessionDelegate {
 }
 
 public extension Plug {
-	public class func request(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .transient, channel: Plug.Channel = Plug.Channel.defaultChannel) -> Connection {
-		return Connection(method: method, url: url, parameters: parameters, persistence: persistence, channel: channel) ?? Connection.noopConnection
+	@discardableResult public class func request(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .transient, channel: Plug.Channel = Plug.Channel.defaultChannel, completion: ((Connection, ConnectionData?, Error?) -> Void)? = nil) -> Connection {
+		let conn = Connection(method: method, url: url, parameters: parameters, persistence: persistence, channel: channel) ?? Connection.noopConnection
+		
+		if let completion = completion {
+			conn.completion() { conn, data in
+				completion(conn, data, nil)
+			}.error() { conn, error in
+				completion(conn, nil, error)
+			}
+		}
+		
+		return conn
+	}
+
+	@discardableResult public class func requestImage(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .transient, channel: Plug.Channel = Plug.Channel.defaultChannel, completion: @escaping (Connection, UXImage?, Error?) -> Void) -> Connection {
+		return self.request(method: method, url: url, parameters: parameters, persistence: persistence, channel: channel) { conn, data, error in
+			
+			if let image = data?.image {
+				completion(conn, image, nil)
+			} else {
+				completion(conn, nil, error)
+			}
+		}
 	}
 }
 
