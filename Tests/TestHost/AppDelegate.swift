@@ -40,6 +40,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		connection.start()
 	}
+
+	func testBodyPOST() {
+		let url = "http://posttestserver.com/post.php"
+		let payloadDict = ["embedded": "data goes here", "Test": "Field 1" ]
+		
+		let params = Plug.Parameters.body(payloadDict)
+		
+		Plug.request(method: .POST, url: url, parameters: params).completion { request, data in
+			print("Request: \(request)")
+		}.error { request, error in
+				
+		}.start()
+	}
 	
 	func testSmallDownloads() {
 		let smallURL = URL(string: "http://stackoverflow.com/questions/34182482/nsurlsessiondatadelegate-not-called")!
@@ -47,8 +60,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		let connection = Plug.request(method: .GET, url: smallURL).completion { request, data in
 			print("Completed, got \(data.length) bytes")
-		}.error { request, error in
-			print("Failed with error: \(error)")
+			}.error { request, error in
+				print("Failed with error: \(error)")
 		} 
 		
 		connection.start()
@@ -86,9 +99,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		let dateString = "2017-08-06T03:10:58.001Z"
 		let date = Date(jsonString: dateString, format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-		print("\(dateString) -> \(date)")
+		print("\(dateString) -> \(date?.description ?? "unparseable date")")
 		
-
+		testBodyPOST()
 		
 		let jsonD = ["A": "B"]
 		let jrep = jsonD.jsonRepresentation
@@ -132,7 +145,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let args: JSONDictionary = ["device": ["udid": UIDevice.current.identifierForVendor!.uuidString]]
 	
 		Plug.request(method: .DELETE, url: url, parameters: Plug.Parameters.json(args)).completion { conn, data in
-			print("got it \(NSString(data: data.data, encoding: String.Encoding.utf8.rawValue) ?? "??")")
+			print("got it \(String(data: data.data, encoding: .utf8) ?? "-- no data --")")
 		}.start()
 	}
 

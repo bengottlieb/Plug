@@ -74,7 +74,7 @@ extension Plug {
 							 "Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n",
 							 "\(value)\r\n"
 					] {
-					if let lineData = line.data(using: String.Encoding.utf8) {
+					if let lineData = line.data(using: .utf8) {
 						data.append(lineData)
 					}
 				}
@@ -89,15 +89,15 @@ extension Plug {
 					"Content-Disposition: form-data; name=\"\(file.name)\"; filename=\"\(filename)\"\r\n",
 					"Content-Type: \(file.mimeType)\r\n\r\n"
 					] {
-						if let lineData = line.data(using: String.Encoding.utf8) {
+						if let lineData = line.data(using: .utf8) {
 							data.append(lineData)
 						}
 				}
 				data.append(filedata)
-				data.append("\(self.boundary)\r\n".data(using: String.Encoding.utf8)!)
+				data.append("\(self.boundary)\r\n".data(using: .utf8)!)
 			}
 	
-			data.append("--\(self.boundary)--\r\n".data(using: String.Encoding.utf8)!)
+			data.append("--\(self.boundary)--\r\n".data(using: .utf8)!)
 
 			return data as Data
 		}
@@ -147,6 +147,7 @@ extension Plug {
 	public enum Parameters: CustomStringConvertible, Codable {
 		case none
 		case url([String: String])
+		case body([String: String])
 		case form(FormComponents)
 		case json(JSONDictionary)
 		case data(Data)
@@ -191,7 +192,7 @@ extension Plug {
 		
 		var stringValue: String {
 			switch (self) {
-			case .url(let params):
+			case .url(let params), .body(let params):
 				if params.keys.count == 0 { return "" }
 				return (params.keys.reduce("?") { if let v = params[$1] { return $0 + "\($1)=\(v.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlHostAllowed)!)&" }; return $0 })
 				
@@ -212,6 +213,7 @@ extension Plug {
 		var type: String {
 			switch (self) {
 			case .url: return "URL"
+			case .body: return "Body"
 			case .form: return "Form"
 			case .data: return "Data"
 			case .json: return "JSON"
@@ -228,10 +230,15 @@ extension Plug {
 		
 		var bodyData: Data? {
 			switch (self) {
+			case .body(let params):
+				if params.keys.count == 0 { return "".data(using: .utf8) }
+				let string = (params.keys.reduce("?") { if let v = params[$1] { return $0 + "\($1)=\(v.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlHostAllowed)!)&" }; return $0 })
+				return string.data(using: .utf8)
+				
 			case .form(let components):
 				return components.dataValue
 			case .json:
-				return self.stringValue.data(using: String.Encoding.utf8, allowLossyConversion: false)
+				return self.stringValue.data(using: .utf8, allowLossyConversion: false)
 			case .data(let data): return data
 			default: return nil
 			}
@@ -241,7 +248,7 @@ extension Plug {
 			switch (self) {
 			case .form: fallthrough
 			case .data: fallthrough
-			case .json:
+			case .json, .body(_):
 				if method == .GET { return .POST }
 				return method
 			default: return method
@@ -250,6 +257,7 @@ extension Plug {
 		
 		var contentTypeHeader: Plug.Header? {
 			switch (self) {
+			case .body: return .contentType("text/html")
 			case .form(let components): return .contentType(components.contentTypeHeader)
 			case .data: return .contentType("application/data")
 			case .json: return .contentType("application/json")
@@ -259,7 +267,7 @@ extension Plug {
 		
 		public var description: String {
 			switch (self) {
-			case .url(let params): return params.keys.reduce("[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
+			case .url(let params), .body(let params): return params.keys.reduce("[") { if let v = params[$1] { return $0 + "\($1): \(v), " }; return $0 } + "]"
 			case .form(let components): return "\(components)"
 			case .json: return "JSON:[" + self.stringValue + "]"
 			case .data: return "[" + self.stringValue + "]"
@@ -271,6 +279,7 @@ extension Plug {
 		public var JSONValue: [String: NSDictionary]? {
 			switch (self) {
 			case .url(let params): return ["URL": NSMutableDictionary(stringDictionary: params)]
+			case .body(let params): return ["body": NSMutableDictionary(stringDictionary: params)]
 			case .form(let components): return ["Form": components.fields as NSDictionary]
 			case .json(let json): return ["JSON": json as NSDictionary]
 				
@@ -302,7 +311,10 @@ public func ==(lhs: Plug.Parameters, rhs: Plug.Parameters) -> Bool {
 	switch (lhs, rhs) {
 	case (.url(let lhString), .url(let rhString)):
 		return lhString == rhString
-		
+
+	case (.body(let lhString), .body(let rhString)):
+		return lhString == rhString
+
 	case (.form(let lhComponents), .form(let rhComponents)):
 		return lhComponents == rhComponents
 		

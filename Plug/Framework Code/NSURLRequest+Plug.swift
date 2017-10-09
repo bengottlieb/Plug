@@ -23,7 +23,7 @@ extension URLRequest {
 		}
 		
 		if let data = self.httpBody {
-			let body = String(data: data, encoding: String.Encoding.utf8)
+			let body = String(data: data, encoding: .utf8)
 			str += "\n" + (body ?? "[unconvertible body: \(data.count) bytes]")
 		}
 		

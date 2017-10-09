@@ -330,7 +330,7 @@ extension Connection {
 			if let json = json as? JSONPrimitive {
 				string += json.jsonString ?? "\(json)"
 			} else {
-				string += (NSString(data: data as Data, encoding: String.Encoding.utf8.rawValue)?.description ?? "--unable to parse data as! UTF8--")
+				string += (String(data: data, encoding: .utf8) ?? "--unable to parse data as! UTF8--")
 			}
 		}
 		if !string.hasSuffix("\n") { string += "\n" }
@@ -357,7 +357,7 @@ extension Connection {
 		let contents = self.detailedDescription(includeDelimiters: false)
 		
 		do {
-			try contents.data(using: String.Encoding.utf8)?.write(to: filepath, options: [.atomicWrite])
+			try contents.data(using: .utf8)?.write(to: filepath, options: [.atomicWrite])
 		} catch _ {
 		}
 		

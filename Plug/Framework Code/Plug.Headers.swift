@@ -72,7 +72,7 @@ extension Plug {
 			case .acceptEncoding(let encoding): return encoding
 			case .contentType(let type): return type
 			case .basicAuthorization(let user, let pass):
-				return "Basic " + ("\(user):\(pass)".data(using: String.Encoding.utf8)?.base64EncodedString() ?? "")
+				return "Basic " + ("\(user):\(pass)".data(using: .utf8)?.base64EncodedString() ?? "")
 			case .userAgent(let agent): return agent
 				
 			case .custom(_, let content): return content

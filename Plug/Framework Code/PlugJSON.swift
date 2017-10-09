@@ -164,7 +164,7 @@ extension JSONConvertible {
 	public var jsonString: String? {
 		if !ValidateJSON(object: self) { return nil }
 		if let json = self.jsonRepresentation, let data = try? JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted]) {
-			return String(data: data, encoding: String.Encoding.utf8)
+			return String(data: data, encoding: .utf8)
 		} else {
 			return nil
 		}
@@ -411,8 +411,8 @@ extension Array: JSONPrimitive {
 
 	public var jsonString: String? {
 		do {
-			let data = try JSONSerialization.data(withJSONObject: (self as AnyObject) as! [Any], options: [.prettyPrinted])
-			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String?) ?? ""
+			let data = try JSONSerialization.data(withJSONObject: (self as AnyObject) as! [AnyObject], options: [.prettyPrinted])
+			return String(data: data, encoding: .utf8) ?? ""
 		} catch let error {
 			print("error while deserializing a JSON object: \(error)")
 		}
