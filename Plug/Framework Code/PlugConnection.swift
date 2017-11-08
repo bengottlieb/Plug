@@ -177,9 +177,11 @@ public class Connection: Hashable, CustomStringConvertible {
 	}
 	
 	func failedWithError(error: Error?) {
-		if let err = error as NSError?, err.code == -1005 && self.superconnection == nil {
-			print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
-		}
+		#if (arch(i386) || arch(x86_64)) && os(iOS)
+			if let err = error as NSError?, err.code == -1005 && self.superconnection == nil {
+				print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
+			}
+		#endif
 		self.response = self.task?.response
 		if let httpResponse = self.response as? HTTPURLResponse { self.statusCode = httpResponse.statusCode }
 		self.resultsError = error ?? self.task?.response?.error
