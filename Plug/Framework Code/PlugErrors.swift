@@ -25,18 +25,20 @@ public extension URLResponse {
 	}
 }
 
-public extension NSError {
-	public class var PlugJSONErrorDomain: String { return "PlugJSONErrorDomain" }
-	public enum JSONErrors: Int { case unableToFindJSONContainer, unexpectedJSONDictionary, unexpectedJSONArray }
+public enum JSONErrors: Int { case unableToFindJSONContainer, unexpectedJSONDictionary, unexpectedJSONArray }
+public extension Error {
+	public static var PlugJSONErrorDomain: String { return "PlugJSONErrorDomain" }
 	
 	public var isCancelledError: Bool {
-		return self.domain == NSURLErrorDomain && self.code == Int(CFNetworkErrors.cfurlErrorCancelled.rawValue)
+		let err = self as NSError
+		return err.domain == NSURLErrorDomain && err.code == Int(CFNetworkErrors.cfurlErrorCancelled.rawValue)
 	}
 	
 	public var isTimeoutError: Bool {
-		if self.domain != NSURLErrorDomain { return false }
-		if self.code == Int(CFNetworkErrors.cfurlErrorTimedOut.rawValue) { return true }
-		if self.code == Int(CFNetworkErrors.cfurlErrorCannotConnectToHost.rawValue) { return true }
+		let err = self as NSError
+		if err.domain != NSURLErrorDomain { return false }
+		if err.code == Int(CFNetworkErrors.cfurlErrorTimedOut.rawValue) { return true }
+		if err.code == Int(CFNetworkErrors.cfurlErrorCannotConnectToHost.rawValue) { return true }
 		return false
 	}
 }

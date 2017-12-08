@@ -68,6 +68,8 @@
 		B5AD5A031E9DC8E3007B61BE /* SwearKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD5A021E9DC8E3007B61BE /* SwearKit.framework */; };
 		B5AD5A051E9DC8E9007B61BE /* SwearKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD5A041E9DC8E9007B61BE /* SwearKit.framework */; };
 		B5B178EE1C9F8507007BFF63 /* DuplicateConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */; };
+		B5E1CB781FDB3D1100DFB83F /* CodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E1CB771FDB3D1100DFB83F /* CodableTests.swift */; };
+		B5E1CB7A1FDB444D00DFB83F /* SwearKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD5A041E9DC8E9007B61BE /* SwearKit.framework */; };
 		B5F5EF881C497E1500284AF8 /* json_sample_1.json in Resources */ = {isa = PBXBuildFile; fileRef = B5F5EF871C497E1500284AF8 /* json_sample_1.json */; };
 		B5F7A9F01CA1524C00A53C48 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5F7A9EE1CA1524C00A53C48 /* Default-568h@2x.png */; };
 		B5FDD9B51CEFC5280001FABA /* PlugJSONConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FDD9B41CEFC5280001FABA /* PlugJSONConnection.swift */; };
@@ -166,6 +168,7 @@
 		B5AD5A021E9DC8E3007B61BE /* SwearKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwearKit.framework; sourceTree = "<group>"; };
 		B5AD5A041E9DC8E9007B61BE /* SwearKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwearKit.framework; sourceTree = "<group>"; };
 		B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuplicateConnections.swift; sourceTree = "<group>"; };
+		B5E1CB771FDB3D1100DFB83F /* CodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableTests.swift; sourceTree = "<group>"; };
 		B5F5EF871C497E1500284AF8 /* json_sample_1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = json_sample_1.json; path = TestHost/json_sample_1.json; sourceTree = "<group>"; };
 		B5F7A9EF1CA1524C00A53C48 /* Base */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Base; path = "Base.lproj/Default-568h@2x.png"; sourceTree = "<group>"; };
 		B5FDD9B41CEFC5280001FABA /* PlugJSONConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugJSONConnection.swift; sourceTree = "<group>"; };
@@ -196,6 +199,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5E1CB7A1FDB444D00DFB83F /* SwearKit.framework in Frameworks */,
 				B504E6A51A897087001B414B /* Plug.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -244,6 +248,7 @@
 				B58D64871A899094005A0002 /* TestHost */,
 				B504E69C1A896E82001B414B /* Plug_Tests.swift */,
 				B51AFC9D1CF0842A005BD586 /* JSONTests.swift */,
+				B5E1CB771FDB3D1100DFB83F /* CodableTests.swift */,
 				B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */,
 				B5F5EF871C497E1500284AF8 /* json_sample_1.json */,
 				B504E69A1A896E82001B414B /* Supporting Files */,
@@ -593,6 +598,7 @@
 			files = (
 				B504E69D1A896E82001B414B /* Plug_Tests.swift in Sources */,
 				B51AFC9E1CF0842A005BD586 /* JSONTests.swift in Sources */,
+				B5E1CB781FDB3D1100DFB83F /* CodableTests.swift in Sources */,
 				B5B178EE1C9F8507007BFF63 /* DuplicateConnections.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -710,7 +716,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -756,7 +762,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -881,7 +887,11 @@
 		B504E6A21A896E82001B414B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ExternalFrameworks/Mac\\ Frameworks",
+					"$(PROJECT_DIR)/ExternalFrameworks/iOS\\ Frameworks",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -896,7 +906,11 @@
 		B504E6A31A896E82001B414B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ExternalFrameworks/Mac\\ Frameworks",
+					"$(PROJECT_DIR)/ExternalFrameworks/iOS\\ Frameworks",
+				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";

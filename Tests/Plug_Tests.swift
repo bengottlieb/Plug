@@ -107,37 +107,37 @@ class Plug_Tests: XCTestCase {
 		XCTAssert(true, "Pass")
     }
 	
-	func testPersistent2() {
-		let expect = expectation(description: "GET_Persistent")
-//		persistentDelegate.expectations.append()
-		let url = "http://httpbin.org/get"
-		let params: Plug.Parameters = .none
-		let headers = Plug.Headers([.accept(["*/*"])])
-		
-		let connection = Plug.request(method: .GET, url: url, parameters: params, persistence: .persistent(persistentDelegate.persistenceInfo))
-		connection.headers = headers
-		let dict: JSONDictionary = connection.JSONRepresentation
-		
-		guard let json = dict.JSONData else { return }
-		connection.cancel()
-		
-		do {
-			if let dict = try JSONSerialization.jsonObject(with: json, options: []) as? NSDictionary {
-				let replacement = Connection(JSONRepresentation: dict)
-				
-				replacement?.completion { req, data in
-					expect.fulfill()
-				}.start()
-			}
-		} catch let error as Error {
-			print("Error while decoding JSON: \(error)")
-		}
-		
-		waitForExpectations(timeout: 1000) { (error) in
-			
-		}
-	}
-    
+//	func testPersistent2() {
+//		let expect = expectation(description: "GET_Persistent")
+////		persistentDelegate.expectations.append()
+//		let url = "http://httpbin.org/get"
+//		let params: Plug.Parameters = .none
+//		let headers = Plug.Headers([.accept(["*/*"])])
+//
+//		let connection = Plug.request(method: .GET, url: url, parameters: params, persistence: .persistent(persistentDelegate.persistenceInfo))
+//		connection.headers = headers
+//		let dict: JSONDictionary = connection.JSONRepresentation as? NSDictionary
+//
+//		guard let json = dict.JSONData else { return }
+//		connection.cancel()
+//
+//		do {
+//			if let dict = try JSONSerialization.jsonObject(with: json, options: []) as? NSDictionary {
+//				let replacement = Connection(JSONRepresentation: dict)
+//
+//				replacement?.completion { req, data in
+//					expect.fulfill()
+//				}.start()
+//			}
+//		} catch let error as Error {
+//			print("Error while decoding JSON: \(error)")
+//		}
+//
+//		waitForExpectations(timeout: 1000) { (error) in
+//
+//		}
+//	}
+	
     func _testPerformanceExample() {
         // This is an example of a performance test case.
         self.measure() {

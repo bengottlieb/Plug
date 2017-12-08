@@ -30,7 +30,7 @@ public protocol BackgroundActivityHandlerProtocol {
 
 public class Plug: NSObject, URLSessionDelegate {
 	public enum ConnectionType: Int { case offline, wifi, wan }
-	public enum Method: String, CustomStringConvertible { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH", HEAD = "HEAD"
+	public enum Method: String, CustomStringConvertible, Codable { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH", HEAD = "HEAD"
 		public var description: String { return self.rawValue } 
 	}
 	
@@ -59,7 +59,7 @@ public class Plug: NSObject, URLSessionDelegate {
 			}
 		}
 		
-		public var JSONValue: Any { return self.persistentInfo?.JSONValue ?? [] }
+		public var JSONValue: Codable { return self.persistentInfo?.JSONValue ?? [] }
 		
 	}
 	

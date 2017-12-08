@@ -56,11 +56,11 @@ extension Plug {
 			}
 		}
 
-		var JSONRepresentation: NSDictionary {
+		var JSONRepresentation: [String: Codable] {
 			return ["name": self.name, "max": self.maximumActiveConnections ]
 		}
 		
-		class func channel(json: NSDictionary?) -> Plug.Channel {
+		class func channel(json: JSONDictionary?) -> Plug.Channel {
 			let name = json?["name"] as? String ?? "default"
 			if let channel = self.allChannels[name] { return channel }
 			

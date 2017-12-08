@@ -11,7 +11,10 @@ import Foundation
 public typealias PlugCompletionClosure = (Connection, Plug.ConnectionData) -> Void
 public typealias PlugJSONCompletionClosure = (Connection, JSONDictionary) -> Void
 
-public class Connection: Hashable, CustomStringConvertible {
+extension URLRequest.CachePolicy : Codable {}
+
+public class Connection: Hashable, CustomStringConvertible, Codable {
+	enum CodableKeys: String, CodingKey { case method, url, parameters, headers, cachingPolicy, tag, startedAt, statusCode, completedAt, resultsError, resultsData, bytesReceived, request, responseHeaders }
 	public var state: State = .waiting {
 		didSet {
 			if self.state == oldValue { return }
@@ -21,15 +24,53 @@ public class Connection: Hashable, CustomStringConvertible {
 		}
 	}
 	
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodableKeys.self)
+		
+		try container.encode(self.method, forKey: .method)
+		try container.encode(self.url, forKey: .url)
+		try container.encode(self.parameters, forKey: .parameters)
+		try container.encode(self.headers, forKey: .headers)
+		try container.encode(self.tag, forKey: .tag)
+		try container.encode(self.cachingPolicy, forKey: .cachingPolicy)
+		if let date = self.startedAt { try container.encode(date, forKey: .startedAt) }
+		if let date = self.completedAt { try container.encode(date, forKey: .completedAt) }
+		if let code = self.statusCode { try container.encode(code, forKey: .statusCode) }
+		if let headers = self.responseHeaders { try container.encode(headers, forKey: .responseHeaders) }
+		if let data = self.resultsData { try container.encode(data, forKey: .resultsData) }
+		try container.encode(self.bytesReceived, forKey: .bytesReceived)
+	}
+	
+	public required init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodableKeys.self)
+		
+		self.method = try container.decode(Plug.Method.self, forKey: .method)
+		self.urlLike = try container.decode(URL.self, forKey: .url)
+		self.parameters = try container.decode(Plug.Parameters.self, forKey: .parameters)
+		self.headers = try container.decode(Plug.Headers.self, forKey: .headers)
+		self.tag = try container.decode(Int.self, forKey: .tag)
+		self.cachingPolicy = try container.decode(URLRequest.CachePolicy.self, forKey: .cachingPolicy)
+		self.startedAt = try? container.decode(Date.self, forKey: .startedAt)
+		self.completedAt = try? container.decode(Date.self, forKey: .completedAt)
+		self.statusCode = try? container.decode(Int.self, forKey: .statusCode)
+		self.responseHeaders = try? container.decode(Plug.Headers.self, forKey: .responseHeaders)
+		self.resultsData = try? container.decode(Data.self, forKey: .resultsData)
+		self.bytesReceived = try container.decode(UInt64.self, forKey: .bytesReceived)
+
+		self.persistence = .transient
+		self.requestQueue = OperationQueue()
+		self.channel = Plug.Channel.defaultChannel
+	}
+	
 	// set at or immediately after instantiation
 	public let method: Plug.Method
 	public var url: URL { get { return self.urlLike.url ?? URL(string: "about:blank")! } }
 	public var destinationFileURL: URL?
 	public let requestQueue: OperationQueue
 	public let parameters: Plug.Parameters
-	public var headers: Plug.Headers?
+	public var headers: Plug.Headers? = nil
 	public let persistence: Plug.Persistence
-	public var completionQueue: OperationQueue?
+	public var completionQueue: OperationQueue? = nil
 	public var completionBlocks: [PlugCompletionClosure] = []
 	public var jsonBlocks: [PlugJSONCompletionClosure] = []
 	public var errorBlocks: [(Connection, Error) -> Void] = []
@@ -277,9 +318,9 @@ extension Connection {
 			}
 		}
 		if let data = self.resultsData {
-			var json: AnyObject?
+			var json: Codable?
 			do {
-				json = try JSONSerialization.jsonObject(with: data, options: []) as AnyObject
+				json = try JSONSerialization.jsonObject(with: data, options: []) as? Codable
 			} catch {
 				json = nil
 			}

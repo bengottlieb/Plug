@@ -9,20 +9,41 @@
 import Foundation
 
 extension Plug {
-	public class FormComponents: Equatable, CustomStringConvertible {
+	public class FormComponents: Equatable, CustomStringConvertible, Codable {
+		enum CodableKeys: String, CodingKey { case fields, fileURLs, boundary }
 		var fields: JSONDictionary = [:]
-		var fileURLs: [(name: String, mimeType: String, url: URL)] = []
+		var fileURLs: [FileURL] = []
 		var boundary = FormComponents.generateBoundaryString()
 		var contentTypeHeader: String { return "multipart/form-data; boundary=\(self.boundary)" }
 		
-		public subscript(key: String) -> Any? {
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodableKeys.self)
+			try container.encode(self.fields, forKey: .fields)
+			try container.encode(self.fileURLs, forKey: .fileURLs)
+			try container.encode(boundary, forKey: .boundary)
+		}
+		
+		public required init(from decoder: Decoder) throws {
+			let container = try decoder.container(keyedBy: CodableKeys.self)
+			self.fields = try container.decode(JSONDictionary.self, forKey: .fields)
+			self.fileURLs = try container.decode([FileURL].self, forKey: .fileURLs)
+			self.boundary = try container.decode(String.self, forKey: .boundary)
+		}
+		
+		public struct FileURL: Codable {
+			let name: String
+			let mimeType: String
+			let url: URL
+		}
+		
+		public subscript(key: String) -> Codable? {
 			get { return self.fields[key] }
 			set { self.fields[key] = newValue }
 		}
 		
 		public func addFile(url: URL?, name: String, mimeType: String) {
 			guard let url = url else { return }
-			self.fileURLs.append((name: name, mimeType: mimeType, url: url))
+			self.fileURLs.append(FileURL(name: name, mimeType: mimeType, url: url))
 		}
 		
 		class func generateBoundaryString() -> String {
@@ -59,14 +80,14 @@ extension Plug {
 				}
 			}
 			
-			for (name, mimeType, url) in self.fileURLs {
-				guard let filedata = try? Data(contentsOf: url) else { continue }
-				let path = url.path
+			for file in self.fileURLs {
+				guard let filedata = try? Data(contentsOf: file.url) else { continue }
+				let path = file.url.path
 				let filename = (path as NSString).lastPathComponent
 				
 				for line in ["--\(self.boundary)\r\n",
-					"Content-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\r\n",
-					"Content-Type: \(mimeType)\r\n\r\n"
+					"Content-Disposition: form-data; name=\"\(file.name)\"; filename=\"\(filename)\"\r\n",
+					"Content-Type: \(file.mimeType)\r\n\r\n"
 					] {
 						if let lineData = line.data(using: String.Encoding.utf8) {
 							data.append(lineData)
@@ -102,14 +123,14 @@ extension Plug {
 				}
 			}
 			
-			for (name, mimeType, url) in self.fileURLs {
-				guard let filedata = try? Data(contentsOf: url) else { continue }
-				let path = url.path
+			for file in self.fileURLs {
+				guard let filedata = try? Data(contentsOf: file.url) else { continue }
+				let path = file.url.path
 				let filename = (path as NSString).lastPathComponent
 				
 				for line in ["--\(self.boundary)\n",
-					"Content-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\n",
-					"Content-Type: \(mimeType)\n\n"
+					"Content-Disposition: form-data; name=\"\(file.name)\"; filename=\"\(filename)\"\n",
+					"Content-Type: \(file.mimeType)\n\n"
 					] {
 						string += line
 				}
@@ -123,12 +144,50 @@ extension Plug {
 		}
 	}
 	
-	public enum Parameters: CustomStringConvertible {
+	public enum Parameters: CustomStringConvertible, Codable {
 		case none
 		case url([String: String])
 		case form(FormComponents)
 		case json(JSONDictionary)
 		case data(Data)
+		
+		enum CodableKeys: String, CodingKey { case label, url, form, json, data }
+		enum CodingError: Error { case empty }
+		public init(from decoder: Decoder) throws {
+			let container = try decoder.container(keyedBy: CodableKeys.self)
+			if let data = try? container.decode(Data.self, forKey: .data) {
+				self = .data(data)
+				return
+			}
+			
+			if let data = try? container.decode(JSONDictionary.self, forKey: .json) {
+				self = .json(data)
+				return
+			}
+			
+			if let data = try? container.decode(FormComponents.self, forKey: .form) {
+				self = .form(data)
+				return
+			}
+			
+			if let data = try? container.decode([String: String].self, forKey: .url) {
+				self = .url(data)
+				return
+			}
+			
+			self = .none
+		}
+		
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodableKeys.self)
+			switch self {
+			case .none: return
+			case .url(let fields): try container.encode(fields, forKey: .url)
+			case .form(let components): try container.encode(components, forKey: .form)
+			case .json(let json): try container.encode(json, forKey: .json)
+			case .data(let data): try container.encode(data, forKey: .data)
+			}
+		}
 		
 		var stringValue: String {
 			switch (self) {

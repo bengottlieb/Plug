@@ -26,7 +26,6 @@ public protocol JSONLoadable {				//any object that can be loaded with a JSON ob
 	@discardableResult func load(json: JSONPrimitive) -> Bool
 }
 
-
 func ValidateJSON(object value: JSONConvertible) -> Bool {
 	if let dict = value as? JSONDictionary { return dict.validateJSON() }
 	if let array = value as? JSONArray { return array.validateJSON() }
@@ -47,8 +46,15 @@ public func ReportInvalidJSON(_ value: Any) {
 	print("△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△")
 }
 
-public typealias JSONArray = [Any]
-public typealias JSONDictionary = [String : Any]
+public typealias JSONArray = [Codable]
+public typealias JSONDictionary = [String : Codable]
+
+extension Dictionary where Key == String, Value: Codable {
+	func encode(to encoder: Encoder) {
+		var container = encoder.singleValueContainer()
+		try? container.encode(self)
+	}
+}
 
 public extension Dictionary {
 	@discardableResult public func validateJSON() -> Bool {
@@ -266,9 +272,9 @@ public extension Data {
 }
 
 let JSONSeparatorsCharacterSet = CharacterSet(charactersIn: ".[]")
-extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
+extension Dictionary where Key == String, Value: Codable {
 //	public func path(path: String) -> AnyObject? {
-	public subscript(path path: String) -> Any? {
+	public subscript(path: String) -> Codable? {
 		let components = path.components(separatedBy: JSONSeparatorsCharacterSet)
 		return self[components: components]
 	}
@@ -280,7 +286,7 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
 		return nil
 	}
 	
-	public subscript(bool bool: String) -> Bool? {
+	public subscript(bool: String) -> Bool? {
 		let components = bool.components(separatedBy: JSONSeparatorsCharacterSet)
 		if let boolean = self[components: components] as? Bool { return boolean }
 		if let integer = self[components: components] as? Int { return integer != 0 }
@@ -291,15 +297,27 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
 		return nil
 	}
 	
-	public subscript(components comps: [String]) -> Any? {
-		guard let dict = (self as AnyObject) as? [String: AnyObject] else { return nil }
+
+	public var jsonString: String? {
+		do {
+			let data = try JSONSerialization.data(withJSONObject: self as Codable, options: [.prettyPrinted])
+			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String?) ?? ""
+		} catch let error {
+			print("error while deserializing a JSON object: \(error)")
+		}
+		
+		return nil
+	}
+	
+	public subscript(components comps: [String]) -> Codable? {
+		guard let dict = (self as AnyObject) as? [String: Codable] else { return nil }
 		var components = comps
 		
 		while components.first == "" { components.remove(at: 0) }
 		guard components.count > 0 else { return nil }
 		
 		let key = components[0]
-
+		
 		components.remove(at: 0)
 		guard components.count > 0 else { return dict[key] }
 		
@@ -307,20 +325,37 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
 			guard let array = dict[key] as? JSONArray else { return nil }
 			return array[components: components]
 		} else {
-			guard let dict = dict[key] as? JSONDictionary else { return nil }
+			guard let dict = dict[key] as? NSDictionary else { return nil }
 			return dict[components: components]
 		}
 	}
+}
 
-	public var jsonString: String? {
-		do {
-			let data = try JSONSerialization.data(withJSONObject: self as AnyObject, options: [.prettyPrinted])
-			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String?) ?? ""
-		} catch let error {
-			print("error while deserializing a JSON object: \(error)")
-		}
+extension NSDictionary {
+	public subscript(components comps: [String]) -> Codable? {
+		guard let dict = (self as AnyObject) as? [String: Codable] else { return nil }
+		var components = comps
 		
-		return nil
+		while components.first == "" { components.remove(at: 0) }
+		guard components.count > 0 else { return nil }
+		
+		let key = components[0]
+		
+		components.remove(at: 0)
+		guard components.count > 0 else { return dict[key] }
+		
+		if Int(components[0]) != nil {
+			guard let array = dict[key] as? JSONArray else { return nil }
+			return array[components: components]
+		} else {
+			guard let dict = dict[key] as? NSDictionary else { return nil }
+			return dict[components: components]
+		}
+	}
+	
+	public subscript(path: String) -> Codable? {
+		let components = path.components(separatedBy: JSONSeparatorsCharacterSet)
+		return self[components: components]
 	}
 }
 
@@ -342,7 +377,7 @@ extension Dictionary: JSONPrimitive {
 }
 
 extension Array: JSONPrimitive {
-	public subscript(path: String) -> Any? {
+	public subscript(path: String) -> Codable? {
 		let components = path.components(separatedBy: JSONSeparatorsCharacterSet)
 		return self[components: components]
 	}
@@ -354,7 +389,7 @@ extension Array: JSONPrimitive {
 		return nil
 	}
 	
-	public subscript(components comps: [String]) -> Any? {
+	public subscript(components comps: [String]) -> Codable? {
 		var components = comps
 		
 		while components.first == "" { components.remove(at: 0) }
@@ -363,20 +398,20 @@ extension Array: JSONPrimitive {
 		guard let index = Int(components[0]) else { return nil }
 		components.remove(at: 0)
 		while components.first == "" { components.remove(at: 0) }
-		guard components.count > 0 else { return self[index] as AnyObject }
+		guard components.count > 0 else { return self[index] as? Codable }
 		
 		if Int(components[0]) != nil {
 			guard let array = self[index] as? JSONArray else { return nil }
 			return array[components: components]
 		} else {
-			guard index < self.count, let dict = self[index] as? JSONDictionary else { return nil }
+			guard index < self.count, let dict = self[index] as? NSDictionary else { return nil }
 			return dict[components: components]
 		}
 	}
 
 	public var jsonString: String? {
 		do {
-			let data = try JSONSerialization.data(withJSONObject: (self as AnyObject) as! [AnyObject], options: [.prettyPrinted])
+			let data = try JSONSerialization.data(withJSONObject: (self as AnyObject) as! [Codable], options: [.prettyPrinted])
 			return (NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String?) ?? ""
 		} catch let error {
 			print("error while deserializing a JSON object: \(error)")

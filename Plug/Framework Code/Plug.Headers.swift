@@ -9,7 +9,40 @@
 import Foundation
 
 extension Plug {
-	public enum Header {
+	public enum Header: Codable {
+		enum CodableKeys: CodingKey { case label, value, secondValue }
+		
+		public init(from decoder: Decoder) throws {
+			let container = try decoder.container(keyedBy: CodableKeys.self)
+			
+			let label = try container.decode(String.self, forKey: .label)
+			
+			switch label {
+			case "Accept": self = .accept(try container.decode([String].self, forKey: .value))
+				
+			default:
+				self = .custom(label, try container.decode(String.self, forKey: .value))
+			}
+		}
+		
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodableKeys.self)
+			try container.encode(self.label, forKey: .label)
+			
+			switch (self) {
+			case .accept(let types): try container.encode(types, forKey: .value)
+			case .acceptEncoding(let encoding): try container.encode(encoding, forKey: .value)
+			case .contentType(let type): try container.encode(type, forKey: .value)
+			case .basicAuthorization(let user, let pass):
+				try container.encode(user, forKey: .value)
+				try container.encode(pass, forKey: .secondValue)
+			case .userAgent(let agent): try container.encode(agent, forKey: .value)
+				
+			case .custom(_, let content): try container.encode(content, forKey: .value)
+			}
+
+		}
+		
 		case accept([String])
 		case acceptEncoding(String)
 		case contentType(String)
@@ -62,7 +95,7 @@ extension Plug {
 		}
 	}
 	
-	public struct Headers: CustomStringConvertible {
+	public struct Headers: CustomStringConvertible, Codable {
 		var headers: [Header] = []
 		public mutating func append(header: Header) {
 			for (index, existing) in self.headers.enumerated() {
