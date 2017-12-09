@@ -36,7 +36,7 @@ extension Plug {
 			let url: URL
 		}
 		
-		public subscript(key: String) -> Codable? {
+		public subscript(key: String) -> Any? {
 			get { return self.fields[key] }
 			set { self.fields[key] = newValue }
 		}

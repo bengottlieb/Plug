@@ -84,7 +84,7 @@ class Plug_Tests: XCTestCase {
 
 		connection.completion(completion: { (conn, data) in
 			let str = String(data: data.data, encoding: .utf8)
-			print("Data: \(str)")
+			print("Data: \(str ?? "--")")
 
 			//XCTAssert(Plug.activityUsageCount == 0, "Activity indicator not set to hidden");
 			print("Block3")
