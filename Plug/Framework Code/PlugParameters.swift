@@ -152,7 +152,7 @@ extension Plug {
 		case json(JSONDictionary)
 		case data(Data)
 		
-		enum CodableKeys: String, CodingKey { case label, url, form, json, data }
+		enum CodableKeys: String, CodingKey { case label, url, body, form, json, data }
 		enum CodingError: Error { case empty }
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodableKeys.self)
@@ -176,6 +176,11 @@ extension Plug {
 				return
 			}
 			
+			if let data = try? container.decode([String: String].self, forKey: .body) {
+				self = .body(data)
+				return
+			}
+			
 			self = .none
 		}
 		
@@ -184,6 +189,7 @@ extension Plug {
 			switch self {
 			case .none: return
 			case .url(let fields): try container.encode(fields, forKey: .url)
+			case .body(let fields): try container.encode(fields, forKey: .body)
 			case .form(let components): try container.encode(components, forKey: .form)
 			case .json(let json): try container.encode(json, forKey: .json)
 			case .data(let data): try container.encode(data, forKey: .data)
