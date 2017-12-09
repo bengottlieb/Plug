@@ -86,7 +86,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 	public fileprivate(set) var completedAt: Date? { didSet { self.subconnections.forEach { $0.completedAt = self.completedAt } } }
 	var task: URLSessionTask? { didSet { self.subconnections.forEach { $0.task = self.task } } }
 	public fileprivate(set) var resultsError: Error?  { didSet { self.subconnections.forEach { $0.resultsError = self.resultsError } } }
-	var resultsData: Data? { didSet { self.subconnections.forEach { $0.resultsData = self.resultsData } } }
+	public var resultsData: Data? { didSet { self.subconnections.forEach { $0.resultsData = self.resultsData } } }
 	var bytesReceived: UInt64 = 0 { didSet { self.subconnections.forEach { $0.bytesReceived = self.bytesReceived } } }
 	var fileHandle: FileHandle! { didSet { self.subconnections.forEach { $0.fileHandle = self.fileHandle } } }
 	
