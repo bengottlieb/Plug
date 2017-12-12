@@ -75,6 +75,7 @@ public class Plug: NSObject, URLSessionDelegate {
 		public static let connectionCompleted = NSNotification.Name("connectionCompleted.com.standalone.plug")
 		public static let connectionCancelled = NSNotification.Name("connectionCancelled.com.standalone.plug")
 		public static let connectionFailed = NSNotification.Name("connectionFailed.com.standalone.plug")
+		public static let connectionTimedOut = NSNotification.Name("connectionTimedOut.com.standalone.plug")
 	}
 	
 	public var timeout: TimeInterval? { didSet {

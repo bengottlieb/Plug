@@ -14,6 +14,10 @@ public typealias PlugJSONCompletionClosure = (Connection, JSONDictionary) -> Voi
 extension URLRequest.CachePolicy : Codable {}
 
 public class Connection: Hashable, CustomStringConvertible, Codable {
+	deinit {
+		self.killTimer?.invalidate()
+	}
+	
 	enum CodableKeys: String, CodingKey { case method, url, parameters, headers, cachingPolicy, tag, startedAt, statusCode, completedAt, resultsError, resultsData, bytesReceived, request, responseHeaders }
 	public var state: State = .waiting {
 		didSet {
@@ -89,6 +93,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 	public var resultsData: Data? { didSet { self.subconnections.forEach { $0.resultsData = self.resultsData } } }
 	var bytesReceived: UInt64 = 0 { didSet { self.subconnections.forEach { $0.bytesReceived = self.bytesReceived } } }
 	var fileHandle: FileHandle! { didSet { self.subconnections.forEach { $0.fileHandle = self.fileHandle } } }
+	weak var killTimer: Timer?
 	
 	internal(set) var response: URLResponse? { didSet {
 		if let resp = response as? HTTPURLResponse {
@@ -226,7 +231,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 		self.response = self.task?.response
 		if let httpResponse = self.response as? HTTPURLResponse { self.statusCode = httpResponse.statusCode }
 		self.resultsError = error ?? self.task?.response?.error
-		self.complete(state: .completedWithError)
+		self.complete(state: error?.isTimeoutError == true ? .timedOut : .completedWithError)
 	}
 
 	var defaultRequest: URLRequest {
@@ -260,7 +265,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 }
 
 extension Connection {
-	public enum State: String, CustomStringConvertible { case waiting = "Waiting", queuing = "Queuing", queued = "Queued", running = "Running", suspended = "Suspended", completed = "Completed", canceled = "Canceled", completedWithError = "Completed with Error"
+	public enum State: String, CustomStringConvertible { case waiting = "Waiting", queuing = "Queuing", queued = "Queued", running = "Running", suspended = "Suspended", completed = "Completed", canceled = "Canceled", completedWithError = "Completed with Error", timedOut = "Timed Out"
 		public var description: String { return self.rawValue }
 		public var isRunning: Bool { return self == .running }
 		public var hasStarted: Bool { return self != .waiting && self != .queued && self != .queuing }
@@ -382,6 +387,18 @@ extension Connection {		//actions
 		Plug.instance.register(connection: self)
 		self.task!.resume()
 		self.startedAt = Date()
+		
+		if let timeout = Plug.instance.timeout {
+			self.killTimer = Timer.scheduledTimer(timeInterval: timeout + 0.5, target: self, selector: #selector(kill), userInfo: nil, repeats: false)
+		}
+	}
+	
+	@objc func kill(timer: Timer) {
+		self.channel.connectionStopped(connection: self, totallyRemove: true)
+		self.state = .timedOut
+		NotificationCenter.default.post(name: Plug.notifications.connectionTimedOut, object: self)
+		self.resultsError = NSError(domain: NSURLErrorDomain, code: Int(CFNetworkErrors.cfurlErrorTimedOut.rawValue), userInfo: nil)
+		self.complete(state: .timedOut)
 	}
 	
 	public func suspend() {
@@ -409,7 +426,8 @@ extension Connection {		//actions
 	
 	func complete(state: State, parent: Connection? = nil) {
 		self.state = state
-
+		self.killTimer?.invalidate()
+		
 		if let parent = parent {
 			self.completedAt = parent.completedAt
 			self.fileHandle = parent.fileHandle
