@@ -87,11 +87,7 @@ extension Plug {
 		func serialize(block: @escaping () -> Void) {
 			self.serializerSemaphore.wait()
 			defer { self.serializerSemaphore.signal() }
-//			if OperationQueue.current == self.queue {
-				block()
-//			} else {
-//				self.queue.addOperations([ BlockOperation(block: block) ], waitUntilFinished: true)
-//			}
+			block()
 		}
 		
 		func enqueue(connection: Connection) {
@@ -179,13 +175,11 @@ extension Plug {
 			}
 			
 			func endBackgroundTask(onlyClearTaskID: Bool) {
-				self.serialize {
-					if let taskID = self.backgroundTaskID , !self.isRunning {
-						DispatchQueue.main.async {
-							if (!onlyClearTaskID) { Plug.instance.backgroundActivityHandler?.endBackgroundTask(taskID) }
-						}
-						self.backgroundTaskID = nil
+				if let taskID = self.backgroundTaskID , !self.isRunning {
+					DispatchQueue.main.async {
+						if (!onlyClearTaskID) { Plug.instance.backgroundActivityHandler?.endBackgroundTask(taskID) }
 					}
+					self.backgroundTaskID = nil
 				}
 			}
 		#else
@@ -212,21 +206,19 @@ extension Plug {
 
 		subscript(task: URLSessionTask) -> Connection? {
 			get {
-				var connection: Connection?;
-				
-				self.serialize {
-					connection = self.connections[task.taskIdentifier]
-				}
-			//	self.queue.addOperations( [ BlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true);
-				return connection
+				self.serializerSemaphore.wait()
+				defer { self.serializerSemaphore.signal() }
+				return self.connections[task.taskIdentifier]
 			}
-			set { self.serialize {
+			set {
+				self.serializerSemaphore.wait()
 				if newValue == nil, let existing = self.connections[task.taskIdentifier] {
 					self.removeWaiting(existing)
 					self.removeActive(existing)
 				}
 				self.connections[task.taskIdentifier] = newValue
-			} }
+				self.serializerSemaphore.signal()
+			}
 		}
 		
 		func existing(matching connection: Connection) -> Connection? {

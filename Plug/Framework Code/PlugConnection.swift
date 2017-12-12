@@ -471,7 +471,7 @@ extension Connection {		//actions
 		
 		for block in self.errorBlocks {
 			let op = BlockOperation(block: { block(self, error) })
-			queue.addOperations([op], waitUntilFinished: true)
+			queue.addOperations([op], waitUntilFinished: false)
 		}
 	}
 }

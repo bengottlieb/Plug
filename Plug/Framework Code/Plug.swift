@@ -87,6 +87,7 @@ public class Plug: NSObject, URLSessionDelegate {
 			self.rebuildSession()
 		}
 	}}
+	var subscriptSemaphore = DispatchSemaphore(value: 1)
 	public var autostartConnections = true
 	public var temporaryDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
 	public func generateTemporaryFileURL() -> URL {
@@ -184,7 +185,6 @@ public class Plug: NSObject, URLSessionDelegate {
 	}
 	
 	internal var channels: [Int: Channel] = [:]
-	internal var serialQueue: OperationQueue = { var q = OperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
 }
 
 public extension Plug {
@@ -229,23 +229,24 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 	
 	subscript(toChannel task: URLSessionTask) -> Channel? {
 		get {
-			var channel: Plug.Channel?
-			self.serialQueue.addOperations( [ BlockOperation(block: {
-				channel = Plug.instance.channels[task.taskIdentifier]
-			} )], waitUntilFinished: true)
-			return channel  }
-		
-		set { self.serialQueue.addOperation { [unowned self] in self.channels[task.taskIdentifier] = newValue } }
+			self.subscriptSemaphore.wait()
+			defer { self.subscriptSemaphore.signal() }
+			return Plug.instance.channels[task.taskIdentifier]
+		}
+		set {
+			self.subscriptSemaphore.wait()
+			self.channels[task.taskIdentifier] = newValue
+			self.subscriptSemaphore.signal()
+		}
 	}
 
 	subscript(task: URLSessionTask) -> Connection? {
 		get {
-			var channel: Plug.Channel?
-		//	self.serialQueue.addOperations( [ BlockOperation(block: {
-				channel = Plug.instance.channels[task.taskIdentifier]
-		//	} )], waitUntilFinished: true)
-			return channel?[task]  }
+			self.subscriptSemaphore.wait()
+			defer { self.subscriptSemaphore.signal() }
+			return Plug.instance.channels[task.taskIdentifier]?[task]
 		}
+	}
 
 	public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
 		
