@@ -241,9 +241,9 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 	subscript(task: URLSessionTask) -> Connection? {
 		get {
 			var channel: Plug.Channel?
-			self.serialQueue.addOperations( [ BlockOperation(block: {
+		//	self.serialQueue.addOperations( [ BlockOperation(block: {
 				channel = Plug.instance.channels[task.taskIdentifier]
-			} )], waitUntilFinished: true)
+		//	} )], waitUntilFinished: true)
 			return channel?[task]  }
 		}
 
