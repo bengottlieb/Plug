@@ -389,7 +389,9 @@ extension Connection {		//actions
 		self.startedAt = Date()
 		
 		if let timeout = Plug.instance.timeout {
-			self.killTimer = Timer.scheduledTimer(timeInterval: timeout + 0.5, target: self, selector: #selector(kill), userInfo: nil, repeats: false)
+			DispatchQueue.main.async {
+				self.killTimer = Timer.scheduledTimer(timeInterval: timeout + 0.5, target: self, selector: #selector(Connection.kill), userInfo: nil, repeats: false)
+			}
 		}
 	}
 	

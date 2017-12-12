@@ -69,8 +69,10 @@ extension Plug {
 		}
 		
 		func startQueue() {
-			self.pausedReason = nil
-			self.updateQueue()
+			self.serialize {
+				self.pausedReason = nil
+				self.updateQueue()
+			}
 		}
 		
 		func pauseQueue(reason: PauseReason = .manual) {
@@ -81,12 +83,15 @@ extension Plug {
 			return self.activeConnections + self.waitingConnections
 		}
 		
+		var serializerSemaphore = DispatchSemaphore(value: 1)
 		func serialize(block: @escaping () -> Void) {
-			if OperationQueue.current == self.queue {
+			self.serializerSemaphore.wait()
+			defer { self.serializerSemaphore.signal() }
+//			if OperationQueue.current == self.queue {
 				block()
-			} else {
-				self.queue.addOperations([ BlockOperation(block: block) ], waitUntilFinished: true)
-			}
+//			} else {
+//				self.queue.addOperations([ BlockOperation(block: block) ], waitUntilFinished: true)
+//			}
 		}
 		
 		func enqueue(connection: Connection) {
@@ -188,17 +193,17 @@ extension Plug {
 			func endBackgroundTask(onlyClearTaskID: Bool) {}
 		#endif
 		
-		func updateQueue() {
-			self.serialize {
-				if !self.isRunning {
-					self.endBackgroundTask(onlyClearTaskID: false)
-					return
-				}
-				
-				if self.waitingConnections.count > 0 && (self.maximumActiveConnections == 0 || self.activeConnections.count < self.maximumActiveConnections) {
-					let connection = self.waitingConnections[0]
-					self.waitingConnections.remove(at: 0)
-					self.activeConnections.append(connection)
+		private func updateQueue() {
+			if !self.isRunning {
+				self.endBackgroundTask(onlyClearTaskID: false)
+				return
+			}
+			
+			if self.waitingConnections.count > 0 && (self.maximumActiveConnections == 0 || self.activeConnections.count < self.maximumActiveConnections) {
+				let connection = self.waitingConnections[0]
+				self.waitingConnections.remove(at: 0)
+				self.activeConnections.append(connection)
+				self.queue.addOperation {
 					connection.run()
 				}
 			}
@@ -206,7 +211,15 @@ extension Plug {
 
 
 		subscript(task: URLSessionTask) -> Connection? {
-			get { var connection: Connection?; self.queue.addOperations( [ BlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true); return connection  }
+			get {
+				var connection: Connection?;
+				
+				self.serialize {
+					connection = self.connections[task.taskIdentifier]
+				}
+			//	self.queue.addOperations( [ BlockOperation(block: { connection = self.connections[task.taskIdentifier] } )], waitUntilFinished: true);
+				return connection
+			}
 			set { self.serialize {
 				if newValue == nil, let existing = self.connections[task.taskIdentifier] {
 					self.removeWaiting(existing)
