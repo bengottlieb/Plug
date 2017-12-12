@@ -258,7 +258,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 		
 		for block in self.completionBlocks {
 			let op = BlockOperation(block: { block(self, data) })
-			queue.addOperations([op], waitUntilFinished: true)
+			queue.addOperations([op], waitUntilFinished: false)
 		}
 	}
 	
