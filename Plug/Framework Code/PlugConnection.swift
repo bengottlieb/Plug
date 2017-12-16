@@ -216,6 +216,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 	}
 	
 	func succeeded() {
+		self.killTimer?.invalidate()
 		self.response = self.task?.response
 		if let httpResponse = self.response as? HTTPURLResponse { self.statusCode = httpResponse.statusCode }
 		self.resultsError = self.task?.response?.error
@@ -223,6 +224,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 	}
 	
 	func failedWithError(error: Error?) {
+		self.killTimer?.invalidate()
 		#if (arch(i386) || arch(x86_64)) && os(iOS)
 			if let err = error as NSError?, err.code == -1005 && self.superconnection == nil {
 				print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
@@ -268,6 +270,7 @@ extension Connection {
 	public enum State: String, CustomStringConvertible { case waiting = "Waiting", queuing = "Queuing", queued = "Queued", running = "Running", suspended = "Suspended", completed = "Completed", canceled = "Canceled", completedWithError = "Completed with Error", timedOut = "Timed Out"
 		public var description: String { return self.rawValue }
 		public var isRunning: Bool { return self == .running }
+		public var isComplete: Bool { return self == .completed || self == .completedWithError }
 		public var hasStarted: Bool { return self != .waiting && self != .queued && self != .queuing }
 	}
 	
@@ -380,6 +383,11 @@ extension Connection {		//actions
 		self.channel.enqueue(connection: self)
 	}
 	
+	func setupTimer(withTimeOut: TimeInterval) {
+		if self.state.isComplete { return }
+		self.killTimer = Timer.scheduledTimer(timeInterval: withTimeOut + 0.5, target: self, selector: #selector(Connection.kill), userInfo: nil, repeats: false)
+	}
+	
 	public func run() {
 		self.channel.connectionStarted(connection: self)
 		self.state = .running
@@ -389,8 +397,10 @@ extension Connection {		//actions
 		self.startedAt = Date()
 		
 		if let timeout = Plug.instance.timeout {
-			DispatchQueue.main.async {
-				self.killTimer = Timer.scheduledTimer(timeInterval: timeout + 0.5, target: self, selector: #selector(Connection.kill), userInfo: nil, repeats: false)
+			if Thread.isMainThread {
+				self.setupTimer(withTimeOut: timeout)
+			} else {
+				DispatchQueue.main.sync { self.setupTimer(withTimeOut: timeout) }
 			}
 		}
 	}
