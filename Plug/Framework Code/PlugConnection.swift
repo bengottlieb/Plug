@@ -267,7 +267,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 }
 
 extension Connection {
-	public enum State: String, CustomStringConvertible { case waiting = "Waiting", queuing = "Queuing", queued = "Queued", running = "Running", suspended = "Suspended", completed = "Completed", canceled = "Canceled", completedWithError = "Completed with Error", timedOut = "Timed Out"
+	public enum State: String, CustomStringConvertible { case waiting = "Waiting", queuing = "Queuing", queued = "Queued", running = "Running", suspended = "Suspended", completed = "Completed", canceled = "Canceled", completedWithError = "Completed with Error", timedOut = "Timed Out", logged = "Logged"
 		public var description: String { return self.rawValue }
 		public var isRunning: Bool { return self == .running }
 		public var isComplete: Bool { return self == .completed || self == .completedWithError }
@@ -464,6 +464,7 @@ extension Connection {		//actions
 			} else {
 				if let error = self.resultsError { self.reportError(error: error) }
 			}
+			Plug.log?.log(connection: self)
 		}
 		
 		self.subconnections.forEach { $0.complete(state: state, parent: self) }
@@ -474,6 +475,7 @@ extension Connection {		//actions
 		} else {
 			NotificationCenter.default.post(name: Plug.notifications.connectionFailed, object: self, userInfo: (self.resultsError != nil) ? ["error": self.resultsError!] : nil)
 		}
+		
 	}
 	
 	func reportError(error: Error) {

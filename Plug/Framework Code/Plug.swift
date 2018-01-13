@@ -66,6 +66,14 @@ public class Plug: NSObject, URLSessionDelegate {
 	public static let instance = Plug()
 	public static var connectionType = ConnectionType.wifi          //let's try starting off optimistically
 	public static var online: Bool { return self.connectionType != .offline }
+	public static var logAllConnections = false { didSet {
+		if self.logAllConnections, self.log == nil {
+			self.log = ConnectionLog()
+		} else if !self.logAllConnections {
+			self.log = nil
+		}
+	}}
+	public static var log: ConnectionLog?
 	
 	public struct notifications {
 		public static let onlineStatusChanged = NSNotification.Name("onlineStatusChanged.com.standalone.plug")
