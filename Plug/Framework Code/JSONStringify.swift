@@ -14,7 +14,8 @@ private let rightQuote = Character("”")
 extension Dictionary where Key == String, Value: Any {
 	
 	public func toString() -> String? {
-		guard var jsonString = self.jsonString else { return nil }
+		guard let data = try? JSONSerialization.data(withJSONObject: self as Any, options: []) else { return nil }
+		guard var jsonString = String(data: data, encoding: .utf8) else { return nil }
 		
 		var index = jsonString.startIndex
 		var previousIndex = index

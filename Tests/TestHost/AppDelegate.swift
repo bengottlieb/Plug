@@ -91,7 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		Connection(url: url)?.fetchJSON().then { json in
 			let string = json.toString() ?? "unable to convert"
-			print("Request: \(string)")
+			print("Converted: \(string)")
 			let converted = JSONDictionary.fromString(string)
 			converted!.log()
 		}
