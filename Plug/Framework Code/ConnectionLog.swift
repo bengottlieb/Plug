@@ -13,6 +13,8 @@ public class ConnectionLog {
 		static let didLogConnection = Notification.Name("Plug:ConnectionLog.didLogConnection")
 	}
 	
+	internal let queue = DispatchQueue(label: "ConnectionLogQueue", attributes: [])
+
 	public var logged: [Connection] = []
 	
 	func clear() {
@@ -28,7 +30,11 @@ public class ConnectionLog {
 		connection.jsonBlocks = []
 		connection.subconnections = []
 		
-		self.logged.append(connection)
-		NotificationCenter.default.post(name: Notifications.didLogConnection, object: connection)
+		self.queue.async {
+			self.logged.append(connection)
+			DispatchQueue.main.async {
+				NotificationCenter.default.post(name: Notifications.didLogConnection, object: connection)
+			}
+		}
 	}
 }
