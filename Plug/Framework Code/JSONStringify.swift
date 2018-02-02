@@ -1,0 +1,63 @@
+//
+//  JSONStringify.swift
+//  Plug
+//
+//  Created by Ben Gottlieb on 2/2/18.
+//  Copyright © 2018 Stand Alone, inc. All rights reserved.
+//
+
+import Foundation
+
+private let leftQuote = Character("“")
+private let rightQuote = Character("”")
+
+extension Dictionary where Key == String, Value: Any {
+	
+	public func toString() -> String? {
+		guard var jsonString = self.jsonString else { return nil }
+		
+		var index = jsonString.startIndex
+		var previousIndex = index
+		var insideQuote = false
+		let last = jsonString.endIndex
+
+		let leftString = String(leftQuote)
+		let rightString = String(rightQuote)
+		
+		index = jsonString.index(after: index)
+		while index < last {
+			if jsonString[index] == "\"", jsonString[previousIndex] != "\\" {
+				let range = index..<jsonString.index(after: index)
+				jsonString.replaceSubrange(range, with: insideQuote ? leftString : rightString)
+				
+				insideQuote = !insideQuote
+			}
+			previousIndex = index
+			index = jsonString.index(after: index)
+		}
+
+		return jsonString
+	}
+	
+	public static func fromString(_ string: String) -> JSONDictionary? {
+		var jsonString = string
+		var index = jsonString.startIndex
+		var previousIndex = index
+		var insideQuote = false
+		let last = jsonString.endIndex
+		
+		index = jsonString.index(after: index)
+		while index < last {
+			if (jsonString[index] == leftQuote || jsonString[index] == rightQuote), jsonString[previousIndex] != "\\" {
+				let range = index..<jsonString.index(after: index)
+				jsonString.replaceSubrange(range, with: "\"")
+				
+				insideQuote = !insideQuote
+			}
+			previousIndex = index
+			index = jsonString.index(after: index)
+		}
+		
+		return jsonString.jsonDictionary()
+	}
+}

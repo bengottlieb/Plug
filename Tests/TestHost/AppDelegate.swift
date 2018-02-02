@@ -90,14 +90,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let url = "http://jsonview.com/example.json"
 		
 		Connection(url: url)?.fetchJSON().then { json in
-			print("Request: \(json)")
+			let string = json.toString() ?? "unable to convert"
+			print("Request: \(string)")
+			let converted = JSONDictionary.fromString(string)
+			converted!.log()
 		}
 	}
 	
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
 		Plug.instance.setup()
 		
-		testBulkDownload()
+		//testBulkDownload()
+		testJSONDownload()
 		return true
 	}
 	
