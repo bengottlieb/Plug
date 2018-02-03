@@ -39,9 +39,19 @@ extension Dictionary where Key == String, Value: Any {
 
 		return jsonString
 	}
+}
+
+extension String {
+	public func toJSONDictionary() -> JSONDictionary? {
+		return self.toJSONString().jsonDictionary()
+	}
 	
-	public static func fromString(_ string: String) -> JSONDictionary? {
-		var jsonString = string
+	public func toJSONData() -> Data? {
+		return self.toJSONString().data(using: .utf8)
+	}
+	
+	public func toJSONString() -> String {
+		var jsonString = self
 		var index = jsonString.startIndex
 		var previousIndex = index
 		var insideQuote = false
@@ -58,7 +68,6 @@ extension Dictionary where Key == String, Value: Any {
 			previousIndex = index
 			index = jsonString.index(after: index)
 		}
-		
-		return jsonString.jsonDictionary()
+		return jsonString
 	}
 }

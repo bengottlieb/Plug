@@ -8,6 +8,26 @@
 
 import Foundation
 
+public struct JSONCodingKey: CodingKey {
+	public var stringValue: String
+	public init?(stringValue: String) {
+		self.stringValue = stringValue
+	}
+	
+	public var intValue: Int?
+	
+	public init?(intValue: Int) {
+		self.init(stringValue: "\(intValue)")
+		self.intValue = intValue
+	}
+	
+	public init(_ string: String) {
+		self.stringValue = string
+	}
+	
+}
+
+
 extension Encodable {
 	public var encodedJSONData: Data? {
 		let encoder = JSONEncoder()
@@ -33,5 +53,14 @@ extension Encodable {
 	public var encodedJSONString: String? {
 		guard let json = self.encodedJSONDictionary else { return nil }
 		return json.toString()
+	}
+}
+
+extension JSONDecoder {
+	public enum Error: Swift.Error { case failedToConvertToJSON }
+	public func decode<T>(_ type: T.Type, from dict: JSONDictionary) throws -> T where T : Decodable {
+		guard let data = dict.jsonData else { throw Error.failedToConvertToJSON }
+		
+		return try self.decode(type, from: data)
 	}
 }
