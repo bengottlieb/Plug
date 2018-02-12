@@ -8,9 +8,9 @@
 
 import Foundation
 
-
 public protocol JSONPrimitive: JSONConvertible {}			// Int, String, Float, Bool, [String: JSONPrimitive], [JSONPrimitive]
 public protocol JSONContainer {}			//either a JSONArray or JSONDictionary
+public typealias JSONCodable = Codable & JSONPrimitive
 
 public protocol JSONConvertible {			// any object that can be converted into a JSONPrimitive
 	var jsonRepresentation: JSONPrimitive? { get }
@@ -64,7 +64,7 @@ public extension Dictionary {
 				return false
 			}
 			
-			guard let jsonValue = value as? JSONConvertible else {
+			guard let jsonValue = value as? JSONConvertible ?? value as? JSONDictionary else {
 				if value is JSONPrimitive { continue }
 				ReportInvalidJSON(value)
 				return false
@@ -129,7 +129,7 @@ extension NSString: JSONPrimitive {
 	public var jsonString: String? { return (self as String) }
 }
 
-extension Data: JSONPrimitive {
+extension Data: JSONCodable {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 	public var jsonString: String? { return self.base64EncodedString() }
 }
@@ -139,7 +139,7 @@ extension NSNumber: JSONPrimitive {
 	public var jsonString: String? { return self.description }
 }
 
-extension Bool: JSONPrimitive  {
+extension Bool: JSONCodable  {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 	public var jsonString: String? { return self ? "true" : "false" }
 }
@@ -359,7 +359,7 @@ extension NSDictionary {
 	}
 }
 
-extension Dictionary: JSONPrimitive {
+extension Dictionary: JSONCodable {
 	public var jsonString: String? {
 		if let dict = (self as AnyObject) as? NSDictionary {
 			return dict.jsonString
@@ -376,7 +376,7 @@ extension Dictionary: JSONPrimitive {
 	public var jsonRepresentation: JSONPrimitive? { return (self as AnyObject) as? JSONDictionary }
 }
 
-extension Array: JSONPrimitive {
+extension Array: JSONCodable {
 	public subscript(path path: String) -> Any? {
 		let components = path.components(separatedBy: JSONSeparatorsCharacterSet)
 		return self[components: components]
@@ -467,18 +467,18 @@ public extension Date {
 	}
 }
 
-extension Int: JSONPrimitive {
+extension Int: JSONCodable {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 }
-extension Float: JSONPrimitive {
-	public var jsonRepresentation: JSONPrimitive? { return self }
-}
-
-extension Double: JSONPrimitive {
+extension Float: JSONCodable {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 }
 
-extension UInt: JSONPrimitive {
+extension Double: JSONCodable {
+	public var jsonRepresentation: JSONPrimitive? { return self }
+}
+
+extension UInt: JSONCodable {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 }
 
