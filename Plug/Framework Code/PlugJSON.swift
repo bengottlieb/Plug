@@ -129,7 +129,7 @@ extension NSString: JSONPrimitive {
 	public var jsonString: String? { return (self as String) }
 }
 
-extension Data: JSONCodable {
+extension Data: JSONPrimitive {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 	public var jsonString: String? { return self.base64EncodedString() }
 }
@@ -139,7 +139,7 @@ extension NSNumber: JSONPrimitive {
 	public var jsonString: String? { return self.description }
 }
 
-extension Bool: JSONCodable  {
+extension Bool: JSONPrimitive  {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 	public var jsonString: String? { return self ? "true" : "false" }
 }
@@ -359,7 +359,7 @@ extension NSDictionary {
 	}
 }
 
-extension Dictionary: JSONCodable {
+extension Dictionary: JSONPrimitive {
 	public var jsonString: String? {
 		if let dict = (self as AnyObject) as? NSDictionary {
 			return dict.jsonString
@@ -376,7 +376,7 @@ extension Dictionary: JSONCodable {
 	public var jsonRepresentation: JSONPrimitive? { return (self as AnyObject) as? JSONDictionary }
 }
 
-extension Array: JSONCodable {
+extension Array: JSONPrimitive {
 	public subscript(path path: String) -> Any? {
 		let components = path.components(separatedBy: JSONSeparatorsCharacterSet)
 		return self[components: components]
@@ -467,18 +467,18 @@ public extension Date {
 	}
 }
 
-extension Int: JSONCodable {
+extension Int: JSONPrimitive {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 }
-extension Float: JSONCodable {
-	public var jsonRepresentation: JSONPrimitive? { return self }
-}
-
-extension Double: JSONCodable {
+extension Float: JSONPrimitive {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 }
 
-extension UInt: JSONCodable {
+extension Double: JSONPrimitive {
+	public var jsonRepresentation: JSONPrimitive? { return self }
+}
+
+extension UInt: JSONPrimitive {
 	public var jsonRepresentation: JSONPrimitive? { return self }
 }
 

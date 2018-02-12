@@ -42,9 +42,13 @@ extension Encodable {
 	}
 	
 	public var encodedJSONDictionary: JSONDictionary? {
+		return self.encodedJSONObject as? JSONDictionary
+	}
+	
+	public var encodedJSONObject: JSONConvertible? {
 		guard let data = self.encodedJSONData else { return nil }
 		do {
-			return try JSONSerialization.jsonObject(with: data, options: []) as? JSONDictionary
+			return try JSONSerialization.jsonObject(with: data, options: []) as? JSONConvertible
 		} catch {}
 		
 		return nil
