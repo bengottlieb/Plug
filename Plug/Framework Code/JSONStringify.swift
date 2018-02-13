@@ -8,8 +8,8 @@
 
 import Foundation
 
-private let leftQuote = Character("“")
-private let rightQuote = Character("”")
+private let leftQuote = Character("”")
+private let rightQuote = Character("“")
 
 extension Dictionary where Key == String, Value: Any {
 	
