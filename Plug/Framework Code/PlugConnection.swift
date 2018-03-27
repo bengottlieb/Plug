@@ -172,6 +172,24 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 		}
 	}
 	
+	public convenience init?(request: URLRequest) {
+		guard let url = request.url
+			else {
+				self.init(url: URL.blank)
+				return nil
+		}
+		let method = Plug.Method(rawValue: request.httpMethod ?? "") ?? .GET
+		var params: Plug.Parameters?
+		
+		if let body = request.httpBody { params = Plug.Parameters.data(body) }
+		
+		self.init(method: method, url: url, parameters: params)
+		
+		for (label, header) in request.allHTTPHeaderFields ?? [:] {
+			self.addHeader(header: Plug.Header(label: label, content: header))
+		}
+	}
+	
 	func generateTask() -> URLSessionTask? {
 		if self.task != nil { return self.task }
 		self.task = Plug.instance.session.dataTask(with: self.request ?? self.defaultRequest)
