@@ -17,15 +17,18 @@ extension Plug {
 		var contentTypeHeader: String { return "multipart/form-data; boundary=\(self.boundary)" }
 		
 		public func encode(to encoder: Encoder) throws {
+			if !self.fields.isEmpty {
+				print("*********** Trying to encode a Plug.FormComponents object iwth a JSON payload; this is not supported **********")
+			}
 			var container = encoder.container(keyedBy: CodableKeys.self)
-			try container.encode(self.fields, forKey: .fields)
-			try container.encode(self.fileURLs, forKey: .fileURLs)
-			try container.encode(boundary, forKey: .boundary)
+			//try container.encode(self.fields, forKey: CodableKeys.fields)
+			try container.encode(self.fileURLs, forKey: CodableKeys.fileURLs)
+			try container.encode(boundary, forKey: CodableKeys.boundary)
 		}
 		
 		public required init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodableKeys.self)
-			self.fields = try container.decode(JSONDictionary.self, forKey: .fields)
+			//self.fields = try container.decode(JSONDictionary.self, forKey: .fields)
 			self.fileURLs = try container.decode([FileURL].self, forKey: .fileURLs)
 			self.boundary = try container.decode(String.self, forKey: .boundary)
 		}
@@ -36,7 +39,7 @@ extension Plug {
 			let url: URL
 		}
 		
-		public subscript(key: String) -> Any? {
+		public subscript(key: String) -> Codable? {
 			get { return self.fields[key] }
 			set { self.fields[key] = newValue }
 		}
@@ -161,22 +164,22 @@ extension Plug {
 				return
 			}
 			
-			if let data = try? container.decode(JSONDictionary.self, forKey: .json) {
-				self = .json(data)
-				return
-			}
+//			if let data = try? container.decode([String: Decodable].self, forKey: CodableKeys.json) {
+//				self = .json(data)
+//				return
+//			}
 			
-			if let data = try? container.decode(FormComponents.self, forKey: .form) {
+			if let data = try? container.decode(FormComponents.self, forKey: CodableKeys.form) {
 				self = .form(data)
 				return
 			}
 			
-			if let data = try? container.decode([String: String].self, forKey: .url) {
+			if let data = try? container.decode([String: String].self, forKey: CodableKeys.url) {
 				self = .url(data)
 				return
 			}
 			
-			if let data = try? container.decode([String: String].self, forKey: .body) {
+			if let data = try? container.decode([String: String].self, forKey: CodableKeys.body) {
 				self = .body(data)
 				return
 			}
@@ -188,11 +191,12 @@ extension Plug {
 			var container = encoder.container(keyedBy: CodableKeys.self)
 			switch self {
 			case .none: return
-			case .url(let fields): try container.encode(fields, forKey: .url)
-			case .body(let fields): try container.encode(fields, forKey: .body)
-			case .form(let components): try container.encode(components, forKey: .form)
-			case .json(let json): try container.encode(json, forKey: .json)
-			case .data(let data): try container.encode(data, forKey: .data)
+			case .url(let fields): try container.encode(fields, forKey: CodableKeys.url)
+			case .body(let fields): try container.encode(fields, forKey: CodableKeys.body)
+			case .form(let components): try container.encode(components, forKey: CodableKeys.form)
+			case .json(_): //container.encode(json, forKey: CodingKey.json)
+				print("*********** Trying to encode a Plug.Parameters.JSON() object; this is not supported **********")
+			case .data(let data): try container.encode(data, forKey: CodableKeys.data)
 			}
 		}
 		

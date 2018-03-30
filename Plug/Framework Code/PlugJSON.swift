@@ -46,10 +46,10 @@ public func ReportInvalidJSON(_ value: Any) {
 	print("△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△")
 }
 
-public typealias JSONArray = [Any]
-public typealias JSONDictionary = [String : Any]
+public typealias JSONArray = [Codable]
+public typealias JSONDictionary = [String : Codable]
 
-extension Dictionary where Key == String, Value: Any {
+extension Dictionary where Key == String, Value: Codable {
 	func encode(to encoder: Encoder) {
 		var container = encoder.singleValueContainer()
 		try? container.encode(self)

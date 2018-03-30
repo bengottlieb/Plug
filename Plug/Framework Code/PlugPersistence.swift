@@ -102,11 +102,11 @@ extension Connection {
 			"url": self.url.absoluteString,
 			"persistenceIdentifier": self.persistence.JSONValue,
 			"method": self.method.rawValue,
-			"channel": self.channel.JSONRepresentation
 		]
+		if let channel = self.channel.JSONRepresentation as? Codable { json["channel"] = channel }
 
 		if let headers = self.headers { json["headers"] = headers.dictionary }
-		if self.parameters.type != "None" { json["parameters"] = self.parameters.JSONValue! }
+		if self.parameters.type != "None", let params = self.parameters.JSONValue as? Codable { json["parameters"] = params }
 		return json
 	}
 	

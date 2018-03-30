@@ -243,7 +243,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 	
 	func failedWithError(error: Error?) {
 		self.killTimer?.invalidate()
-		#if (arch(i386) || arch(x86_64)) && os(iOS)
+		#if targetEnvironment(simulator)
 			if let err = error as NSError?, err.code == -1005 && self.superconnection == nil {
 				print("++++++++ Simulator comms issue, please restart the sim. ++++++++")
 			}
