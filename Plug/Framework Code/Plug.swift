@@ -120,7 +120,6 @@ public class Plug: NSObject, URLSessionDelegate {
 		return URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.libraryDirectory, [.userDomainMask], true).first!)
 	}
 	class public var plugDirectoryURL: URL { return self.libraryDirectoryURL.appendingPathComponent("Plug") }
-	static public var autoAcceptCredentialsFrom: [String] = []
 	
 	public override init() {
 		let reachabilityClassReference : AnyObject.Type = NSClassFromString("Plug_Reachability")!
@@ -280,8 +279,14 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 //	}
 	
 	public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-		if Plug.autoAcceptCredentialsFrom.contains(challenge.protectionSpace.host) {
-			completionHandler(.useCredential, challenge.proposedCredential)
+		if Credentials.instance.isDomainTrusted(challenge.protectionSpace.host) {
+			if let proposed = challenge.proposedCredential {
+				completionHandler(.useCredential, proposed)
+			} else if let trust = challenge.protectionSpace.serverTrust {
+				completionHandler(.useCredential, URLCredential(trust:  trust))
+			} else {
+				completionHandler(.useCredential, nil)
+			}
 		} else {
 			completionHandler(.performDefaultHandling, challenge.proposedCredential)
 		}
