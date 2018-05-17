@@ -117,7 +117,7 @@ extension Connection {
 		let persistance = Plug.PersistenceInfo(JSONValue: (info["persistenceIdentifier"] as? [String]) ?? [])
 		let channelJSON = info["channel"] as? NSDictionary
 		let channel = Plug.Channel.channel(json: channelJSON as? JSONDictionary)
-		let parametersData = (info["parameters"] as? [String: NSDictionary])
+		let parametersData = (info["parameters"] as? [String: JSONDictionary])
 		
 		let parameters = Plug.Parameters(dictionary: parametersData ?? [:])
 		

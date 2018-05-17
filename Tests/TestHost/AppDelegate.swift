@@ -13,7 +13,7 @@ import Plug
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	var window: UIWindow?
-	let pendingData = IncomingData(url: URL(string: "http://stackoverflow.com/questions/34182482/nsurlsessiondatadelegate-not-called")!)
+//	let pendingData = IncomingData(url: URL(string: "http://stackoverflow.com/questions/34182482/nsurlsessiondatadelegate-not-called")!)
 
 //	let incoming = Incoming<Data>(url: URL(string: "http://stackoverflow.com/questions/34182482/nsurlsessiondatadelegate-not-called")!) { data in
 //		print("Data: \(data)")
@@ -92,8 +92,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		Connection(url: url)?.fetchJSON().then { json in
 			let string = json.toString() ?? "unable to convert"
 			print("Converted: \(string)")
-			let converted = JSONDictionary.fromString(string)
-			converted!.log()
+			//let converted = JSONDictionary.fromString(string)
+		//	converted!.log()
 		}
 	}
 	
@@ -101,7 +101,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		Plug.instance.setup()
 		
 		//testBulkDownload()
-		testJSONDownload()
+		//testJSONDownload()
+		
+		let url = "https://www.codementor.io/blog/land-clients-freelance-developer-39w3i166wy?utm_content=posts&amp;utm_source=sendgrid&amp;utm_medium=email&amp;utm_term=post-39w3i166wy&amp;utm_campaign=newsletter20180516"
+		let request = Plug.request(url: url)
+		request.addHeader(header: .accept(["*/*"]))
+		
+		request.completion { request, data in
+			print(data)
+		}.error { request, error in
+			print(error)
+		}
 		return true
 	}
 	

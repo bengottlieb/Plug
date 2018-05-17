@@ -40,8 +40,8 @@ extension Plug {
 		}
 		
 		public subscript(key: String) -> Codable? {
-			get { return self.fields[key] }
-			set { self.fields[key] = newValue }
+			get { return self.fields[key] as? Codable }
+			set { self.fields[key] = newValue as? JSONPrimitive }
 		}
 		
 		public func addFile(url: URL?, name: String, mimeType: String) {
@@ -213,7 +213,7 @@ extension Plug {
 				return String(data: data, encoding: .utf8) ?? ""
 				
 			case .json(let object):
-				return (object as NSDictionary).jsonString ?? ""
+				return (object as JSONDictionary).jsonString ?? ""
 				
 			case .none:
 				return ""
@@ -286,18 +286,18 @@ extension Plug {
 			}
 		}
 		
-		public var JSONValue: [String: NSDictionary]? {
+		public var JSONValue: [String: JSONDictionary]? {
 			switch (self) {
-			case .url(let params): return ["URL": NSMutableDictionary(stringDictionary: params)]
-			case .body(let params): return ["body": NSMutableDictionary(stringDictionary: params)]
-			case .form(let components): return ["Form": components.fields as NSDictionary]
-			case .json(let json): return ["JSON": json as NSDictionary]
+			case .url(let params): return ["URL": params]
+			case .body(let params): return ["body": params]
+			case .form(let components): return ["Form": components.fields as JSONDictionary]
+			case .json(let json): return ["JSON": json as JSONDictionary]
 				
 			default: return nil
 			}
 		}
 		
-		init(dictionary: [String: NSDictionary]) {
+		init(dictionary: [String: JSONDictionary]) {
 			if let urlParams = dictionary["URL"] as? [String: String] {
 				self = .url(urlParams)
 				return
@@ -307,7 +307,7 @@ extension Plug {
 				return
 			}
 			
-			if let JSONParams = dictionary["JSON"] as? JSONDictionary {
+			if let JSONParams = dictionary["JSON"] {
 				self = .json(JSONParams)
 				return
 			}
@@ -329,7 +329,7 @@ public func ==(lhs: Plug.Parameters, rhs: Plug.Parameters) -> Bool {
 		return lhComponents == rhComponents
 		
 	case (.json(let lhJson), .json(let rhJson)):
-		return (lhJson as NSDictionary) == (rhJson as NSDictionary)
+		return (lhJson as JSONDictionary) == (rhJson as JSONDictionary)
 	
 	case (.none, .none): return true
 		

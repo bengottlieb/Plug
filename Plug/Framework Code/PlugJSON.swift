@@ -46,8 +46,8 @@ public func ReportInvalidJSON(_ value: Any) {
 	print("△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△")
 }
 
-public typealias JSONArray = [Codable]
-public typealias JSONDictionary = [String : Codable]
+public typealias JSONArray = [Any]
+public typealias JSONDictionary = [String : Any]
 
 extension Dictionary where Key == String, Value: Codable {
 	func encode(to encoder: Encoder) {
@@ -55,6 +55,7 @@ extension Dictionary where Key == String, Value: Codable {
 		try? container.encode(self)
 	}
 }
+
 
 public extension Dictionary {
 	@discardableResult public func validateJSON() -> Bool {
