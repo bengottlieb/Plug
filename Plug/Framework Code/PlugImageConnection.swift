@@ -8,7 +8,7 @@
 
 import Foundation
 import CrossPlatformKit
-import SwearKit
+import SwearKit 
 
 
 extension Connection {
@@ -33,4 +33,13 @@ extension Connection {
 		return promise
 	}
 	
+}
+
+extension Connection.ImageConnectionError: LocalizedError {
+	public var errorDescription: String? {
+		switch self {
+		case .noImageReturned:
+			return NSLocalizedString("No image found", comment: "No image found")
+		}
+	}
 }

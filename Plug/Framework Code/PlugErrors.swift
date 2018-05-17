@@ -10,18 +10,62 @@ import Foundation
 
 
 public extension URLResponse {
-	public class var PlugHTTPErrorDomain: String { return "PlugHTTPErrorDomain" }
+	enum StatusCode: Int, Error { case badRequest = 400, unauthorized = 401, paymentRequired = 402, forbidden = 403, fileNotFound = 404, methodNotAllowed = 405, notAcceptable = 406, proxyAuthenticationRequired = 407, requestTimedOut = 408, conflict = 409, gone = 410, lengthRequired = 411, preconditionFailed = 412, payloadTooLarge = 413, uriTooLong = 414, unsupportedMediaType = 415, rangeNotSatisfiable = 416, expectationFailed = 417, imATeapot = 418, misdirectedRequest = 421, unprocessableEntity = 422, locked = 423, failedDependency = 424, upgradeRequired = 426, preconditionRequired = 428, tooManyRequests = 429, requestHeaderFieldsTooLarge = 431, unavailableForLegalReasons = 451
+		
+		case internalServerError = 500, notImplemented = 501, badGateway = 502, serviceUnavailable = 503, gatewayTimeout = 504, httpVersionNotSupported = 505, variantAlsoNegotiates = 506, insufficientStorage = 507, loopDetected = 508, notExtended = 510, networkAuthenticationRequired = 511
+	}
 	
 	var error: Error? {
-		if let response = self as? HTTPURLResponse {
-			switch response.statusCode {
-			case 200...299: return nil		//no error
-			
-			default:
-				return NSError(domain: URLResponse.PlugHTTPErrorDomain, code: response.statusCode, userInfo: ["response": self])
-			}
-		}
+		if let response = self as? HTTPURLResponse, let error = StatusCode(rawValue: response.statusCode) { return error }
+		
 		return nil
+	}
+}
+
+extension URLResponse.StatusCode: LocalizedError {
+	public var errorDescription: String? {
+		switch self {
+		case .badRequest: return "bad request"
+		case .unauthorized: return "unauthorized"
+		case .paymentRequired: return "payment required"
+		case .forbidden: return "forbidden"
+		case .fileNotFound: return "file not found"
+		case .methodNotAllowed: return "method not allowed"
+		case .notAcceptable: return "not acceptable"
+		case .proxyAuthenticationRequired: return "proxy authentication required"
+		case .requestTimedOut: return "request timed out"
+		case .conflict: return "conflict"
+		case .gone: return "gone"
+		case .lengthRequired: return "length required"
+		case .preconditionFailed: return "precondition failed"
+		case .payloadTooLarge: return "payload too large"
+		case .uriTooLong: return "URI too long"
+		case .unsupportedMediaType: return "unsupported media type"
+		case .rangeNotSatisfiable: return "range not satisfiable"
+		case .expectationFailed: return "expectation failed"
+		case .imATeapot: return "I'm a teapot"
+		case .misdirectedRequest: return "misdirected request"
+		case .unprocessableEntity: return "unprocessable entity"
+		case .locked: return "locked"
+		case .failedDependency: return "failed dependency"
+		case .upgradeRequired: return "upgrade required"
+		case .preconditionRequired: return "pecondition required"
+		case .tooManyRequests: return "too many requests"
+		case .requestHeaderFieldsTooLarge: return "request header fields too large"
+		case .unavailableForLegalReasons: return "unavailable for legal reasons"
+			
+		case .internalServerError: return "internal server error"
+		case .notImplemented: return "not implemented"
+		case .badGateway: return "bad gatewau"
+		case .serviceUnavailable: return "service unavailable"
+		case .gatewayTimeout: return "gateway timeout"
+		case .httpVersionNotSupported: return "HTTP version not supported"
+		case .variantAlsoNegotiates: return "variant also negotiates"
+		case .insufficientStorage: return "insufficient storage"
+		case .loopDetected: return "loop detected"
+		case .notExtended: return "not extended"
+		case .networkAuthenticationRequired: return "network authentication required"
+		}
 	}
 }
 
