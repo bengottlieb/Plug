@@ -107,8 +107,14 @@ public class Plug: NSObject, URLSessionDelegate {
 		let config = URLSessionConfiguration.default
 		
 		if let timeout = self.timeout { config.timeoutIntervalForRequest = timeout }
+		config.httpCookieStorage = self.cookieStorage
+		config.httpShouldSetCookies = false
 		return config
 	}
+	
+	public var cookieStorage: HTTPCookieStorage? = HTTPCookieStorage.shared
+	public var addCookies = true
+	
 	public var session: URLSession!
 	public var defaultHeaders = Plug.Headers([
 			.accept(["application/json"]),

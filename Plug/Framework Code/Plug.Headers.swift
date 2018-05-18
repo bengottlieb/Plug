@@ -37,7 +37,9 @@ extension Plug {
 				try container.encode(user, forKey: .value)
 				try container.encode(pass, forKey: .secondValue)
 			case .userAgent(let agent): try container.encode(agent, forKey: .value)
-				
+			case .setCookie(let cookie): try container.encode(cookie, forKey: .value)
+			case .cookie(let cookies): try container.encode(cookies, forKey: .value)
+
 			case .custom(_, let content): try container.encode(content, forKey: .value)
 			}
 
@@ -48,7 +50,9 @@ extension Plug {
 		case contentType(String)
 		case basicAuthorization(String, String)
 		case userAgent(String)
-		
+		case cookie(String)
+		case setCookie(String)
+
 		case custom(String, String)
 		
 		public var label: String {
@@ -58,7 +62,9 @@ extension Plug {
 			case .contentType: return "Content-Type"
 			case .basicAuthorization: return "Authorization"
 			case .userAgent: return "User-Agent"
-				
+			case .setCookie(_): return "Set-Cookie"
+			case .cookie(_): return "Cookie"
+
 			case .custom(let label,  _): return label
 			}
 		}
@@ -74,7 +80,9 @@ extension Plug {
 			case .basicAuthorization(let user, let pass):
 				return "Basic " + ("\(user):\(pass)".data(using: .utf8)?.base64EncodedString() ?? "")
 			case .userAgent(let agent): return agent
-				
+			case .setCookie(let cookie): return cookie
+			case .cookie(let cookie): return cookie
+
 			case .custom(_, let content): return content
 			}
 		}
@@ -89,7 +97,9 @@ extension Plug {
 			case "Accept-Encoding": self = .acceptEncoding(content)
 			case "Content-Type": self = .contentType(content)
 			case "User-Agent": self = .acceptEncoding(content)
-				
+			case "Set-Cookie": self = .setCookie(content)
+			case "Cookie": self = .cookie(content)
+
 			default: self = .custom(label, content)
 			}
 		}

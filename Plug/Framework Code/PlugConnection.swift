@@ -401,12 +401,18 @@ extension Connection {		//actions
 		self.channel.enqueue(connection: self)
 	}
 	
+	var responseCookies: [HTTPCookie] {
+		guard let responseHeaders = self.responseHeaders?.dictionary else { return [] }
+		return HTTPCookie.cookies(withResponseHeaderFields: responseHeaders, for: self.url)
+	}
+	
 	func setupTimer(withTimeOut: TimeInterval) {
 		if self.state.isComplete { return }
 		self.killTimer = Timer.scheduledTimer(timeInterval: withTimeOut + 0.5, target: self, selector: #selector(Connection.kill), userInfo: nil, repeats: false)
 	}
 	
 	public func run() {
+		if let header = Plug.instance.cookieStorage?.cookiesHeader(for: self) { self.addHeader(header: header) }
 		self.channel.connectionStarted(connection: self)
 		self.state = .running
 		self.task = self.generateTask()
@@ -455,6 +461,7 @@ extension Connection {		//actions
 	}
 	
 	func complete(state: State, parent: Connection? = nil) {
+		Plug.instance.cookieStorage?.finished(connection: self)
 		self.state = state
 		self.killTimer?.invalidate()
 		

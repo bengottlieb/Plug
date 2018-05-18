@@ -103,6 +103,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		//testBulkDownload()
 		//testJSONDownload()
 		
+		Credentials.instance.trustAllDomains = true
+		
 		let url = "https://www.codementor.io/blog/land-clients-freelance-developer-39w3i166wy?utm_content=posts&amp;utm_source=sendgrid&amp;utm_medium=email&amp;utm_term=post-39w3i166wy&amp;utm_campaign=newsletter20180516"
 		let request = Plug.request(url: url)
 		request.addHeader(header: .accept(["*/*"]))

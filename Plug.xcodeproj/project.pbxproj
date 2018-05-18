@@ -45,6 +45,8 @@
 		B560B52D1AA4A15000F3161F /* PlugReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B560B5271AA4A15000F3161F /* PlugReachability.m */; };
 		B5635F5720AE34A500BB250A /* PlugCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5635F5620AE34A500BB250A /* PlugCredentials.swift */; };
 		B5635F5820AE34A500BB250A /* PlugCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5635F5620AE34A500BB250A /* PlugCredentials.swift */; };
+		B5635F5A20AE669000BB250A /* HTTPCookie+Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5635F5920AE669000BB250A /* HTTPCookie+Plug.swift */; };
+		B5635F5B20AE669000BB250A /* HTTPCookie+Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5635F5920AE669000BB250A /* HTTPCookie+Plug.swift */; };
 		B56A0B361E22FADC009BA288 /* Plug+iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56A0B351E22FADC009BA288 /* Plug+iOS.swift */; };
 		B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
 		B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
@@ -158,6 +160,7 @@
 		B560B5261AA4A15000F3161F /* PlugReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlugReachability.h; sourceTree = "<group>"; };
 		B560B5271AA4A15000F3161F /* PlugReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlugReachability.m; sourceTree = "<group>"; };
 		B5635F5620AE34A500BB250A /* PlugCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlugCredentials.swift; sourceTree = "<group>"; };
+		B5635F5920AE669000BB250A /* HTTPCookie+Plug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPCookie+Plug.swift"; sourceTree = "<group>"; };
 		B56A0B351E22FADC009BA288 /* Plug+iOS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Plug+iOS.swift"; path = "Plug/Framework Code/Plug+iOS.swift"; sourceTree = "<group>"; };
 		B572EB721A8CC96E00670D8E /* Plug.Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plug.Headers.swift; sourceTree = "<group>"; };
 		B57AEF431C59C1AE007611F0 /* sample_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sample_image.png; sourceTree = "<group>"; };
@@ -351,6 +354,7 @@
 				B550979F1A9A4FE7003E5155 /* PlugJSON.swift */,
 				B5FF885A20247BD300CA26BE /* JSONStringify.swift */,
 				B58432252024B94600830910 /* Codable+Additions.swift */,
+				B5635F5920AE669000BB250A /* HTTPCookie+Plug.swift */,
 			);
 			name = "Framework Code";
 			path = "Plug/Framework Code";
@@ -616,6 +620,7 @@
 				B58D647F1A898FBD005A0002 /* Plug.swift in Sources */,
 				B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */,
 				B55097A01A9A4FE7003E5155 /* PlugJSON.swift in Sources */,
+				B5635F5A20AE669000BB250A /* HTTPCookie+Plug.swift in Sources */,
 				B58D64801A898FBD005A0002 /* PlugConnection.swift in Sources */,
 				B58432262024B94600830910 /* Codable+Additions.swift in Sources */,
 				B5AD59F51E9DC21A007B61BE /* PlugImageConnection.swift in Sources */,
@@ -665,6 +670,7 @@
 				B58D64861A898FBE005A0002 /* PlugProtocols.swift in Sources */,
 				B580E02A1A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B5FDD9BC1CEFE3500001FABA /* Plug.ConnectionData.swift in Sources */,
+				B5635F5B20AE669000BB250A /* HTTPCookie+Plug.swift in Sources */,
 				B586AF3D1EFABEA500CA72CE /* Incoming.swift in Sources */,
 				B55097A11A9A4FE7003E5155 /* PlugJSON.swift in Sources */,
 				B5AD59F61E9DC21A007B61BE /* PlugImageConnection.swift in Sources */,
