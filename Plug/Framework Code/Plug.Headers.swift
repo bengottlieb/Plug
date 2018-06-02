@@ -33,6 +33,7 @@ extension Plug {
 			case .accept(let types): try container.encode(types, forKey: .value)
 			case .acceptEncoding(let encoding): try container.encode(encoding, forKey: .value)
 			case .contentType(let type): try container.encode(type, forKey: .value)
+			case .tokenAuthorization(let token): try container.encode(token, forKey: .value)
 			case .basicAuthorization(let user, let pass):
 				try container.encode(user, forKey: .value)
 				try container.encode(pass, forKey: .secondValue)
@@ -49,6 +50,7 @@ extension Plug {
 		case acceptEncoding(String)
 		case contentType(String)
 		case basicAuthorization(String, String)
+		case tokenAuthorization(String)
 		case userAgent(String)
 		case cookie(String)
 		case setCookie(String)
@@ -61,6 +63,7 @@ extension Plug {
 			case .acceptEncoding: return "Accept-Encoding"
 			case .contentType: return "Content-Type"
 			case .basicAuthorization: return "Authorization"
+			case .tokenAuthorization: return "Authorization"
 			case .userAgent: return "User-Agent"
 			case .setCookie(_): return "Set-Cookie"
 			case .cookie(_): return "Cookie"
@@ -77,6 +80,7 @@ extension Plug {
 				
 			case .acceptEncoding(let encoding): return encoding
 			case .contentType(let type): return type
+			case .tokenAuthorization(let token): return "Bearer \(token)"
 			case .basicAuthorization(let user, let pass):
 				return "Basic " + ("\(user):\(pass)".data(using: .utf8)?.base64EncodedString() ?? "")
 			case .userAgent(let agent): return agent
