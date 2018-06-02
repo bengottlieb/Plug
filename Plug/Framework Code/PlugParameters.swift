@@ -155,6 +155,16 @@ extension Plug {
 		case json(JSONDictionary)
 		case data(Data)
 		
+		public static func encoded<T>(_ item: T) -> Parameters? where T: Codable {
+			do {
+				guard let json = try JSONEncoder().encode(item).json else { return nil }
+				return Parameters.json(json)
+			} catch {
+				print("Error while encoding \(item)")
+				return nil
+			}
+		}
+		
 		enum CodableKeys: String, CodingKey { case label, url, body, form, json, data }
 		enum CodingError: Error { case empty }
 		public init(from decoder: Decoder) throws {

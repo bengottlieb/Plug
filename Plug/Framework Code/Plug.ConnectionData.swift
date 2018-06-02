@@ -29,6 +29,10 @@ public extension Plug {
 		
 		public var description: String { return "Data, \(ByteCountFormatter.string(fromByteCount: Int64(self.length), countStyle: .file)), \(self.data)" }
 		
+		public func decode<T>(_ type: T.Type) throws -> T where T : Decodable {
+			return try JSONDecoder().decode(T.self, from: self.data)
+		}
+		
 		init?(data: Data?, size: UInt64) {
 			length = size
 			if data == nil { return nil }

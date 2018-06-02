@@ -9,6 +9,22 @@
 import UIKit
 import Plug
 
+
+extension String {
+	
+	func fromBase64() -> String? {
+		guard let data = Data(base64Encoded: self) else {
+			return nil
+		}
+		
+		return String(data: data, encoding: .utf8)
+	}
+	
+	func toBase64() -> String {
+		return Data(self.utf8).base64EncodedString()
+	}
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -97,23 +113,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 	}
 	
+	
+	func test() {
+		let session = URLSession.shared
+		var request = URLRequest(url: URL(string: "https://api.mailgun.net/v3/mg.bengottlieb.com/messages")!)
+		request.httpMethod = "POST"
+		let data = "from: Excited User <(Benjamin Beetlejuice)>&to: [ben@standalone.com,(Other guy)]&subject:Hello&text:Testing some Mailgun awesomness!"
+		request.httpBody = data.data(using: .utf8)
+		
+		let credentials = "api:key-9aa909efe57d51eb4da88147fd35217e"
+		request.setValue("Basic \(credentials.toBase64())", forHTTPHeaderField: "Authorization")
+		
+
+	//	request.setValue("key-9aa909efe57d51eb4da88147fd35217e", forHTTPHeaderField: "api")
+	//	request.setValue("key-(Personal info)", forHTTPHeaderField: "api")
+		let task = session.dataTask(with: request) { (data, response, error) in
+			
+			if let error = error {
+				print(error)
+			}
+			if let response = response {
+				print("url = \(response.url!)")
+				print("response = \(response)")
+				let httpResponse = response as! HTTPURLResponse
+				print("response code = \(httpResponse.statusCode)")
+			}
+			
+			
+		}
+		task.resume()
+	}
+
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
 		Plug.instance.setup()
-		
+
 		//testBulkDownload()
 		//testJSONDownload()
 		
 		Credentials.instance.trustAllDomains = true
 		
-		let url = "https://www.codementor.io/blog/land-clients-freelance-developer-39w3i166wy?utm_content=posts&amp;utm_source=sendgrid&amp;utm_medium=email&amp;utm_term=post-39w3i166wy&amp;utm_campaign=newsletter20180516"
-		let request = Plug.request(url: url)
-		request.addHeader(header: .accept(["*/*"]))
-		
-		request.completion { request, data in
-			print(data)
-		}.error { request, error in
-			print(error)
-		}
 		return true
 	}
 	
