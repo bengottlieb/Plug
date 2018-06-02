@@ -252,7 +252,7 @@ extension Plug {
 			switch (self) {
 			case .body(let params):
 				if params.keys.count == 0 { return "".data(using: .utf8) }
-				let string = (params.keys.reduce("?") { if let v = params[$1] { return $0 + "\($1)=\(v.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlHostAllowed)!)&" }; return $0 })
+				let string = (params.keys.reduce("") { if let v = params[$1] { return $0 + "\($1)=\(v.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlHostAllowed)!)&" }; return $0 })
 				return string.data(using: .utf8)
 				
 			case .form(let components):
