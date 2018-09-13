@@ -1,0 +1,11 @@
+framework module CrossPlatformKit {
+  umbrella header "CrossPlatformKit.h"
+
+  export *
+  module * { export * }
+}
+
+module CrossPlatformKit.Swift {
+    header "CrossPlatformKit-Swift.h"
+    requires objc
+}
