@@ -19,7 +19,7 @@ extension HTTPCookieStorage {
 	func cookiesHeader(for connection: Connection) -> Plug.Header? {
 		guard Plug.instance.addCookies, let cookies = self.cookies(for: connection.url) else { return nil }
 		let dict = HTTPCookie.requestHeaderFields(with: cookies)
-		if let header = dict["Cookies"] {
+		if let header = dict["Cookie"] ?? dict["Cookies"] {
 			return .cookie(header)
 		}
 		return nil
