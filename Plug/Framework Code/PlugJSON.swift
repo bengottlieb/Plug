@@ -58,7 +58,7 @@ extension Dictionary where Key == String, Value: Codable {
 
 
 public extension Dictionary {
-	@discardableResult public func validateJSON() -> Bool {
+	@discardableResult func validateJSON() -> Bool {
 		for (key, value) in self {
 			if !(key is String) {
 				print("Illegal key: \(key)")
@@ -80,7 +80,7 @@ public extension Dictionary {
 }
 
 public extension NSDictionary {
-	@discardableResult public func validateJSON() -> Bool {
+	@discardableResult func validateJSON() -> Bool {
 		for (key, value) in self {
 			if !(key is String) {
 				print("Illegal key: \(key)")
@@ -98,7 +98,7 @@ public extension NSDictionary {
 }
 
 public extension Array {
-	@discardableResult public func validateJSON() -> Bool {
+	@discardableResult func validateJSON() -> Bool {
 		for value in self {
 			guard let jsonValue = value as? JSONConvertible else {
 				if value is JSONPrimitive { continue }
@@ -112,7 +112,7 @@ public extension Array {
 }
 
 public extension NSArray {
-	@discardableResult public func validateJSON() -> Bool {
+	@discardableResult func validateJSON() -> Bool {
 		for value in self {
 			guard let jsonValue = value as? JSONConvertible else {
 				if value is JSONPrimitive { continue }
@@ -209,9 +209,9 @@ extension NSArray: JSONPrimitive {
 }
 
 public extension String {
-	public var json: JSONDictionary? { return self.jsonDictionary() }
+	var json: JSONDictionary? { return self.jsonDictionary() }
 	
-	public func jsonDictionary(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONDictionary? {
+	func jsonDictionary(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONDictionary? {
 		guard let data = self.data(using: .utf8) else { return nil }
 		
 		do {
@@ -223,7 +223,7 @@ public extension String {
 		return nil
 	}
 	
-	public func jsonArray(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONArray? {
+	func jsonArray(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONArray? {
 		guard let data = self.data(using: .utf8) else { return nil }
 		
 		do {
@@ -237,9 +237,9 @@ public extension String {
 }
 
 public extension Data {
-	public var json: JSONDictionary? { return self.jsonDictionary() }
+	var json: JSONDictionary? { return self.jsonDictionary() }
 	
-	public func jsonDictionary(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONDictionary? {
+	func jsonDictionary(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONDictionary? {
 		do {
 			let dict = try JSONSerialization.jsonObject(with: self, options: options) as? JSONDictionary
 			return dict
@@ -249,7 +249,7 @@ public extension Data {
 		return nil
 	}
 	
-	public func jsonArray(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONArray? {
+	func jsonArray(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONArray? {
 		do {
 			let dict = try JSONSerialization.jsonObject(with: self, options: options) as? JSONArray
 			return dict
@@ -259,7 +259,7 @@ public extension Data {
 		return nil
 	}
 	
-	public func jsonContainer(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONContainer? {
+	func jsonContainer(options: JSONSerialization.ReadingOptions = [], suppressErrors: Bool = false) -> JSONContainer? {
 		do {
 			let container = try JSONSerialization.jsonObject(with: self, options: options)
 			
@@ -431,9 +431,9 @@ extension Array: JSONPrimitive {
 }
 
 public extension Date {
-	public static var JSONFormat = "yyyy-MM-dd HH:mm:ss Z"
+	static var JSONFormat = "yyyy-MM-dd HH:mm:ss Z"
 	
-	public init?(jsonString: String?, format: String = Date.JSONFormat, formats: [String]? = nil, cachedFormatter: DateFormatter? = nil) {
+	init?(jsonString: String?, format: String = Date.JSONFormat, formats: [String]? = nil, cachedFormatter: DateFormatter? = nil) {
 		var result: Date?
 		
 		for format in formats ?? (format == Date.JSONFormat ? [format] : [format, Date.JSONFormat]) {
@@ -456,7 +456,7 @@ public extension Date {
 		}
 	}
 	
-	public func jsonString(format: String = Date.JSONFormat, cachedFormatter: DateFormatter? = nil) -> String {
+	func jsonString(format: String = Date.JSONFormat, cachedFormatter: DateFormatter? = nil) -> String {
 		let formatter = cachedFormatter ?? {
 			let formatter = DateFormatter()
 			formatter.timeZone = TimeZone.current

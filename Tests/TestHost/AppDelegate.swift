@@ -144,7 +144,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		task.resume()
 	}
 
-	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 		Plug.instance.setup()
 
 		//testBulkDownload()

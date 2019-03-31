@@ -95,7 +95,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 	var fileHandle: FileHandle! { didSet { self.subconnections.forEach { $0.fileHandle = self.fileHandle } } }
 	weak var killTimer: Timer?
 	
-	internal(set) var response: URLResponse? { didSet {
+	var response: URLResponse? { didSet {
 		if let resp = response as? HTTPURLResponse {
 			self.responseHeaders = Plug.Headers(dictionary: resp.allHeaderFields as NSDictionary)
 			self.statusCode = resp.statusCode
@@ -121,7 +121,10 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 		}
 		return 0
 	}
-	
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(self.hashValue)
+	}
 	public var hashValue: Int {
 		return self.url.absoluteString.hash
 	}

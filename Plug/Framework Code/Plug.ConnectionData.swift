@@ -10,7 +10,7 @@ import Foundation
 import CrossPlatformKit
 
 public extension Plug {
-	public class ConnectionData: CustomStringConvertible {
+	class ConnectionData: CustomStringConvertible {
 		public enum JSONObjectType { case dictionary, array }
 		
 		public var data: Data {

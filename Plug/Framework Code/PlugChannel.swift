@@ -128,13 +128,13 @@ extension Plug {
 		
 		func removeWaiting(_ connection: Connection) {
 			self.unfinishedConnections.remove(connection)
-			if let index = self.waitingConnections.index(of: connection) {
+			if let index = self.waitingConnections.firstIndex(of: connection) {
 				self.waitingConnections.remove(at: index)
 			}
 		}
 		
 		func removeActive(_ connection: Connection) {
-			if let index = self.activeConnections.index(of: connection) {
+			if let index = self.activeConnections.firstIndex(of: connection) {
 				self.activeConnections.remove(at: index)
 			}
 		}
@@ -142,8 +142,8 @@ extension Plug {
 		func connectionStarted(connection: Connection) {
 			self.startBackgroundTask()
 			self.serialize {
-				if let index = self.waitingConnections.index(of: connection) { self.waitingConnections.remove(at: index) }
-				if self.activeConnections.index(of: connection) == -1 { self.activeConnections.append(connection) }
+				if let index = self.waitingConnections.firstIndex(of: connection) { self.waitingConnections.remove(at: index) }
+				if self.activeConnections.firstIndex(of: connection) == -1 { self.activeConnections.append(connection) }
 				NotificationCenter.default.post(name: Plug.notifications.connectionStarted, object: connection)
 			}
 		}

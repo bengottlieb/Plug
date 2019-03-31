@@ -71,14 +71,14 @@ extension URLResponse.StatusCode: LocalizedError {
 
 public enum JSONErrors: Int { case unableToFindJSONContainer, unexpectedJSONDictionary, unexpectedJSONArray }
 public extension Error {
-	public static var PlugJSONErrorDomain: String { return "PlugJSONErrorDomain" }
+	static var PlugJSONErrorDomain: String { return "PlugJSONErrorDomain" }
 	
-	public var isCancelledError: Bool {
+	var isCancelledError: Bool {
 		let err = self as NSError
 		return err.domain == NSURLErrorDomain && err.code == Int(CFNetworkErrors.cfurlErrorCancelled.rawValue)
 	}
 	
-	public var isTimeoutError: Bool {
+	var isTimeoutError: Bool {
 		let err = self as NSError
 		if err.domain != NSURLErrorDomain { return false }
 		if err.code == Int(CFNetworkErrors.cfurlErrorTimedOut.rawValue) { return true }

@@ -9,7 +9,7 @@
 import Foundation
 
 public extension Plug {
-	public class PersistenceManager {
+	class PersistenceManager {
 		public class var defaultManager: PersistenceManager { struct s { static let mgr = PersistenceManager() }; return s.mgr }
 		
 		public func register(_ object: PlugPersistentDelegate) {
@@ -27,7 +27,7 @@ public extension Plug {
 		
 		func register(_ connection: Connection) {
 			self.queue.addOperation {
-				if self.persistentConnections.index(of: connection) == nil {
+				if self.persistentConnections.firstIndex(of: connection) == nil {
 					self.persistentConnections.append(connection)
 					self.queuePersistentConnectionSave()
 				}
@@ -36,7 +36,7 @@ public extension Plug {
 		
 		func unregister(_ connection: Connection) {
 			self.queue.addOperation {
-				if let index = self.persistentConnections.index(of: connection) {
+				if let index = self.persistentConnections.firstIndex(of: connection) {
 					self.persistentConnections.remove(at: index)
 					self.queuePersistentConnectionSave()
 				}
@@ -126,9 +126,12 @@ extension Connection {
 }
 
 public extension Plug {
-	public struct PersistenceInfo: Hashable, Equatable {
+	struct PersistenceInfo: Hashable, Equatable {
 		public var objectKey: String
 		public var instanceKey: String?
+		public func hash(into hasher: inout Hasher) {
+			hasher.combine(self.hashValue)
+		}
 		public var hashValue: Int { return self.objectKey.hash + (self.instanceKey?.hash ?? 0) }
 		
 		public init(objectKey oKey: String, instanceKey iKey: String? = nil) {

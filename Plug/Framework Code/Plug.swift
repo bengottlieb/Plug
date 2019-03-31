@@ -137,7 +137,7 @@ public class Plug: NSObject, URLSessionDelegate {
 		self.rebuildSession()
 		
 		#if os(iOS)
-			NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive), name: .UIApplicationDidBecomeActive, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
 		#endif
 	}
 	
@@ -201,7 +201,7 @@ public class Plug: NSObject, URLSessionDelegate {
 }
 
 public extension Plug {
-	@discardableResult public class func request(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .transient, channel: Plug.Channel = Plug.Channel.defaultChannel, completion: ((Connection, ConnectionData?, Error?) -> Void)? = nil) -> Connection {
+	@discardableResult class func request(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .transient, channel: Plug.Channel = Plug.Channel.defaultChannel, completion: ((Connection, ConnectionData?, Error?) -> Void)? = nil) -> Connection {
 		let conn = Connection(method: method, url: url, parameters: parameters, persistence: persistence, channel: channel) ?? Connection.noopConnection
 		
 		if let completion = completion {
@@ -215,7 +215,7 @@ public extension Plug {
 		return conn
 	}
 
-	@discardableResult public class func requestImage(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .transient, channel: Plug.Channel = Plug.Channel.defaultChannel, completion: @escaping (Connection, UXImage?, Error?) -> Void) -> Connection {
+	@discardableResult class func requestImage(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .transient, channel: Plug.Channel = Plug.Channel.defaultChannel, completion: @escaping (Connection, UXImage?, Error?) -> Void) -> Connection {
 		return self.request(method: method, url: url, parameters: parameters, persistence: persistence, channel: channel) { conn, data, error in
 			
 			if let image = data?.image {
