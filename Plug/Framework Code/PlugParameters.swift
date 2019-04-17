@@ -352,9 +352,7 @@ extension NSMutableDictionary {
 		self.init()
 		
 		for (key, value) in stringDictionary {
-			if value != nil {
-				self[key] = value!
-			}
+			if let actual = value { self[key] = actual }
 		}
 	}
 	

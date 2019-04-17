@@ -21,18 +21,21 @@ extension Plug {
 		
 		public enum PauseReason: Int { case manual, offline, backgrounding }
 
-		public static var defaultChannel: Channel = { return Channel(name: "default", maxSimultaneousConnections: 1) }()
-		public static var resourceChannel: Channel = { return Channel(name: "resources", maxSimultaneousConnections: 50) }()
+		public static var defaultChannel: Channel = { return Channel(name: "default", maxSimultaneousConnections: 1)! }()
+		public static var resourceChannel: Channel = { return Channel(name: "resources", maxSimultaneousConnections: 50)! }()
 
 		static var allChannels: [String: Channel] = [:]
 		
-		init(name chName: String, maxSimultaneousConnections max: Int) {
-			name = chName
-			pausedReason = Plug.connectionType == .offline ? .offline : nil
-			maxSimultaneousConnections = max
-			queue = OperationQueue()
-			queue.maxConcurrentOperationCount = 1//max
-			Channel.allChannels[chName] = self
+		init?(name chName: String, maxSimultaneousConnections max: Int) {
+			self.name = chName
+			self.pausedReason = Plug.connectionType == .offline ? .offline : nil
+			self.maxSimultaneousConnections = max
+			self.queue = OperationQueue()
+            self.queue.name = "Queue for " + chName
+			self.queue.maxConcurrentOperationCount = 1//max
+
+            if Channel.allChannels[chName] != nil { return nil }
+            Channel.allChannels[chName] = self
 		}
 
 		internal var unfinishedConnections: Set<Connection> = []
@@ -60,7 +63,7 @@ extension Plug {
 			return ["name": self.name, "max": self.maximumActiveConnections ]
 		}
 		
-		class func channel(json: JSONDictionary?) -> Plug.Channel {
+		class func channel(json: JSONDictionary?) -> Plug.Channel? {
 			let name = json?["name"] as? String ?? "default"
 			if let channel = self.allChannels[name] { return channel }
 			
@@ -126,7 +129,7 @@ extension Plug {
 			}
 		}
 		
-		func removeWaiting(_ connection: Connection) {
+		func removeWaiting(_ connection: Connection) {          // this is only called  from other serialized code, do not serialize
 			self.unfinishedConnections.remove(connection)
 			if let index = self.waitingConnections.firstIndex(of: connection) {
 				self.waitingConnections.remove(at: index)

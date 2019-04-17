@@ -10,7 +10,7 @@ import Foundation
 
 public extension Plug {
 	class PersistenceManager {
-		public class var defaultManager: PersistenceManager { struct s { static let mgr = PersistenceManager() }; return s.mgr }
+        public static let instance = PersistenceManager()
 		
 		public func register(_ object: PlugPersistentDelegate) {
 			self.persistentDelegates[object.persistenceInfo] = object
@@ -21,10 +21,17 @@ public extension Plug {
 			return nil
 		}
 		
+        let queue: OperationQueue
 		var persistentDelegates: [PersistenceInfo: PlugPersistentDelegate] = [:]
 		var persistentConnections: [Connection] = []
-		var queue: OperationQueue = { var q = OperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
-		
+
+        init() {
+            self.queue = OperationQueue()
+            self.queue.maxConcurrentOperationCount = 1
+            self.queue.name = "Plug PersistenceManager Queue"
+        }
+        
+
 		func register(_ connection: Connection) {
 			self.queue.addOperation {
 				if self.persistentConnections.firstIndex(of: connection) == nil {
@@ -83,11 +90,11 @@ public extension Plug {
 		
 		@objc func savePersistentConnections() {
 			self.saveTimer = nil
-			if self.persistentCacheURL == nil { return }
+			guard let persistentURL = self.persistentCacheURL else { return }
 			let dictionaries: [[String : Codable]] = self.persistentConnections.map { return $0.JSONRepresentation }
 			do {
 				let json = try JSONSerialization.data(withJSONObject: dictionaries, options: JSONSerialization.WritingOptions.prettyPrinted)
-				try json.write(to: self.persistentCacheURL!, options: [.atomicWrite])
+				try json.write(to: persistentURL, options: [.atomicWrite])
 			} catch let error {
 				print("error while saving a persistent connection: \(error)")
 			}
@@ -116,7 +123,7 @@ extension Connection {
 		let method = Plug.Method(rawValue: (info["method"] as? String) ?? "GET")
 		let persistance = Plug.PersistenceInfo(JSONValue: (info["persistenceIdentifier"] as? [String]) ?? [])
 		let channelJSON = info["channel"] as? NSDictionary
-		let channel = Plug.Channel.channel(json: channelJSON as? JSONDictionary)
+		let channel = Plug.Channel.channel(json: channelJSON as? JSONDictionary) ?? Plug.Channel.defaultChannel
 		let parametersData = (info["parameters"] as? [String: JSONDictionary])
 		
 		let parameters = Plug.Parameters(dictionary: parametersData ?? [:])

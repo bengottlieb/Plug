@@ -63,6 +63,7 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 
 		self.persistence = .transient
 		self.requestQueue = OperationQueue()
+        self.requestQueue.name = "Main Plug Queue"
 		self.channel = Plug.Channel.defaultChannel
 	}
 	
@@ -149,8 +150,9 @@ public class Connection: Hashable, CustomStringConvertible, Codable {
 	var superconnection: Connection?
 	
 	public init?(method meth: Plug.Method = .GET, url: URLLike, parameters params: Plug.Parameters? = nil, persistence persist: Plug.Persistence = .transient, channel chn: Plug.Channel = Plug.Channel.defaultChannel) {
-		requestQueue = OperationQueue()
-		requestQueue.maxConcurrentOperationCount = 1
+		self.requestQueue = OperationQueue()
+        self.requestQueue.name = "Operation queue for \(url)"
+		self.requestQueue.maxConcurrentOperationCount = 1
 		
 		persistence = persist
 		parameters = params ?? .none

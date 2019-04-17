@@ -412,7 +412,8 @@ extension Array: JSONPrimitive {
 
 	public var jsonString: String? {
 		do {
-			let data = try JSONSerialization.data(withJSONObject: (self as AnyObject) as! [AnyObject], options: [.prettyPrinted])
+            guard let array = (self as AnyObject) as? [AnyObject] else { return nil }
+			let data = try JSONSerialization.data(withJSONObject: array, options: [.prettyPrinted])
 			return String(data: data, encoding: .utf8) ?? ""
 		} catch let error {
 			print("error while deserializing a JSON object: \(error)")

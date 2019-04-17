@@ -50,7 +50,7 @@ public class Plug: NSObject, URLSessionDelegate {
 			default: return true
 			}
 		}
-		public var persistentDelegate: PlugPersistentDelegate? { return Plug.PersistenceManager.defaultManager.delegateForPersistenceInfo(info: self.persistentInfo) }
+		public var persistentDelegate: PlugPersistentDelegate? { return Plug.PersistenceManager.instance.delegateForPersistenceInfo(info: self.persistentInfo) }
 		
 		public var persistentInfo: Plug.PersistenceInfo? {
 			switch (self) {
@@ -303,15 +303,19 @@ extension Plug: URLSessionTaskDelegate, URLSessionDownloadDelegate, URLSessionDa
 extension Plug {
 	func register(connection: Connection) {
 		if let task = connection.task {
+            self.subscriptSemaphore.wait()
 			connection.channel.connections[task.taskIdentifier] = connection
-			if connection.persistence.isPersistent { PersistenceManager.defaultManager.register(connection) }
+            self.subscriptSemaphore.signal()
+			if connection.persistence.isPersistent { PersistenceManager.instance.register(connection) }
 		}
 	}
 	
 	func unregister(connection: Connection) {
 		if let task = connection.task {
+            self.subscriptSemaphore.wait()
 			connection.channel.connections.removeValue(forKey: task.taskIdentifier)
-			if connection.persistence.isPersistent { PersistenceManager.defaultManager.unregister(connection) }
+            self.subscriptSemaphore.signal()
+			if connection.persistence.isPersistent { PersistenceManager.instance.unregister(connection) }
 		}
 	}
 	
