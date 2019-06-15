@@ -25,7 +25,7 @@ class ViewController: UIViewController {
 			switch (Plug.connectionType) {
 			case .offline: self.statusLabel.text = "Offline"
 			case .wifi: self.statusLabel.text = "WiFi"
-			case .wan: self.statusLabel.text = "WAN"
+			case .cellular: self.statusLabel.text = "WAN"
 			}
 		}
 	}

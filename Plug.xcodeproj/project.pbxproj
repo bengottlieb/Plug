@@ -38,14 +38,12 @@
 		B55097A01A9A4FE7003E5155 /* PlugJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B550979F1A9A4FE7003E5155 /* PlugJSON.swift */; };
 		B55097A11A9A4FE7003E5155 /* PlugJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B550979F1A9A4FE7003E5155 /* PlugJSON.swift */; };
 		B557097A2250429C00042D8A /* CrossPlatformKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */; };
-		B560B52A1AA4A15000F3161F /* PlugReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = B560B5261AA4A15000F3161F /* PlugReachability.h */; };
-		B560B52B1AA4A15000F3161F /* PlugReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = B560B5261AA4A15000F3161F /* PlugReachability.h */; };
-		B560B52C1AA4A15000F3161F /* PlugReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B560B5271AA4A15000F3161F /* PlugReachability.m */; };
-		B560B52D1AA4A15000F3161F /* PlugReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B560B5271AA4A15000F3161F /* PlugReachability.m */; };
 		B5635F5720AE34A500BB250A /* PlugCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5635F5620AE34A500BB250A /* PlugCredentials.swift */; };
 		B5635F5820AE34A500BB250A /* PlugCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5635F5620AE34A500BB250A /* PlugCredentials.swift */; };
 		B5635F5A20AE669000BB250A /* HTTPCookie+Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5635F5920AE669000BB250A /* HTTPCookie+Plug.swift */; };
 		B5635F5B20AE669000BB250A /* HTTPCookie+Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5635F5920AE669000BB250A /* HTTPCookie+Plug.swift */; };
+		B568E10622B52D070006F03A /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568E10522B52D070006F03A /* Reachability.swift */; };
+		B568E10722B52D070006F03A /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568E10522B52D070006F03A /* Reachability.swift */; };
 		B56A0B361E22FADC009BA288 /* Plug+iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56A0B351E22FADC009BA288 /* Plug+iOS.swift */; };
 		B572EB731A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
 		B572EB741A8CC96E00670D8E /* Plug.Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572EB721A8CC96E00670D8E /* Plug.Headers.swift */; };
@@ -152,10 +150,9 @@
 		B51E80EB1DB90E2400510096 /* Dates.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Dates.playground; sourceTree = "<group>"; };
 		B5264A851AE68AA30062537C /* PlugChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugChannel.swift; sourceTree = "<group>"; };
 		B550979F1A9A4FE7003E5155 /* PlugJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugJSON.swift; sourceTree = "<group>"; };
-		B560B5261AA4A15000F3161F /* PlugReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlugReachability.h; sourceTree = "<group>"; };
-		B560B5271AA4A15000F3161F /* PlugReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlugReachability.m; sourceTree = "<group>"; };
 		B5635F5620AE34A500BB250A /* PlugCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlugCredentials.swift; sourceTree = "<group>"; };
 		B5635F5920AE669000BB250A /* HTTPCookie+Plug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPCookie+Plug.swift"; sourceTree = "<group>"; };
+		B568E10522B52D070006F03A /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		B56A0B351E22FADC009BA288 /* Plug+iOS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Plug+iOS.swift"; path = "Plug/Framework Code/Plug+iOS.swift"; sourceTree = "<group>"; };
 		B572EB721A8CC96E00670D8E /* Plug.Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plug.Headers.swift; sourceTree = "<group>"; };
 		B57AEF431C59C1AE007611F0 /* sample_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sample_image.png; sourceTree = "<group>"; };
@@ -272,15 +269,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		B560B5241AA4A15000F3161F /* ObjC */ = {
-			isa = PBXGroup;
-			children = (
-				B560B5261AA4A15000F3161F /* PlugReachability.h */,
-				B560B5271AA4A15000F3161F /* PlugReachability.m */,
-			);
-			path = ObjC;
-			sourceTree = "<group>";
-		};
 		B586AF391EFABD3E00CA72CE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -324,7 +312,6 @@
 		B58D64741A898F81005A0002 /* Framework Code */ = {
 			isa = PBXGroup;
 			children = (
-				B560B5241AA4A15000F3161F /* ObjC */,
 				B58D64751A898F81005A0002 /* Plug.swift */,
 				B5635F5620AE34A500BB250A /* PlugCredentials.swift */,
 				B50066A3200A483800ED2081 /* ConnectionLogViewController.swift */,
@@ -345,6 +332,7 @@
 				B5FF885A20247BD300CA26BE /* JSONStringify.swift */,
 				B58432252024B94600830910 /* Codable+Additions.swift */,
 				B5635F5920AE669000BB250A /* HTTPCookie+Plug.swift */,
+				B568E10522B52D070006F03A /* Reachability.swift */,
 			);
 			name = "Framework Code";
 			path = "Plug/Framework Code";
@@ -390,7 +378,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B560B52A1AA4A15000F3161F /* PlugReachability.h in Headers */,
 				B58D64961A899285005A0002 /* Plug.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -399,7 +386,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B560B52B1AA4A15000F3161F /* PlugReachability.h in Headers */,
 				B58D64791A898F89005A0002 /* Plug.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -618,11 +604,11 @@
 				B50066A1200A46FB00ED2081 /* ConnectionLog.swift in Sources */,
 				B58D64811A898FBD005A0002 /* PlugParameters.swift in Sources */,
 				B5FF885B20247BD300CA26BE /* JSONStringify.swift in Sources */,
-				B560B52C1AA4A15000F3161F /* PlugReachability.m in Sources */,
 				B5FDD9B81CEFE3380001FABA /* NSURLRequest+Plug.swift in Sources */,
 				B580E0291A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B58D64821A898FBD005A0002 /* PlugProtocols.swift in Sources */,
 				B50066A4200A483800ED2081 /* ConnectionLogViewController.swift in Sources */,
+				B568E10622B52D070006F03A /* Reachability.swift in Sources */,
 				B56A0B361E22FADC009BA288 /* Plug+iOS.swift in Sources */,
 				B5FDD9BB1CEFE3500001FABA /* Plug.ConnectionData.swift in Sources */,
 				B5264A871AE68AED0062537C /* PlugChannel.swift in Sources */,
@@ -662,10 +648,10 @@
 				B580E02A1A99867C0067F89D /* PlugPersistence.swift in Sources */,
 				B5FDD9BC1CEFE3500001FABA /* Plug.ConnectionData.swift in Sources */,
 				B5635F5B20AE669000BB250A /* HTTPCookie+Plug.swift in Sources */,
+				B568E10722B52D070006F03A /* Reachability.swift in Sources */,
 				B586AF3D1EFABEA500CA72CE /* Incoming.swift in Sources */,
 				B55097A11A9A4FE7003E5155 /* PlugJSON.swift in Sources */,
 				B5AD59F61E9DC21A007B61BE /* PlugImageConnection.swift in Sources */,
-				B560B52D1AA4A15000F3161F /* PlugReachability.m in Sources */,
 				B5FDD9B61CEFC5280001FABA /* PlugJSONConnection.swift in Sources */,
 				B5635F5820AE34A500BB250A /* PlugCredentials.swift in Sources */,
 			);
@@ -827,6 +813,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = YY6CWUX533;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -844,6 +831,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = YY6CWUX533;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

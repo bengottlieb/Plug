@@ -29,7 +29,7 @@ public protocol BackgroundActivityHandlerProtocol {
 }
 
 public class Plug: NSObject, URLSessionDelegate {
-	public enum ConnectionType: Int { case offline, wifi, wan }
+	public enum ConnectionType: Int { case offline, wifi, cellular }
 	public enum Method: String, CustomStringConvertible, Codable { case GET = "GET", POST = "POST", DELETE = "DELETE", PUT = "PUT", PATCH = "PATCH", HEAD = "HEAD"
 		public var description: String { return self.rawValue } 
 	}
@@ -128,16 +128,14 @@ public class Plug: NSObject, URLSessionDelegate {
 	class public var plugDirectoryURL: URL { return self.libraryDirectoryURL.appendingPathComponent("Plug") }
 	
 	public override init() {
-		let reachabilityClassReference : AnyObject.Type = NSClassFromString("Plug_Reachability")!
-		let reachabilityClass : NSObject.Type = reachabilityClassReference as! NSObject.Type
-		self.reachability = reachabilityClass.init()
-
 		super.init()
-		self.reachability.setValue(self, forKey: "delegate");
 		self.rebuildSession()
 		
+        Reachability.instance?.start()
+        NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged), name: Reachability.reachabilityChanged, object: nil)
+        
 		#if os(iOS)
-		NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
 		#endif
 	}
 	
@@ -162,15 +160,27 @@ public class Plug: NSObject, URLSessionDelegate {
 	public func rebuildSession() {
 		self.session = URLSession(configuration: self.configuration, delegate: self, delegateQueue: self.sessionQueue)
 	}
+    
+    @objc func reachabilityChanged() {
+        let newState = Reachability.instance?.connection ?? .offline
+        
+        self.updateChannelStates()
+        //print("online via WAN: \(wan), wifi: \(wifi)")
+        if newState == Plug.connectionType { return }
+        
+        Plug.connectionType = newState
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: Plug.notifications.onlineStatusChanged, object: nil)
+        }
+    }
 	
-	private var reachability: AnyObject
 	@objc func setOnlineViaWifi(_ wifi: Bool, orWAN wan: Bool) {
 		var newState = ConnectionType.offline
 		
 		if wifi {
 			newState = .wifi
 		} else if wan {
-			newState = .wan
+			newState = .cellular
 		} else {
 			newState = .offline
 		}

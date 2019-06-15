@@ -6,6 +6,7 @@
 //  Copyright © 2018 Stand Alone, inc. All rights reserved.
 //
 
+#if canImport(UIKit)
 import UIKit
 
 
@@ -71,3 +72,5 @@ public class ConnectionLogViewController: UITableViewController {
 		self.viewConnection?(self.log.logged[indexPath.row])
 	}
 }
+
+#endif
