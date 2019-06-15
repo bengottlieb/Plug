@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import CrossPlatformKit
 
 
 extension Connection {

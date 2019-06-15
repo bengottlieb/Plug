@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import CrossPlatformKit
 
 #if os(iOS)
 	import UIKit
@@ -223,17 +222,6 @@ public extension Plug {
 		}
 		
 		return conn
-	}
-
-	@discardableResult class func requestImage(method: Method = .GET, url: URLLike, parameters: Plug.Parameters? = nil, persistence: Plug.Persistence = .transient, channel: Plug.Channel = Plug.Channel.defaultChannel, completion: @escaping (Connection, UXImage?, Error?) -> Void) -> Connection {
-		return self.request(method: method, url: url, parameters: parameters, persistence: persistence, channel: channel) { conn, data, error in
-			
-			if let image = data?.image {
-				completion(conn, image, nil)
-			} else {
-				completion(conn, nil, error)
-			}
-		}
 	}
 }
 

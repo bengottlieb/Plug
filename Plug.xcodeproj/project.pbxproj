@@ -28,12 +28,10 @@
 		B504E6A41A897017001B414B /* Plug.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B504E6461A8968DC001B414B /* Plug.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B504E6A51A897087001B414B /* Plug.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B504E6461A8968DC001B414B /* Plug.framework */; };
 		B507A3C91A8E85BC008E3DB1 /* PlugErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B507A3C81A8E85BC008E3DB1 /* PlugErrors.swift */; };
-		B51657471F0E3F0E00E2D0E0 /* CrossPlatformKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B519F8871C498B36002C5A61 /* json_sample_1.json in Resources */ = {isa = PBXBuildFile; fileRef = B5F5EF871C497E1500284AF8 /* json_sample_1.json */; };
 		B51AFC9E1CF0842A005BD586 /* JSONTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51AFC9D1CF0842A005BD586 /* JSONTests.swift */; };
 		B5264A871AE68AED0062537C /* PlugChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5264A851AE68AA30062537C /* PlugChannel.swift */; };
 		B55097A01A9A4FE7003E5155 /* PlugJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B550979F1A9A4FE7003E5155 /* PlugJSON.swift */; };
-		B557097A2250429C00042D8A /* CrossPlatformKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */; };
 		B5635F5720AE34A500BB250A /* PlugCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5635F5620AE34A500BB250A /* PlugCredentials.swift */; };
 		B5635F5A20AE669000BB250A /* HTTPCookie+Plug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5635F5920AE669000BB250A /* HTTPCookie+Plug.swift */; };
 		B568E10622B52D070006F03A /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568E10522B52D070006F03A /* Reachability.swift */; };
@@ -55,8 +53,6 @@
 		B58D64951A899094005A0002 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58D648F1A899094005A0002 /* ViewController.swift */; };
 		B58D64961A899285005A0002 /* Plug.h in Headers */ = {isa = PBXBuildFile; fileRef = B58D646B1A898F81005A0002 /* Plug.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B5AD59F51E9DC21A007B61BE /* PlugImageConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5AD59F41E9DC21A007B61BE /* PlugImageConnection.swift */; };
-		B5AD59FF1E9DC647007B61BE /* CrossPlatformKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */; };
-		B5AD5A011E9DC64C007B61BE /* CrossPlatformKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5AD5A001E9DC64C007B61BE /* CrossPlatformKit.framework */; };
 		B5B178EE1C9F8507007BFF63 /* DuplicateConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */; };
 		B5E1CB781FDB3D1100DFB83F /* CodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E1CB771FDB3D1100DFB83F /* CodableTests.swift */; };
 		B5F5EF881C497E1500284AF8 /* json_sample_1.json in Resources */ = {isa = PBXBuildFile; fileRef = B5F5EF871C497E1500284AF8 /* json_sample_1.json */; };
@@ -99,7 +95,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				B504E6A41A897017001B414B /* Plug.framework in Embed Frameworks */,
-				B51657471F0E3F0E00E2D0E0 /* CrossPlatformKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -129,6 +124,7 @@
 		B51AFC9D1CF0842A005BD586 /* JSONTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONTests.swift; sourceTree = "<group>"; };
 		B51E80EB1DB90E2400510096 /* Dates.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Dates.playground; sourceTree = "<group>"; };
 		B5264A851AE68AA30062537C /* PlugChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugChannel.swift; sourceTree = "<group>"; };
+		B54B228E22B557C700D44FD7 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		B550979F1A9A4FE7003E5155 /* PlugJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugJSON.swift; sourceTree = "<group>"; };
 		B5635F5620AE34A500BB250A /* PlugCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlugCredentials.swift; sourceTree = "<group>"; };
 		B5635F5920AE669000BB250A /* HTTPCookie+Plug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPCookie+Plug.swift"; sourceTree = "<group>"; };
@@ -154,8 +150,6 @@
 		B58D648E1A899094005A0002 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B58D648F1A899094005A0002 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B5AD59F41E9DC21A007B61BE /* PlugImageConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlugImageConnection.swift; sourceTree = "<group>"; };
-		B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CrossPlatformKit.framework; sourceTree = "<group>"; };
-		B5AD5A001E9DC64C007B61BE /* CrossPlatformKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CrossPlatformKit.framework; sourceTree = "<group>"; };
 		B5B178ED1C9F8507007BFF63 /* DuplicateConnections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuplicateConnections.swift; sourceTree = "<group>"; };
 		B5E1CB771FDB3D1100DFB83F /* CodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableTests.swift; sourceTree = "<group>"; };
 		B5F5EF871C497E1500284AF8 /* json_sample_1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = json_sample_1.json; path = TestHost/json_sample_1.json; sourceTree = "<group>"; };
@@ -179,7 +173,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5AD59FF1E9DC647007B61BE /* CrossPlatformKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,7 +181,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				B504E6A51A897087001B414B /* Plug.framework in Frameworks */,
-				B557097A2250429C00042D8A /* CrossPlatformKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,7 +188,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5AD5A011E9DC64C007B61BE /* CrossPlatformKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,6 +197,7 @@
 		B504E60A1A89230F001B414B = {
 			isa = PBXGroup;
 			children = (
+				B54B228E22B557C700D44FD7 /* Package.swift */,
 				B54B228C22B5560E00D44FD7 /* Source */,
 				B504E6991A896E82001B414B /* Plug Tests */,
 				B504E6141A89230F001B414B /* Products */,
@@ -285,22 +277,12 @@
 			path = Plug;
 			sourceTree = "<group>";
 		};
-		B586AF391EFABD3E00CA72CE /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				B5AD59F71E9DC538007B61BE /* iOS Frameworks */,
-				B5AD59F91E9DC538007B61BE /* Mac Frameworks */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		B586AF3A1EFABE0A00CA72CE /* Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
 				B504E66A1A896980001B414B /* BuildFramework.sh */,
 				B58D64661A898F81005A0002 /* Plug_Mac */,
 				B58D64691A898F81005A0002 /* Plug_iOS */,
-				B586AF391EFABD3E00CA72CE /* Frameworks */,
 			);
 			name = Infrastructure;
 			sourceTree = "<group>";
@@ -338,24 +320,6 @@
 				B58D648F1A899094005A0002 /* ViewController.swift */,
 			);
 			path = TestHost;
-			sourceTree = "<group>";
-		};
-		B5AD59F71E9DC538007B61BE /* iOS Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				B5AD59FE1E9DC647007B61BE /* CrossPlatformKit.framework */,
-			);
-			name = "iOS Frameworks";
-			path = "ExternalFrameworks/iOS Frameworks";
-			sourceTree = "<group>";
-		};
-		B5AD59F91E9DC538007B61BE /* Mac Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				B5AD5A001E9DC64C007B61BE /* CrossPlatformKit.framework */,
-			);
-			name = "Mac Frameworks";
-			path = "ExternalFrameworks/Mac Frameworks";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
