@@ -8,6 +8,14 @@
 
 import Foundation
 
+#if canImport(UIKit)
+    import UIKit
+#endif
+
+#if canImport(AppKit)
+    import AppKit
+#endif
+
 
 extension Connection {
 	public enum ImageConnectionError: Error { case noImageReturned }
