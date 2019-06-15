@@ -105,8 +105,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func testJSONDownload() {
 		let url = "http://jsonview.com/example.json"
 		
-		Connection(url: url)?.fetchJSON().then { json in
-			let string = json.toString() ?? "unable to convert"
+		Connection(url: url)?.fetchJSON { json in
+			let string = (try? json.get().toString()) ?? "unable to convert"
 			print("Converted: \(string)")
 			//let converted = JSONDictionary.fromString(string)
 		//	converted!.log()

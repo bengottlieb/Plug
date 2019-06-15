@@ -7,29 +7,25 @@
 //
 
 import Foundation
-import SwearKit
 
 
 extension Connection {
 	public enum JSONConnectionError: Error { case noJSONReturned }
 	
-	public func fetchJSON() -> Promise<JSONDictionary> {
-		let promise = Promise<JSONDictionary>()
-		
+    public func fetchJSON(completion: @escaping (Result<JSONDictionary, Error>) -> Void) {
 		self.completion { connection, data in
 			if let json = data.json {
-				promise.fulfill(json)
+                completion(.success(json))
 			} else {
-				promise.reject(JSONConnectionError.noJSONReturned)
+                completion(.failure(JSONConnectionError.noJSONReturned))
 			}
 		}
 		
 		self.error { connection, error in
-			promise.reject(error)
+            completion(.failure(error))
 		}
-		
-		self.start()
-		return promise
+        
+        self.start()
 	}
 	
 }

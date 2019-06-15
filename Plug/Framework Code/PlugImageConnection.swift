@@ -8,29 +8,25 @@
 
 import Foundation
 import CrossPlatformKit
-import SwearKit 
 
 
 extension Connection {
 	public enum ImageConnectionError: Error { case noImageReturned }
 
-	public func fetchImage() -> Promise<UXImage> {
-		let promise = Promise<UXImage>()
-		
+    public func fetchImage(completion: @escaping (Result<UIImage, Error>) -> Void) {
 		self.completion { connection, data in
 			if let image = data.image {
-				promise.fulfill(image)
+				completion(.success(image))
 			} else {
-				promise.reject(ImageConnectionError.noImageReturned)
+				completion(.failure(ImageConnectionError.noImageReturned))
 			}
 		}
 		
 		self.error { connection, error in
-			promise.reject(error)
+			completion(.failure(error))
 		}
 		
 		self.start()
-		return promise
 	}
 	
 }

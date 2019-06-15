@@ -1,4 +1,0 @@
-framework module SwearKit {
-    header "SwearKit-Swift.h"
-    requires objc
-}
