@@ -130,9 +130,10 @@ extension SCNetworkReachabilityFlags {
             }
         
             if self.contains(.connectionOnTraffic), !self.contains(.interventionRequired) { connection = .wifi }
-        
-            if self.contains(.isWWAN) { connection = .cellular }
-        
+		
+				#if os(iOS)
+						if self.contains(.isWWAN) { connection = .cellular }
+				#endif
             return connection
         #endif
     }
