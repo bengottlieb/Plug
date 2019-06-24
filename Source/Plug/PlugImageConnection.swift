@@ -10,12 +10,12 @@ import Foundation
 
 #if canImport(UIKit)
    import UIKit
-	typealias ImageType = UIImage
+	public typealias ImageType = UIImage
 #endif
 
 #if canImport(AppKit)
 	import AppKit
-	typealias ImageType = NSImage
+	public typealias ImageType = NSImage
 #endif
 
 
