@@ -6,6 +6,7 @@
 //  Copyright © 2017 Stand Alone, inc. All rights reserved.
 //
 
+#if canImport(UIKit)
 import UIKit
 
 extension Plug {
@@ -36,3 +37,4 @@ extension Plug {
     
 
 }
+#endif
