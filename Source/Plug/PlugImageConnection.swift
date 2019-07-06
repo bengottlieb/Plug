@@ -10,17 +10,19 @@ import Foundation
 
 #if canImport(UIKit)
     import UIKit
+	 public typealias UXImage = UIImage
 #endif
 
 #if canImport(AppKit)
     import AppKit
+	 public typealias UXImage = NSImage
 #endif
 
 
 extension Connection {
 	public enum ImageConnectionError: Error { case noImageReturned }
 
-    public func fetchImage(completion: @escaping (Result<UIImage, Error>) -> Void) {
+    public func fetchImage(completion: @escaping (Result<UXImage, Error>) -> Void) {
 		self.completion { connection, data in
 			if let image = data.image {
 				completion(.success(image))
