@@ -32,7 +32,7 @@ extension Encodable {
 	public var encodedJSONData: Data? {
 		let encoder = JSONEncoder()
 		
-		if #available(iOS 11.0, iOSApplicationExtension 11.0, OSXApplicationExtension 10.13, *) {
+		if #available(iOS 11.0, iOSApplicationExtension 11.0, OSX 10.13, OSXApplicationExtension 10.13, *) {
 			encoder.outputFormatting = [.sortedKeys]
 		} else {
 			encoder.outputFormatting = []
