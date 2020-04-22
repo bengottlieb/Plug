@@ -11,13 +11,12 @@ import Foundation
 #if canImport(UIKit)
    import UIKit
 	public typealias ImageType = UIImage
+#else
+	#if canImport(AppKit)
+		import AppKit
+		public typealias ImageType = NSImage
+	#endif
 #endif
-
-#if canImport(AppKit)
-	import AppKit
-	public typealias ImageType = NSImage
-#endif
-
 
 extension Connection {
 	public enum ImageConnectionError: Error { case noImageReturned }
